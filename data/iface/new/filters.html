@@ -1,0 +1,221 @@
+[-
+   $args = shift @param;
+
+   @filters = &EMU::get_filters();
+   @folders = @{ $args->{folders} };
+
+   $garbage_folder = $EMU::msg{"GARBAGE_Filter_Name"} || "GARBAGE";
+   push(@folders, $garbage_folder) if (!grep(/^$garbage_folder$/, @folders));
+
+   $realtime_filtering = $EMU::userdb{"options.do_realtime_filter"};
+   $theme = $args->{theme};
+
+-]
+<html>
+<head>
+  <link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+  <title>[+ $EMU::c{publisher_name} +] - Filter Manager</title>
+<script language="JavaScript">
+
+function setSelected(filterid) {
+   document.emuform.filterid.value = filterid;
+}
+
+//function setRealtimeFilter(val) {
+//   document.emuform.do_realtime_filter.value = (val?1:0);
+//   submitForm('toggle_realtime');
+//}
+
+var Filters = new Array();
+[+ foreach $safef (@folders){ $safef =~ s/'/\\'/g; $safef =~ s/\//\\\//g; $safef =~ s/\\/\\\\/g; } +]
+var Folders = new Array([+ join(',', map { "'$_'" } @folders) +]);
+var current;
+
+function Filter(filterid, name, key, operator, data, action, target, active) {
+   this.filterid = filterid;
+   this.name = name;
+   this.key = key;
+   this.operator = operator;
+   this.data = data;
+   this.action = action;
+   this.target = target;
+   this.active = active;
+   
+   return this;
+}
+
+function editFilter(filter) {
+   
+   if (!filter) {
+      filter = new Filter('','','','','','','','1');
+      filter.fresh = true;
+   }
+
+   current = filter;
+   
+   window.open('[+ $args->{HTMLURL} +]/filter_editor.html','filter_editor','scrollbars=yes,resizable=yes,width=400,height=225');
+}
+
+function getCurrent() {
+   return current;
+}
+
+function getFolders() {
+   return Folders;
+}
+
+function saveFilter(filter) {
+   document.emuform.filterid.value = filter.filterid;
+   document.emuform.name.value = filter.name;
+   document.emuform.key.value = filter.key;
+   document.emuform.operator.value = filter.operator;
+   document.emuform.data.value = filter.data;
+   document.emuform.action.value = filter.action;
+   document.emuform.target.value = filter.target;
+   document.emuform.active.value = filter.active;
+
+   submitForm('save');
+}   
+
+function submitForm(fn, val) {
+   if (val)
+      document.emuform.fillme.value = val;
+      
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+
+</script>
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='passed' value='process_filters'>
+          <input type='hidden' name='fillme' value='42'>
+          <input type='hidden' name='filterid' value=''>
+          <input type='hidden' name='active' value=''>
+          <input type='hidden' name='name' value=''>
+          <input type='hidden' name='key' value=''>
+          <input type='hidden' name='operator' value=''>
+          <input type='hidden' name='data' value=''>
+          <input type='hidden' name='action' value=''>
+          <input type='hidden' name='target' value=''>
+          
+          <input type='hidden' name='do_realtime_filter' value='[+ $realtime_filtering +]'>
+
+          <div id=folder-title> 
+            <div id=folder-name>Filter Manager</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              [$ if (@filters) $]
+              <input type="image" name='delete.x' value="Delete Selected" onclick="submitForm('delete');" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif">
+              [$ endif $]
+              <input type="image" value="Add Filter" onclick='editFilter(); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addFilterButton.gif">
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+
+            [$ if (@filters) $]
+            <table>
+              <tr> 
+                <th id=grid-header class="grid-header1 narrow"> </th>
+                <th id=grid-header>Filter Name</th>
+                <th id=grid-header>Filter Description</th>
+                <th id=grid-header class=narrow>Active</th>
+                <th colspan="2" id=grid-header>Sequence</th>
+              </tr>
+              [$ foreach $i (0..$#filters) $]
+              [- 
+                 $f = $filters[$i];
+                 $active = $f->{active}?'Yes!':'No!';
+                 $f->{name} ||= '[Untitled]';
+
+                 # This is a tad hard-codey
+                 if ($f->{target}) {
+                 $target = "to '$f->{target}'";
+                 }
+              -]
+              <script>
+              Filters[ [+ $i +] ] = new Filter('[+ $f->{filterid} +]','[+ $f->{name} +]','[+ $f->{key} +]','[+ $f->{operator} +]','[+ $f->{data} +]','[+ $f->{action} +]','[+ $f->{target} +]','[+ $f->{active} +]');
+              </script>
+              <tr>
+                <td id=grid-data1 class=centered><input name='selected' type="checkbox" value='[+ $f->{filterid} +]'></td>
+                <td id=grid-data><a href="#" onclick='editFilter(Filters[ [+ $i +] ]); return false;'>[+ $f->{name} +]</a></td>
+                <td id=grid-data>If [+ $f->{key} +] [+ $f->{operator} +] '[+ $f->{data} +]', then [+ $f->{action} +] [+ $target +]</td>
+                <td id=grid-data class=centered>[+ $active +]&nbsp;</td>
+                <td id=grid-data>
+                [$ if ($i != 0) $]
+                  <input type="submit" name="move_up.x" value='Up' onclick="setSelected('[+ $f->{filterid} +]')">
+                [$ else $]
+                  &nbsp;
+                [$ endif $]
+                 </td>
+                 <td id=grid-data>
+                 [$ if ($i != $#filters) $]
+                   <input type="submit" name="move_down.x" value='Down' onclick="setSelected('[+ $f->{filterid} +]')">
+                 [$ else $]
+                   &nbsp;
+                 [$ endif $]
+                 </td>
+               </tr>
+               [$ endforeach $]
+               [$ if (@filters) $]
+               <tr>
+                 <td colspan="6" align="center">Note that active filters are automatically 
+                 applied while downloading messages.</td>
+               </tr>
+               [$ endif $]
+            </table>
+            [$ else $]
+            <div class="mediumText red centered">You have no filters set.<br>&nbsp;</div>
+            <div class="mediumText blue centered"><br><a href="#" onclick='editFilter()'>Add Filter</a><br>&nbsp;</div>
+            [$ endif $]
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              [$ if (@filters) $]
+              <input type="image" name='delete.x' value="Delete Selected" onclick="submitForm('delete');" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif">
+              [$ endif $]
+              <input type="image" value="Add Filter" onclick='editFilter(); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addFilterButton.gif">
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>
+

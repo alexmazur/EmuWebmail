@@ -1,0 +1,91 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   @admins = split(/(,|\s)+/, $EMU::c{admins});
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Options</title>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Options</font></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu">
+  <td valign="top">
+  
+[# Open Menu #]   
+[- &Execute("$args->{DOCROOT}/menu.html", $args, \@folders) -]
+[# Close Menu #]
+
+[# Open Body #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+ <tr class="Body">
+  <td colspan="4"><center><font class="alert">[+ &EMU::get_status() +]</font></center>
+    <table width="100%" border="0" cellspacing="10" cellpadding="0">
+[$ if (grep { $_ eq $EMU::user_name } @admins) $]
+     <tr> 
+      <td colspan="2"><font class="DefaultText"><a href='[+ $EMU::EMU_URL +]?passed=editor' class="Default"><b>Administrator
+File Editor</b></a><br>Allows Administrators to review and modify their installation of Webmail.<br>&nbsp;</font></td>
+     </tr>
+[$ endif $]
+     <tr> 
+      <td colspan="2"><font class="DefaultText"><a href="[+ &EMU::make_url('options') +]" class="Default"><b>Account 
+       Info</b></a><br>Change your personal information and setup account preferences, such 
+       as your name, your signature, how many messages per page, and more.<br>&nbsp;</font></td>
+     </tr><tr> 
+      <td colspan="2"><font class="DefaultText"><a href="[+ &EMU::make_url('mailboxes') +]" class="Default"><b>Mailboxes</b></a><br>Setup one or more of your email accounts from other sites to be checked 
+       at the same time using [+ $EMU::c{publisher_name} +].<br>&nbsp;</font></td>
+     </tr><tr> 
+      <td colspan="2"><font class="DefaultText"><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=filters.html" class="Default"><b>Filters</b></a><br>Create rules for sorting and filtering your new email, such as sorting 
+       out email from specific people, automatically deleting email solicitations, 
+       and more.<br>&nbsp;</font></td>
+     </tr>
+    </table></td>
+  </tr>
+ </table>
+[# Close Body #]
+
+</td>
+ </tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>
+

@@ -1,0 +1,37 @@
+
+body.frame                      { margin: 0px; background-color: #FFFFFF; }
+body.Index                      { margin: 3px; background-color: #FFFFFF; }
+body.Content                    { margin: 12px; background-color: #FFFFFF; }
+
+iframe                          { border: 0px solid #FFFFFF; height: 100%; }
+
+tr.HeaderRow                    { background-color: #006699; height: 30px; }
+
+tr.FooterRow                    { background-color: #006699; height: 30px; }
+
+
+span,a                          { font-family: Verdana, san-serif; font-size: 11px; color: #000000; }
+span.Header                     { font-size: 13px; font-weight: bold; }
+span.Grayed			{ color: #4499BB; }
+
+a,a:visited                     { color: #006699; }
+a:hover,a:active                { color: #66AADD; }
+
+a.PageHeader                    { font-size: 13px; font-weight: bold; color: #FFFFFF; }
+.PageHeader:link,.PageHeader:visited            { font-size: 13px; font-weight: bold; color: #FFFFFF; }
+.PageHeader:hover                               { color: #66AADD; }
+
+span.IndexHeader                { font-size: 13px; font-weight: bold; }
+a.IndexTopic                    { font-size: 11px; font-weight: bold; }
+a.IndexItem                     { font-size: 11px; }
+
+a.anchor                        { font-size: 13px; font-weight: bold; color: #000000; }
+
+hr                              { color: #AAAAAA; height: 1px; }
+ul                              { list-style-image: url(img/icon_bullet.gif); }
+
+
+
+
+
+

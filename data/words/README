@@ -1,0 +1,9 @@
+This directory contains a sorted wordlist to be used in the spellchecker.
+
+words.txt is the default dictionary, however others can be added in the format:
+
+INTERFACENAME.txt
+
+This allows a Spanish interface to use a spanish language dictionary, for example.
+
+

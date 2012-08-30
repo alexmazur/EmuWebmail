@@ -1,0 +1,147 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+  <link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+  <title>[+ $EMU::c{publisher_name} +] - Search</title>
+<script language="JavaScript" src="./html/datepicker/popcalendar.js"></script>
+<script language=javascript>
+addHoliday(25,12,0,"Christmas Day");
+addHoliday(4,7,0,"Independence day");
+addHoliday(1,1,0,"New Year's Day");
+addHoliday(11,11,0,"Veterans Day");
+// http://www4.law.cornell.edu/uscode/5/6103.html
+</script>
+</head>
+
+<BODY onload="init();">
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='passed' value='select'>
+
+          <div id=folder-title> 
+            <div id=folder-name>Email Search</div>
+          </div>
+
+          <div id="action-buttons">&nbsp;</div>
+          
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+
+	        <table cellspacing=0 cellpadding=1 border=0 style="width: 85%!important;">
+	          <tr>
+	            <td> <!-- gripper -->
+		          <fieldset><!--  style="width:300;-->
+		            <legend align="bottom"><b>Search criteria</b></legend>
+		            <table cellspacing=0 cellpadding=0 border=0>
+		              <tr>
+		                <td valign=top>
+ 			              <table cellspacing=2 cellpadding=2 border=0>
+    		                <tr>
+    		                  <td><nobr>Look in:</nobr>&nbsp;</td>
+    		                  <td><select name="srch_folder_name"><!-- <option value=''>- All local folders - -->
+    			                <option value='[+ $EMU::inbox +]'>[+ $EMU::inbox +]
+    			                [$ foreach $folder (@{$args->{folders}}) $]
+    			                  <option value='[+ $folder +]'>[+ $folder +]
+    			                [$ endforeach $]
+    			                </select>
+    			              </td>
+    			            </tr>
+                    		<tr>
+    		                  <td>Date:</td>
+    		                  <td>
+    			                <nobr>
+    			                     from <input type="text" name="srch_start_date" size=10 maxlength=10 value="">&nbsp;<a href="#" onclick="popUpCalendar(this, emuform.srch_start_date, 'mm/dd/yyyy'); return false;"><img src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/" +]icons/34x34/calendar.gif" align="absmiddle" border="0" alt="Open Calendar"></a> 
+    			                     to <input type="text" name="srch_end_date" size=10 maxlength=10 value="">&nbsp;<a href="#" onclick="popUpCalendar(this, emuform.srch_end_date, 'mm/dd/yyyy'); return false;"><img src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/" +]icons/34x34/calendar.gif" align="absmiddle" border="0" alt="Open Calendar"></a>
+    			                </nobr>
+    		                  </td>
+    		                </tr>
+    		              </table>
+                        </td>
+		                <td width=15>&nbsp;</td>
+		                <td valign=top align="right">
+       		              <table cellspacing=2 cellpadding=2 border=0 style="width: 85%!important;">
+    		                <tr>
+    		                  <td>From:&nbsp;</td>
+    		                  <td><input type=text name="srch_criterion_from" value=""></td>
+    		                </tr>
+    		                <tr>
+    		                  <td>To:&nbsp;</td>
+    		                  <td><input type=text name="srch_criterion_to" value=""></td>
+    		                </tr>
+    		                <tr>
+    		                  <td>Subject:&nbsp;</td>
+    		                  <td><input type=text name="srch_criterion_subj"></td>
+    		                </tr>
+    		                <tr>
+    		                  <td>Body:&nbsp;</td>
+    		                  <td><input type=text name="srch_criterion_body" onFocus="CheckBodyCriterion('visible')" onBlur="CheckBodyCriterion('hidden')"></td>
+    		                </tr>
+                    		<script language="JavaScript">
+                    		function CheckBodyCriterion(visibility)
+                    		{
+                    			if (!document.emuform.srch_criterion_body.value)
+                    				document.getElementById('fullbodysearchwarn').style.visibility = visibility;
+                    		}
+                    		</script>
+    		                <tr>
+    		                  <td colspan=2>
+    		                    <div id="fullbodysearchwarn" name="fullbodysearchwarn" style="visibility: hidden;">
+    		                    <font color="red"><b>Warning!</b></font>
+    		                    A full body search requires <b>all messages</b> to be downloaded from your mail server 
+    		                    and may take a while to complete. Please be patient. 
+    		                    [$ if (&EMU::get_var('allowed') > 0) $]
+    		                    Also, please note this may <b>break your quota</b>.
+    		                    [$ endif $]
+    		                    </div>
+    		                  </td>
+    		                </tr>
+    		              </table>
+ 		                </td>
+ 		              </tr>
+		            </table>
+    	          </fieldset>
+	            </td>
+	          </tr>
+	          <tr>
+	            <td align="right">
+		           &nbsp;<input type="image" name="search.x" value="Start  Search" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/startSearchButton.gif">
+	            </td>
+	          </tr>
+	        </table> <!-- /gripper -->
+          </div>
+          <div id="action-buttons">&nbsp;</div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

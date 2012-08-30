@@ -1,0 +1,251 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   @folders = @{ $args->{folders} }; push(@folders, $EMU::msg{'V_FilterTrash'} || 'GARBAGE');
+   @skins = grep { $_ ne $EMU::c{default_skin} } split(/\s+/, $EMU::c{skins});
+   # Now add the default
+   unshift(@skins, $EMU::c{default_skin});
+   for $tzk (EMU::Time::Zones::tzkeys())
+   {
+   	push @gmtset, {'desc' => EMU::Time::Zones::tznames($tzk), 'abbr' => $tzk, 'tzabbr' => EMU::Time::Zones::tzabbr($tzk) || EMU::Time::Zones::tzcode($tzk), 'code' => EMU::Time::Zones::tzcode($tzk)};
+   }
+-]
+
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Account Information</title>
+<script language='Javascript'>
+
+function goIndex() {
+   window.location.href="[+ &EMU::make_url('go_index') +]";
+}
+
+function setSelected(item, val) {
+   document.emuform.elements[item].value = (val?1:0);
+}
+
+function setValue(item, val) {
+   document.emuform.elements[item].value = val;
+}
+
+</script>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='process_options'>
+<input type='hidden' name='do_realtime_filter' value='[+ &EMU::get_var('do_realtime_filter') +]'>
+<input type='hidden' name='full_header' value='[+ &EMU::get_var('full_header') +]'>
+<input type='hidden' name='no_html_images' value='[+ &EMU::get_var('no_html_images') +]'>
+<input type='hidden' name='quoted_reply' value='[+ &EMU::get_var('quoted_reply') +]'>
+<input type='hidden' name='use_trash_folder' value='[+ &EMU::get_var('use_trash_folder') +]'>
+<input type='hidden' name='filter_spam' value='[+ EMU::get_var('filter_spam') +]'>
+<input type='hidden' name='filter_spam_folder' value='[+ EMU::get_var('filter_spam_folder') +]'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+   
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Account&nbsp;Information</font></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu">
+  <td valign="top">
+   
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args, \@folders) -]
+[# Close Menu #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="3">
+ <tr class="BodyButtonBar">
+  <td align="center"><input type="submit" name="save.x" value="Save" class="DefaultButton">&nbsp;<input
+type="button" value="Cancel" onclick='goIndex()' class="DefaultButton"></td>
+ </tr>
+</table><table width="100%" border="0" cellspacing="1" cellpadding="3">
+ <tr class="Body"> 
+  <td colspan="4"><table width="100%" border="0" cellspacing="5" cellpadding="0">
+[$ if (&EMU::get_status()) $]
+    <tr class="GridData">  
+     <td align="center" colspan="2"><font class="Alert">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;</font></td>
+    </tr>
+[$ endif $]
+    <tr>
+     <td align="right" width="40%"><font class="DefaultText">Name:&nbsp;</font></td>
+     <td width="60%"><input type="text" name="yourname" value='[+ &EMU::get_var('real_name') +]' class="DefaultTextbox"></td>
+    </tr><tr> 
+     <td align="right"><font class="DefaultText">Organization:&nbsp;</font></td>
+     <td><input type="text" name="organization" value='[+ &EMU::get_var('organization') +]' class="DefaultTextbox"></td>
+    </tr><tr> 
+     <td align="right"><font class="DefaultText">Email:&nbsp;</font></td>
+     <td><input type="text" name="yourmail" value="[+ &EMU::get_var('email') +]" class="DefaultTextbox"></td>
+    </tr>
+    [$ if (@skins) $]
+    <tr> 
+     <td align="right"><font class="DefaultText">Webmail Skin:&nbsp;</font></td>
+     <td><select name="skin" class="DefaultSelect" style="width: 200px">
+         [$ foreach $skin (@skins) $]
+           [- ($text = $skin) =~ s/_/ /g -]
+           <option value='[+ $skin +]' [+ 'selected' if (&EMU::get_var('skin') eq $skin) +]>[+ $text +]</option>
+         [$ endforeach $]
+         </select></td>
+    </tr>
+    [$ endif $]
+    <tr> 
+     <td align="right"><font class="DefaultText">Time Zone:&nbsp;</font></td>
+     <td>
+     <select name="timezone" class="DefaultSelect"> <!-- style="width: 200px" -->
+     [- $currenttz = EMU::get_timezone() -]
+     [$ if ($EMU::c{timezone} && !$currenttz) $]
+     [- $currenttz = EMU::Time::Zones::tzabbr2key($EMU::c{timezone}) || 'GDST' -]
+     [$ endif $]
+     [$ foreach $tz (@gmtset) $]
+        [- $isselected = '' -]
+     	[- $isselected = ' selected' if ( 
+     									lc($tz->{abbr}) eq lc($currenttz) || 
+     									( $currenttz && length($currenttz) < 4 && lc($tz->{tzabbr}) eq lc($currenttz) )
+     									) 
+     	-]
+     <option value="[+ $tz->{abbr} +]"[+ $isselected +]> ([+ $tz->{tzabbr} +]) [+ $tz->{desc} +]</option>
+     [$ endforeach $]
+     </select>
+     </td>
+    </tr><tr> 
+     <td align="right"><font class="DefaultText">Messages per Page:&nbsp;</font></td>
+     <td><input type="text" name="max_messages" size="5" value='[+ &EMU::get_var('max_messages') +]' class="DefaultTextbox"></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">Seconds between mail checks:&nbsp;</font></td>
+     <td><input type="text" name="checkmail" size="5" value='[+ &EMU::get_var('checkmail') +]' class="DefaultTextbox"></td>
+    </tr>
+    <tr>
+     <td align="right"><font class="DefaultText">Primary Mailhost Protocol:&nbsp;</font></td>
+     <td><select name="protocol" class="DefaultSelect"><option value='pop3' [+ 'selected' if (&EMU::get_var('protocol') eq 'pop3') +]>POP3</option><option value='imap' [+ 'selected' if (&EMU::get_var('protocol') eq 'imap') +]>IMAP</option></select>&nbsp;&nbsp;&nbsp;&nbsp;<font class="DefaultText"><input type=checkbox name="dont_try_other_protocols" [+ 'checked' if (&EMU::get_var('dont_try_other_protocols') == 1) +] value=1> Use this protocol <b>only</b></font></td>
+    </tr><tr> 
+     <td align="right"><font class="DefaultText">IMAP Prefix:&nbsp;</font></td>
+     <td><input type="text" name="prefix" value='[+ $EMU::userdb{'options.prefix'} +]' class="DefaultTextbox"></td>
+    </tr><tr> 
+     <td align="right"><font class="DefaultText">Sent Mail Folder Name:&nbsp;</font></td>
+     <td><input type="text" name="sentfolder" value='[+ &EMU::get_var('sentfolder') +]' class="DefaultTextbox"></td>
+    </tr><tr> 
+     <td align="right"><input type="checkbox" name="mailcheck_popup" value='1' [+ 'checked' if &EMU::get_var('mailcheck_popup') +]></td>
+     <td><font class="DefaultText">Notify me with a Popup when I have new email</font></td>
+    </tr><!--<tr>
+     <td align="right"><input type="checkbox" name="show_folder_stats" value='1' [+ 'checked' if &EMU::get_var('show_folder_stats') +]></td>
+     <td><font class="DefaultText">Show folder statistics in menu pane</font></td>
+    </tr>--><tr>
+     <td align="right"><input type="checkbox" name="synchronize" value='1' [+ 'checked' if &EMU::get_var('synchronize') +]></td>
+     <td><font class="DefaultText">Don't synchronize with POP server</font></td>
+    </tr><tr> 
+     <td align="right"><input type="checkbox" name="autoload" value="1" [+ 'checked' if &EMU::get_var('autoload') +]></td>
+     <td><font class="DefaultText">When reading email, automatically display attachments</font></td>
+    </tr><tr> 
+     <td align="right"><input type="checkbox" onclick="setSelected('full_header', this.checked)" [+ 'checked' if &EMU::get_var('full_header') +]></td>
+     <td><font class="DefaultText">When reading email, display full message headers</font></td>
+    </tr><tr> 
+     <td align="right"><input type="checkbox" onclick="setSelected('no_html_images', this.checked)" [+ 'checked' if &EMU::get_var('no_html_images') +]></td>
+     <td><font class="DefaultText">Do not load images in HTML email messages</font></td>
+    </tr><tr> 
+     <td align="right"><input type="checkbox" onclick="setSelected('quoted_reply', this.checked)" [+ 'checked' if &EMU::get_var('quoted_reply') +]></td>
+     <td><font class="DefaultText">When replying to email, always quote the original message</font></td>
+    </tr>
+    <tr>
+     <td align="right" valign="top"><input type="checkbox" onclick="setSelected('do_realtime_filter', this.checked)" [+ 'checked' if &EMU::get_var('do_realtime_filter') +]></td>
+     <td><font class="DefaultText">When downloading new email, automatically apply filters</font></td>
+    </tr>
+    <tr>
+     [- $disabled_s_f = ''; $disabled_s_f = ' disabled title="' . $EMU::c{'publisher_name'} . ' admin didn\'t enable spam filtering"' if (!$EMU::c{'spam_determinative_header'}); -]
+     <td align="right" valign="top"><input type="checkbox" name="filter_spam_checkbox" onclick="setSelected('filter_spam', this.checked); setValue('filter_spam_folder', document.forms['emuform'].filter_to_folder.value)"[+ ' checked' if (EMU::get_var('filter_spam')) +][+ $disabled_s_f +]></td>
+     <td>
+     <font class="DefaultText">Filter spam to folder 
+     <script language=JavaScript>
+     function folderSpamSelect(source)
+     {
+   		if (source.selectedIndex != 0)
+   		{
+   			// The second item in the list is delimiter
+   			setValue('filter_spam_folder', source[source.selectedIndex].value);
+   			setSelected('filter_spam', 1); document.forms['emuform'].filter_spam_checkbox.checked = true;
+   		} else
+   		{
+   			setValue('filter_spam_folder', '');
+   			setSelected('filter_spam', 0); document.forms['emuform'].filter_spam_checkbox.checked = false;
+   		}
+	 }
+	 </script>
+     <select name="filter_to_folder" onchange="folderSpamSelect(this)" class="DefaultSelect"[+ $disabled_s_f +]>
+	 <option value=''>----
+	 [$ foreach $f (@folders) $]
+ 	 [- ($fesc = $f) =~ s/'/\\'/g; -]
+  	 <option value='[+ $fesc +]'[+ ' selected' if ( EMU::get_var('filter_spam_folder') eq $f ) +]>[+ $f +]
+ 	 [$ endforeach $]
+     </select>
+     when downloading new email</font>
+     </td>
+    </tr>
+    <tr>
+     <td align="right" valign="top"><input type="checkbox" onclick="setSelected('use_trash_folder', this.checked)" [+ 'checked' if &EMU::get_var('use_trash_folder') +]></td>
+     <td><font class="DefaultText">Send deleted messages to "[+ &EMU::get_var('TRASH_Fold_Name') +]" folder</font></td>
+    </tr>
+
+[# This is not implemented in the backend (yet)
+
+    <tr>
+     <td align="right" valign="top"><input type="checkbox"></td>
+     <td><font class="DefaultText">Automatically sort Saved messages into seperate monthly folders every month.</font></td>
+    </tr>
+
+#]
+
+    <tr><br></tr>
+    <tr> 
+     <td align="right"><font class="DefaultText">Email Signature:&nbsp;</font></td>
+     <td><textarea name="signature" cols="35" rows="4">[+ &EMU::get_var('signature') +]</textarea></td>
+    </tr><tr> 
+     <td align="center" colspan="2">&nbsp;<br><input type="submit" name='reset.x' value="Restore Default Settings" class="DefaultButton"><br>&nbsp;</td>
+    </tr>
+   </table></td>
+ </tr>
+</table><table width="100%" border="0" cellspacing="0" cellpadding="3">
+ <tr class="BodyButtonBar">
+  <td align="center"><input type="submit" name="save.x" value="Save" class="DefaultButton">&nbsp;<input type="button" value="Cancel" onclick='goIndex()' class="DefaultButton"></td>
+ </tr>
+</table>
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="2" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>
+

@@ -1,0 +1,28 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Error</title>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="20">
+ <tr class="Body"> 
+  <td align="center"><font class="Alert">[+ &EMU::get_var('phrase') +]<br>&nbsp;<br><a href="[+ $EMU::EMU_URL +]" class="Default">Click here to Login again</a></font></td>
+ </tr>
+</table>
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN"
+     "http://www.wapforum.org/DTD/wml_1.1.xml">
+
+
+<wml>
+
+
+<card id="message_index_main">
+
+<do type="options" label="MENU">
+    <go href="#message_index_menu"/>
+</do>
+
+({if ($total_msgs) })
+
+<do type="accept" label="VIEW">
+    <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="msg"/>
+      <postfield name="folder" value="$folder"/>
+      <postfield name="variable" value="$(choice)"/>
+      <postfield name="ch" value="1"/>
+    </go>
+</do>
+
+({endif})
+
+
+({if ($total_msgs == 0) })
+
+<do type="accept" label="BACK">
+  <prev/>
+</do>
+
+({endif})
+
+
+
+
+<p> 
+$folder: 
+
+({ get_status() }) $m
+</p>
+
+({ (<p mode="nowrap">) if ($total_msgs) })
+({ (<p>) if ($total_msgs == 0) })
+
+
+({ if ($total_msgs) })
+
+  <select name="choice" ivalue="1">
+
+     ({ for msg in @messages })
+
+        <option value="$messages[hash$msg]">
+ <!--onpick="$messages[href$msg]&amp;ch=1"-->
+           $messages[subject$msg]  ($messages[from$msg])
+        </option>   
+
+     ({ done })
+
+     ({ if ($moremsgs) })
+
+        <option title="MORE">
+
+     	   <onevent type="onpick">
+     		<go href="$url?$cache_bust" method="post">
+         	<postfield name="folder" value="$folder"/>
+       	        <postfield name="passed" value="select"/>
+         	<postfield name="position" value="$next_page"/>
+         	<postfield name="index_jump.x" value="1"/>
+        	</go>
+      	   </onevent>
+	 MORE 
+	</option>
+
+      ({endif})
+({endif})       
+
+    ({ if ($prev_page) })
+        <option title="BACK">
+           <onevent type="onpick">
+                <go href="$url?$cache_bust" method="post">
+                <postfield name="folder" value="$folder"/>
+                <postfield name="passed" value="select"/>
+                <postfield name="position" value="$prev_page"/>
+                <postfield name="index_jump.x" value="1"/>
+                </go>
+           </onevent>
+         BACK
+        </option>
+
+    ({endif})
+
+
+({ if ($total_msgs)})
+</select>
+({endif})
+
+({if ($total_msgs == 0) })
+No messages.
+({endif})
+
+</p>
+
+</card>
+
+
+<card id="message_index_menu">
+
+<p>
+
+ <select ivalue="1">
+
+ <!--option title="VIEW">
+   <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="msg"/>
+      <postfield name="folder" value="$folder"/>
+      <postfield name="variable" value="$(choice)"/>
+      <postfield name="ch" value="1"/>
+     </go>
+    </onevent>
+    VIEW
+ </option-->
+
+({ if ($total_msgs)})
+
+ <option title="REPLY">
+   <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="multi"/>
+      <postfield name="reply.x" value="1"/>
+      <postfield name="variable" value="$(choice)"/>
+         <setvar name="mymessg" value=""/>
+         <setvar name="myto" value=""/>
+         <setvar name="mysubj" value=""/>
+     </go>
+    </onevent>
+    REPLY
+ </option>
+
+ <option title="SAVE">
+   <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="multi"/>
+      <postfield name="addto.x" value="1"/>
+      <postfield name="variable" value="$(choice)"/>
+      <postfield name="add2folder" value="SAVED"/>
+     </go>
+    </onevent>
+    SAVE
+ </option>
+
+ <option title="DELETE">
+   <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="multi"/>
+      <postfield name="delete.x" value="1"/>
+      <postfield name="variable" value="$(choice)"/>
+     </go>
+    </onevent>
+    DELETE
+ </option>
+
+({endif})
+
+ <option title="WRITE">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+          <postfield name="folder" value="$folder"/>
+          <postfield name="passed" value="compose"/>
+          <setvar name="mymessg" value=""/>
+          <setvar name="myto" value=""/>
+          <setvar name="mysubj" value=""/>
+         </go>
+       </onevent>
+     WRITE
+ </option>
+
+ <option title="INDEX">
+  <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+         <postfield name="folder" value="$folder"/>
+         <postfield name="passed" value="select"/>
+         <postfield name="position" value="1"/>
+         <postfield name="index_jump.x" value="1"/>
+     </go>
+    </onevent>
+    INDEX
+ </option>
+
+
+ <option title="FOLDERS">
+     <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+          <postfield name="folder" value="$folder"/>
+          <postfield name="passed" value="folders"/>
+         </go>
+       </onevent>
+     FOLDERS
+ </option>
+
+ <option title="OPTIONS">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+          <postfield name="folder" value="$folder"/>
+          <postfield name="passed" value="options"/>
+         </go>
+       </onevent>
+     OPTIONS
+ </option>
+
+ <option title="QUIT">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+         <postfield name="folder" value="$folder"/>
+         <postfield name="passed" value="logout"/>
+        </go>
+       </onevent>
+     QUIT
+ </option>
+
+ </select>
+
+</p>
+
+</card>
+
+</wml>
+
+

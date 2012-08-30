@@ -1,0 +1,155 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   
+   $file = &EMU::get_var('file');
+   $type = &EMU::get_var('filetype');
+   $content = &EMU::get_var('content');
+   $message = &EMU::get_var('message');
+   
+   @conf_files = @{ &EMU::get_var('config_files') };
+   @tmpl_files = @{ &EMU::get_var('tmpl_files') };
+   @html_files = @{ &EMU::get_var('html_files') };
+-]
+<html>
+<head>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<title>[+ $EMU::c{publisher_name} +] - Administrator File Editor</title>
+<script>
+
+function OpenFile(select, type) {
+   var file = select.options[select.selectedIndex].text;
+   document.emuform.file.value = file;
+   document.emuform.filetype.value = type;
+
+   document.emuform.submit();
+}
+function submitForm(fn) {
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+</script>
+
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='passed' value='editor'>
+          <input type='hidden' name='file' value='[+ $file +]'>
+          <input type='hidden' name='filetype' value='[+ $type +]'>
+          <input type='hidden' name='fillme' value='42'>
+
+          <div id=folder-title> 
+            <div id=folder-name>Administrator File Editor</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              <input type='image' name='save.x' value='Save' onclick="submitForm('save')" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/admSaveButton.gif">
+              <input type='image' value='Reset' onclick="this.form.reset()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/resetButton.gif">
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            <div class="mediumText selected">Important Note: This tool allows the modification of
+Webmail configuration files, html, stylesheets, and more. When you save your modifications, the changes to your
+installation of Webmail are immediate. Please use this tool carefully! For the specifics on modifying
+your files, review any documentation bundled with this product or check for an updated product manual at
+ <a href="http://www.emumail.com/support/" target="_blank" class="blue">http://www.emumail/support/</a><br>&nbsp;
+            </div>
+            [$ if ($message) $]
+            <div class="mediumText red centered"><br>[+ $message +]<br>&nbsp;</div>
+            [$ endif $]
+
+            <table width="100%" border="0" cellspacing="1" cellpadding="3">
+              <tr>
+                <td align="right">Config Files:</td>
+                <td><select name='config_file' style="width: 300px">
+                  <option value=''>-- Select File --</option>
+                  [$ foreach $f (@conf_files) $]
+                    <option>[+ $f +]</option>
+                  [$ endforeach $]
+                  </select> 
+                  <input type='image' value='Open' onClick="OpenFile(this.form.config_file, 'config')" style="margin-bottom: -4px;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/openButton.gif">
+                </td>
+              </tr>
+              <tr>
+                <td align="right">Template Files:</td>
+                <td><select name='tmpl_file' style="width: 300px">
+                  <option value=''>-- Select File --</option>
+                  [$ foreach $f (@tmpl_files) $]
+                  <option>[+ $f +]</option>
+                  [$ endforeach $]
+                  </select> 
+                  <input type='image' value='Open' onClick="OpenFile(this.form.tmpl_file, 'tmpl')" style="margin-bottom: -4px;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/openButton.gif">
+                </td>
+              </tr>
+              <tr>
+                <td align="right">HTML Files:</td>
+                <td><select name='html_file' style="width: 300px">
+                  <option value=''>-- Select File --</option>
+                  [$ foreach $f (@html_files) $]
+                  <option>[+ $f +]</option>
+                  [$ endforeach $]
+                  </select> 
+                  <input type='image' value='Open' onClick="OpenFile(this.form.html_file, 'html')" style="margin-bottom: -4px;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/openButton.gif">
+                </td>
+              </tr>
+              <tr>
+               <td colspan="2">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right">Editing:</td>
+                <td><b>[+ $file || '[None]' +]</b></td>
+              </tr>
+              <tr>
+                <td align="center" colspan="2">
+                  <textarea name="content" cols="70" style="width: 550px" rows="30" wrap="virtual">[+
+CGI::escapeHTML($content) +]</textarea></td>
+              </tr>
+              <tr>
+                <td colspan="2"></td>
+              </tr>
+            </table>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              <input type='image' name='save.x' value='Save' onclick="submitForm('save')" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/admSaveButton.gif">
+              <input type='image' value='Reset' onclick="this.form.reset()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/resetButton.gif">
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>
+            
+            

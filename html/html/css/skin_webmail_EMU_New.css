@@ -1,0 +1,646 @@
+/* CSS Document */
+body {
+	PADDING-RIGHT: 0px; 
+	PADDING-LEFT: 0px; 
+	PADDING-BOTTOM: 0px; 
+	PADDING-TOP: 0px;
+
+	margin-top: 3px; 
+	margin-left: 10px; 
+	margin-right: 10px; 
+	margin-bottom: 10px; 
+
+	background: #FFFFFF;
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+.login-body {
+	PADDING-RIGHT: 0px; 
+	PADDING-LEFT: 0px; 
+	PADDING-BOTTOM: 0px; 
+	PADDING-TOP: 0px;
+
+	margin-top: 25px; 
+	margin-left: 10px; 
+	margin-right: 10px; 
+	margin-bottom: 10px; 
+
+	text-align: center;
+
+	background: #FFFFFF;
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+form {
+	margin: 0px;
+}
+a {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+/* a img {
+	border: 0;
+} */
+.selected {
+	font-weight: bold;
+}
+.centered {
+	text-align: center;
+}
+.narrow {
+	width: 5%;
+}
+.left {
+	text-align: left;
+}
+.right {
+	text-align: right;
+}
+.red {
+	color: #CC0000;
+}
+.smallText {
+	font-size: 100%;
+}
+.mediumText {
+	font-size: 120%;
+}
+pre {
+	font-size: 130%;
+}
+.blue {
+	color: #0066CC!important;
+}
+.blue a {
+	color: #0066CC!important;
+}
+/* --- Header --- */
+#header {
+	position: relative;
+	height: 53px;
+	width: 100%;
+	min-width: 760px;
+}
+#header-inner-wrap {
+	display: block;
+}
+/* method 1 a bodge for IE5.5 and IE6 browsers */
+* html #header{border-right: 760px solid #fff;}
+* html #header-inner-wrap {display:inline-block; position:relative; margin-right:-760px;}
+#login-header {
+	position: relative;
+	height: 53px;
+	min-width: 500px;
+	text-align: left;
+	margin: auto;
+	width:expression(document.body.clientWidth < 800? "500px": "60%" );
+	width: 60%;
+}
+#login-header-inner-wrap {
+	display: block;
+}
+/* method 1 a bodge for IE5.5 and IE6 browsers */
+/*
+* html #login-header{border-right: 500px solid #fff;}
+* html #login-header-inner-wrap {display:inline-block; position:relative; margin-right:-500px;}
+*/
+#welcome {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	overflow: hidden;
+}
+#welcome .name {
+	color: #0099FF;
+	font-weight: bold;
+}
+#welcome .email {
+	color: #0066CC;
+	font-weight: bold;
+}
+#emu-logo {
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+/* --- Main ---*/
+#box-wrap {
+	position: relative; 
+	min-width: 760px;
+	width:expression(document.body.clientWidth < 800? "760px": "100%" );
+	width: 100%;
+}
+#box-inner-wrap {
+	display: block;
+	z-index: 0;
+
+	border-left: 11px solid #B6E4FF; 
+	border-right: 1px solid #6BBFFF; 
+}
+/* method 1 a bodge for IE5.5 and IE6 browsers */
+/*
+* html #box-wrap {border-right:760px solid #fff;}
+* html #box-inner-wrap {display:inline-block; position: relative; margin-right:-760px;}
+*/
+/* --- Login ---*/
+#login-box-wrap {
+	position: relative; 
+	text-align: left;
+	margin: auto;  
+	min-width: 500px;
+	width:expression(document.body.clientWidth < 800? "500px": "60%" );
+	width: 60%; 
+}
+#login-box-inner-wrap {
+	display: block;
+	z-index: 0;
+
+	border-left: 11px solid #B6E4FF; 
+	border-right: 1px solid #B6E4FF; 
+	border-top: 1px solid #B6E4FF; 
+	border-bottom: 1px solid #B6E4FF; 
+}
+/* method 1 a bodge for IE5.5 and IE6 browsers */
+/*
+* html #login-box-wrap {border-right: 500px solid #fff;}
+* html #login-box-inner-wrap {display: inline-block; position: relative; margin-right: -500px;}
+*/
+/* ---- Toolbar ----- */
+#top-corner{
+	position: absolute;
+	left: 0px;
+	height: 11px;
+	width: 21px;
+	z-index: 3;
+
+	background: url(../../emuimages/skins/EMU_New/toolbar_lcorner.gif) no-repeat right top;
+}
+#toolbar {
+	position: relative;
+	margin: 0px;
+	height: 95px;
+	overflow: hidden;
+
+	padding: 0px;
+	background: url(../../emuimages/skins/EMU_New/toolbar_fill.jpg) repeat-x;
+}
+#toolbar-content {
+	padding-top: 6px; 
+	padding-left: 50px; 
+	height: 89px;
+	overflow: hidden;
+}
+#toolbar-content table {
+	width: 90%;
+	cell-spacing: 2;
+	padding: 0px;
+	text-align: center;
+	
+}
+#toolbar-content td {
+	font-size: 11px;
+	line-height: 1.35em;
+	width: 15%;
+}
+#toolbar-content img {
+	width: 52px;
+	height: 52px;
+}
+#toolbar-content a {
+	color: #000000;
+}
+#colwrapper {
+	position: relative;
+	WIDTH: 100%; 
+
+	PADDING-RIGHT: 0px; 
+	PADDING-LEFT: 0px; 
+	PADDING-BOTTOM: 0px; 
+	MARGIN: 0px; 
+	PADDING-TOP: 0px; 
+	background: url(../../emuimages/skins/EMU_New/menu_bottom.jpg) no-repeat left bottom;
+}
+#navcol-fill {
+	position: absolute;
+	width: 150px;
+	height: 125px;
+	margin-bottom: 0px;
+	bottom: 0px;
+	left: 0px;
+	z-index: 0;
+	
+	background: url(../../emuimages/skins/EMU_New/menu_bottom_fill.jpg) repeat-x bottom;
+}
+#navcol {
+	FLOAT: left; 
+	WIDTH: 150px;
+
+	PADDING: 0px; 
+	background: url(../../emuimages/skins/EMU_New/menu_top_fill.jpg) repeat-x top;
+}
+#login-navcol {
+	FLOAT: left; 
+	WIDTH: 200px;
+
+	PADDING: 0px; 
+	background: url(../../emuimages/skins/EMU_New/menu_top_fill.jpg) repeat-x top;
+}
+#login-navcol-fill {
+	position: absolute;
+	width: 200px;
+	height: 115px;
+	margin-bottom: 0px;
+	bottom: 0px;
+	left: 0px;
+	z-index: 0;
+	
+	background: url(../../emuimages/skins/EMU_New/menu_bottom_fill.jpg) repeat-x bottom;
+}
+#side-content {
+	position: relative;
+	width: 100%;
+	padding-top: 0px;
+	padding-left: 4px;
+	padding-right: 2px;
+	z-index: 1;
+}
+#side-button {
+	position: relative;
+	width: 100%;
+	padding-bottom: 6px;
+	padding-top: 6px;
+	padding-left: 2px;
+}
+#side-button a {
+	color: #0793FF;
+}
+#side-button-divider {
+	position: relative;
+	width: 140;
+	height: 1px;
+	overflow: hidden;
+	margin-top: 4px;
+	margin-bottom: 6px;
+
+	background: #B7E5FF; 
+}
+/* --- Folders Tree ---*/
+#folders-tree {
+	padding-top: 8px;
+	padding-bottom: 16px;
+	padding-left: 2px;
+}
+#folders-tree table {
+	width: 96%;
+	cell-spacing: 0px;
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+#folders-tree .selected {
+	color: #0793FF;
+/*	font-weight: bold; */
+}
+#tree-root  a{
+	color: #55AFE4;
+	padding-left: 0px;
+}
+.tree-branch {
+	border-bottom: 1px solid #95D2F6; 
+	border-left: 1px solid #95D2F6;
+	font-size: 10px;
+}
+#branch-name {
+	position: relative;
+/*	bottom: -1em; 
+	padding-bottom: 2px;
+	line-height: 1.35em;
+*/
+	z-index: 2;
+	color: #55AFE4;
+	font-size: 0.7em;
+}
+#branch-name a{
+	padding-left: 4px;
+	color: #55AFE4;
+}
+/* --- Main Content --- */
+#main {
+	position: relative;
+	background: #FFFFFF;
+
+	PADDING-RIGHT: 1px; 
+	PADDING-LEFT: 2px; 
+	PADDING-BOTTOM: 10px; 
+	MARGIN-LEFT: 150px; 
+	MARGIN-RIGHT: 0px; 
+	PADDING-TOP: 5px;
+}
+#login-main {
+	position: relative;
+	background: #FFFFFF;
+
+	PADDING-RIGHT: 1px; 
+	PADDING-LEFT: 2px; 
+	PADDING-BOTTOM: 10px; 
+	PADDING-TOP: 45px;
+	MARGIN-LEFT: 200px; 
+	MARGIN-RIGHT: 0px; 
+}
+#login-main td {
+	font-size: 11px;
+	line-height: 1.35em;
+}
+#login-main input {
+	font-size: 11px;
+	line-height: 1.35em;
+	width: 140px;
+}
+#login-main img {
+	width: 140px;
+	height: 22px;
+}
+#login-main a {
+	color: #000000;
+}
+#folder-title {
+	height: 20px;
+	overflow: hidden;
+}
+#folder-name {
+	height: 20px;
+	float: left;
+}
+#folder-option {
+	position: relative;
+	height: 20px;
+	float:  right;
+}
+#folder-option a {
+	color: #000000;
+}
+#folder-option select {
+	border: #0099FF 1px solid;
+	font-size: 11px;
+	line-height:1.25em;
+	margin-bottom: -2px;
+}
+#action-buttons {
+	height: 31px;
+	background: #F3F3F3;
+}
+#action-buttons select {
+	border: #0099FF 1px solid;
+	font-size: 11px;
+	line-height:1.35em;
+}
+#action-buttons table {
+	width: 100%;
+	border: 0;
+	cell-spacing: 2px;
+	padding: 2px;	
+}
+#action-buttons a:hover {
+	background: inherit;
+}
+#action-buttons-wrap {
+	padding-left: 1px;
+	padding-right: 1px;
+	padding-top: 5px;
+}
+#action-buttons-wrap input {
+	margin-left: 2px;
+}
+#folder-content {
+	position: relative;
+	width: 100%;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+#folder-content table {
+	width: 100%;
+	border: 0px;
+	cell-spacing: 0px;
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+#folder-content  th {
+	font-size: 11px;
+	line-height: 1.35em;
+	white-space: nowrap;
+}
+#folder-content  td {
+	font-size: 11px;
+	line-height: 1.35em;
+}
+#folder-content a {
+	color: #000000;
+}
+#grid-header {
+	background: url(../../emuimages/skins/EMU_New/table_header.jpg) #0793FF repeat-x bottom;
+	border-left: 1px solid #FFFFFF;
+	border-top: 1px solid #0793FF; 
+	color: #FFFFFF;
+	padding-bottom: 4px;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+#grid-header.grid-header1 {
+	border-left: 1px solid #0793FF;
+}
+#grid-header a, a:visited{
+	color: #FFFFFF;
+}
+#grid-header a:hover {
+	background: #0793FF; 
+}
+#grid-header-msg {
+	background: #52B4FF;
+	border-top: 1px solid #0793FF; 
+	color: #FFFFFF;
+	padding-bottom: 4px;
+	padding-left: 2px;
+	padding-right: 2px;
+	text-align: right;
+}
+#grid-data {
+	border-bottom: 1px solid #6BBFFF;
+	border-left: 1px solid #6BBFFF; 
+	padding-left: 3px;
+	padding-right: 2px;
+/*
+	padding-bottom: 1px;
+	padding-top: 1px;
+*/
+}
+#grid-data1 {
+	border-bottom: 1px solid #6BBFFF;
+	border-left: 1px solid #6BBFFF; 
+}
+#grid-data a{
+	color: #000000;
+}
+#contact-grid {
+	padding-top: 2px;
+	padding-bottom: 3px;
+}
+/* --- Footer --- */
+#foot {
+	CLEAR: both; 
+	position: relative;
+	height: 30px;
+	margin-top: -1px;
+	overflow: hidden;
+
+	TEXT-ALIGN: center;
+	background: url(../../emuimages/skins/EMU_New/footer_fill.jpg) repeat-x;  
+}
+#copyright{
+	position: relative;
+	top: 7px;
+	
+	color: #999999;
+}
+#footer-corner{
+	position: relative;
+	left: 0px;
+	margin-bottom: 0px; 
+	bottom: 10px;
+	height: 20px;
+	width: 21px;
+
+	background: url(../../emuimages/skins/EMU_New/footer_corner.gif) no-repeat left top; 
+}
+#login-footer-corner{
+	position: absolute;
+	margin-bottom: 0px; 
+	bottom: -10px;
+	height: 20px;
+	width: 21px;
+
+	background: url(../../emuimages/skins/EMU_New/footer_corner.gif) no-repeat left top; 
+}
+.clear {
+	CLEAR: both; 
+	PADDING-RIGHT: 0px; 
+	DISPLAY: block; 
+	PADDING-LEFT: 0px; 
+	PADDING-BOTTOM: 0px; 
+	MARGIN: 0px; 
+	OVERFLOW: hidden; 
+	PADDING-TOP: 0px; 
+	HEIGHT: 1px;
+}
+#attachments_widget {
+	display: none; 
+	border: 1px solid #999999;
+	marginWidth: 0;
+	marginHeight: 0;
+	margin-top: 4px;
+}
+.attachments_body {
+
+	background: #FFFFFF;
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+.attachments_body table tr td {
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+.attachments_body th {
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+.Popup {
+	margin: 10px;
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+.DefaultText {
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+.GridHeader {
+	font-weight: bold;
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.9em;
+	line-height:1.35em;
+}
+.GridHeader tr {
+	background: #52B4FF;
+	color: #ffffff;
+}
+.GridData {
+    color: #000000;
+	font-family: Tahoma, Helvetica, sans-serif;
+	font-size: 0.7em;
+	line-height:1.35em;
+}
+.GridData a {
+	color: #0066CC!important;
+	font-size: 1em;
+}
+/* Folder Tree */
+.menutitle{
+	cursor:pointer;
+	margin-bottom: 0.5px;
+	margin-left: 0px;
+	width:130px;
+	padding: 1px;
+	color: #55AFE4;
+}
+.menutitle a {
+	color: #55AFE4!important;
+	text-decoration: none;
+}
+.menutitle a:hover {
+	text-decoration: underline;
+}
+.submenu{
+	margin-bottom: 0.5px;
+	margin-left: 8px;
+	padding-left: 9px;
+	color: #55AFE4;
+}
+.submenulink {
+	color: #55AFE4!important;
+}
+
+div.vnesh{
+	position:relative; 
+	top:8px;
+	background-color:#ffffff; 
+	padding:1px; 
+	border:1px solid #FFBF40; 
+	display:block;
+	margin:0px 15px 0px 15px
+}
+
+div.vnesh2{
+	position:relative; 
+	top:-9px;
+	padding:0px; 
+	display:block; 
+	margin-right:10px;
+}
+
+div.vnutr{
+	background-color:#D6EEF2; 
+	padding:0px;
+	font-size:12px
+}
+
+div.vnutr2{
+	text-align: center;
+	font-size:12px; 
+	padding: 0 10 0 10px
+}

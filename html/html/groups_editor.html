@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>Address Group Editor</title>
+<script Language='Javascript'>
+
+var me;
+
+function Load() {
+   me = window.opener.getCurrent();
+
+   document.popup.name.value = me.name;
+   document.popup.name.focus();
+}
+
+function saveChanges() {
+
+   me.name = document.popup.name.value;
+   
+   if (!me.name) {
+      alert("You must enter a name.");
+      return;
+   }
+
+   window.opener.saveGroup(me);
+   window.close();
+}
+
+</script>
+</head>
+
+<script>
+   document.write("<link id='css_link' rel='stylesheet' type='text/css' href='css/skin_webmail_"+window.opener.GetSkin()+".css'>");
+</script>
+
+<body class="Popup" onload='Load()'>
+
+<form name='popup' onSubmit="return saveChanges();">
+
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+<tr>
+  <td align="right"><font class="DefaultText">Address Group Name:&nbsp;</font></td>
+  <td><input type="text" name="name" class="DefaultTextbox"></td>
+ </tr><tr>
+  <td colspan="2" align="center"><input type="button" value="Save Changes" onClick="saveChanges()" class="DefaultButton"><input type="button" value="Cancel" onClick="window.close()" class="DefaultButton"></td>
+ </tr>
+</table>
+</form>
+</body>
+</html>

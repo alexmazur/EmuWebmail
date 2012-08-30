@@ -1,0 +1,12 @@
+
+EMU6.x Interfaces
+
+This directory contains the various interfaces/html templates 
+for use with EMU6.x by EMUmail.
+
+Each directory contains html templates and optional lang.emu and conf.emu files.
+
+The lang.emu and conf.emu files override the defaults in the main EMU directory.
+
+http://www.emumail.com
+

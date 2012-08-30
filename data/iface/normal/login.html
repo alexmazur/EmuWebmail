@@ -1,0 +1,173 @@
+[-
+   $args = shift @param;
+
+   @interfaces = split(/[\s,]+/, $EMU::c{'ifaces'});
+   $default_interface = &EMU::get_var('type') || &EMU::get_var('emu_type') || $EMU::emu_cookies{'emu_type'} || $EMU::c{"default_interface"};
+
+   @mailhosts = split(/[\s,]+/, $EMU::c{'mail_hosts'});
+   $default_host = &EMU::get_var('hostname') || $emu_cookies{'host'};
+
+   if (&EMU::get_var('user_name') && $default_host) {
+      $email = &EMU::get_var('user_name')."\@$default_host";
+   }
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Login</title>
+<script language='javascript'>
+
+function setupSession () {
+   document.emuform.submit.disabled = true;
+   document.emuform.password.value = document.emuform.pass_tmp.value;
+   document.emuform.pass_tmp.value = "";
+   
+   document.cookie="emu_session=; expires=Sun, 01-Jan-1995 01:00:00 GMT;";
+   today = new Date();
+   document.emuform.sessionID.value = today.getTime();
+}
+
+</script>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST' onsubmit='setupSession()'>
+<input type='hidden' name='passed' value='login_parse'>
+<input type='hidden' name='first' value='1'>
+<input type='hidden' name='sessionID' value=''>
+<input type='hidden' name='password' value=''>
+[$ if (!&EMU::get_var('multi_interfaces') || !@interfaces) $]
+  <input type='hidden' name='type' value='[+ $default_interface +]'>
+[$ elsif (@interfaces == 1) $]
+  <input type='hidden' name='type' value='[+ $interfaces[0] +]'>
+[$ endif $]
+
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+
+[# Open Pre-Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close Pre-Body #]
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu"> 
+  <td valign="top">
+
+
+[# Open Menu #]
+   <table width="100%" border="0" cellspacing="15" cellpadding="0">
+    <tr>
+     <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr>
+        <td><font class="login"><img src="[+ $args->{IMGURL} +]/point.gif" width="155" height="4" alt="">
+	<br>Checking your email from anywhere is easy with EMU Webmail v[+ $EMU::Version +]<br>&nbsp;</font></td>
+        </tr><tr>
+	 <td><font class="login"><ol>
+         <li>Enter&nbsp;your&nbsp;email&nbsp;address<br>Ex:&nbsp;yohan@company.com<br>&nbsp;
+          [$ if (@mailhosts) $]
+         <li>Enter&nbsp;your&nbsp;POP&nbsp;or&nbsp;IMAP mail&nbsp;server&nbsp;name<br>Ex: pop.company.com<br>&nbsp;
+          [$ endif $]
+         <li>Enter your password<br>&nbsp;
+         <li>Click "Login"<br>&nbsp;</ol></font></td>
+        </tr>
+       </table></td>
+     </tr>
+    </table>
+[# Close Menu #]
+
+
+   </td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+
+[# Open Body #]
+    <table width="100%" border="0" cellspacing="1" cellpadding="3">
+     <tr class="Body">
+      <td><center><font class="alert">[+ &EMU::get_status() +]</font></center> 
+       <table width="85%" border="0" cellspacing="3" cellpadding="0">
+        <tr>
+         <td colspan=2 align='center'><font class="alert">[+ &EMU::get_var('login_error') +]</font></td>
+        </tr><tr>
+         <td colspan="2">&nbsp;</td>
+        </tr><tr>
+         <td align="right" width="50%"><font class="LoginForm">Email address:&nbsp;</font></td>
+         <td><input type="text" name="user_name" value='[+ $email +]' class="DefaultTextbox"></td>
+        </tr>
+        [$ if (@mailhosts) $]
+        <tr> 
+         <td align="right"><font class="default">POP/IMAP Host:&nbsp;</font></td>
+         <td> 
+         <select name='hostname'>
+         <option value=''>[+ $EMU::msg{'MSG_SelectHost'} +]
+         [$ foreach $h (@mailhosts) $]
+         [- $selected = ($h eq $default_host)?'selected':''; -]
+         <option [+ $selected +]>[+ $h +]
+         [$ endforeach $]
+         </select>
+[$ endif $]
+         </td>
+        </tr><tr> 
+         <td align="right"><font class="LoginForm">Password:&nbsp;</font></td>
+         <td><input type="password" name="pass_tmp" autocomplete='off' class="DefaultTextbox"></td>
+        </tr>
+[$ if (&EMU::get_var('multi_interfaces') && (@interfaces > 1)) $]
+        <tr> 
+         <td align="right"><font class="LoginForm">Interface:&nbsp;</font></td>
+         <td><select name="type" class="DefaultSelect">
+             [$ foreach $i (@interfaces) $]
+             [- $selected =  ($i eq $default_interface)?'selected':''; -]
+             <option [+ $selected +]>[+ $i +]
+             [$ endforeach $]
+         </select></td>
+        </tr>
+[$ endif $]
+        <tr>
+	 <td>&nbsp;</td>
+         <td>&nbsp;<br>&nbsp;<br><input type="submit" name="submit" value="Login &amp; Check Email" class="DefaultButton"><br>&nbsp;</td>
+        </tr>
+       </table></td>
+     </tr>
+    </table>
+[# Close Body #]
+
+
+</td>
+ </tr>
+</table>
+
+
+[# Open Post-Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close Post-Body #]
+
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+
+</form>
+<script Language='Javascript'>
+document.emuform.password.value="";
+</script>
+</body>
+</html>
+

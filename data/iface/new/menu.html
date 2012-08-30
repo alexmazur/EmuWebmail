@@ -1,0 +1,81 @@
+[-
+   ($args) = (@param);
+   $folders = &EMU::get_organized_folders();
+   &EMU::get_message_stat();
+
+#   # Don't show sub menu's if the top level is closed
+#   if ($folders && !&EMU::get_menu_setting('main')) {
+#      $folders = '';
+#   } elsif ($folders) {
+#      # Don't show folders for closed menus
+#      foreach my $f (keys %$folders) {
+#         if (!&EMU::get_menu_setting($f)) {
+#            $folders->{$f} = '';
+#         }
+#      }
+#   }
+
+   %sections = (local => 'Local Folders',
+                imap => 'IMAP Folders',
+                mailboxes => 'Mailboxes',
+                other => 'OTHER'
+               );
+
+   sub get_menu_img {
+      if ($_[0]) { return 'menu_minus.gif' }
+      else       { return 'menu_plus.gif'  }
+   }
+
+   $name = $EMU::userdb{'options.real_name'};
+   if (defined $EMU::userdb{'options.email'}) {
+      $email  = $EMU::userdb{'options.email'};
+   } else {
+      $email = &EMU::get_var('user_name');
+   }
+   $now = &EMU::get_date(undef,undef,undef,1);
+   $theme = $args->{theme};
+
+   @admins = split(/(,|\s)+/, $EMU::c{admins});
+-]
+
+<script language="JavaScript" src="[+ $args->{HTMLURL} +]/menu/tree.js"></script>
+[# Open Product Menu #]
+        <div id=side-content> 
+  [$ if ($EMU::c{cal_url}) $]
+          <div id=side-button> <a href="[+ $EMU::EMU_URL +]?passed=go_index"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/34x34/e-mail.gif" width="33" height="33" border="0" align="absmiddle"></a> 
+            &nbsp; <a href="[+ $EMU::EMU_URL +]?passed=go_index">E-Mail</a> </div>
+          <div id=side-button> <a href="[+ $EMU::c{cal_url} +]"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/34x34/calendar.gif" width="33" height="33" border="0" align="absmiddle"></a> 
+            &nbsp; <a href="[+ $EMU::c{cal_url} +]">Calendar</a> </div>
+  [$ endif $]
+[# Close Product Menu #]
+          <div id=side-button-divider>&nbsp;</div>
+          <div id=folders-tree> 
+            <div id=tree-root class="selected">
+              <a href="[+ $EMU::EMU_URL +]?passed=go_index&folder=[+ &EMU::get_var('inbox') +]">&nbsp;[+ &EMU::get_var('inbox') +]</a>
+            </div>
+        [$ if (ref $folders) $]
+            <div id="masterdiv">
+          [- $cnt = 1; -]
+          [$ foreach $t (qw/local imap mailboxes/) $]
+            [$ if (exists $folders->{$t}) $]
+              <div class="menutitle" onclick="SwitchMenu('sub[+ $cnt +]')">
+                <img id="i_sub[+ $cnt +]" border=0 src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/menu_plus.gif" +]" height="9" width="9" alt="" hspace="2">
+                <a href="#" onclick=this.parent.click()>[+ $sections{$t} +]</a>
+              </div>
+              <span class="submenu" id="sub[+ $cnt +]">
+              [$ foreach $f ( sort { lc($a) cmp lc ($b) } keys %{$folders->{$t}} ) $]
+                <a href="[+ $EMU::EMU_URL +]?passed=select&reload.x=19&folder=[+ &CGI::escape($f) +]" class=submenulink><nobr>[+ $f =~ s/(.{22})/$1<br>/ig; $f +]</nobr></a><br>
+              [$ endforeach $]
+              </span>
+              [- $cnt++; -]
+            [$ endif $]
+          [$ endforeach $]
+            </div>
+       [$ endif $]
+          </div>
+          <div id=side-button-divider>&nbsp;</div>
+          <div id=side-button> <a href="#" onClick="window.open('[+ &EMU::get_var('help_url') +]','WebmailHelp','width=750,height=500,toolbar=yes,location=no,directories=no,status=yes,menubar=yes,resizable=yes,copyhistory=no,scrollbars=yes');return false;"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/34x34/help.gif" width="33" height="33" border="0" align="absmiddle"></a> 
+            &nbsp; <a href="#" onClick="window.open('[+ &EMU::get_var('help_url') +]','WebmailHelp','width=750,height=500,toolbar=yes,location=no,directories=no,status=yes,menubar=yes,resizable=yes,copyhistory=no,scrollbars=yes');return false;">Help</a> </div>
+          <div id=side-button> <a href="[+ &EMU::make_url('logout') +]"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/34x34/logout.gif" width="33" height="33" border="0" align="absmiddle"></a> 
+            &nbsp; <a href="[+ &EMU::make_url('logout') +]">Logout</a> </div>
+        </div>

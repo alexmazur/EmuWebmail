@@ -1,0 +1,176 @@
+[-
+   $args = shift @param;
+
+   @hosts = &EMU::get_ldap_hosts();
+
+   my @data = &EMU::get_directory();
+   @directory_array = @{ $data[0] };
+   %directory_data = %{ $data[1] };
+   $theme = $args->{theme};
+
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Addressbook - Internet Search</title>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<INPUT TYPE='hidden' NAME='passed' VALUE='directory'>
+<input type=hidden name=showentries value=1>
+<input type=hidden name="ldap_position" value="0">
+<input type=hidden value="cn|realname|o|mail|c|givenname|ou|facsimiletelephoneNumber|telephoneNumber|title" name="ldap_search_fields">
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Internet Search</font></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu"> 
+  <td valign="top">
+  
+[# Open Menu #]   
+[- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+[# Close Menu #]
+
+[# Open Body #]
+
+  </td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+
+[$ if (&EMU::get_status()) $]
+   <tr class="GridData">
+    <td align="center" colspan="4"><font class="Alert">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;</font></td>
+   </tr>
+[$ endif $]
+
+ <tr class="Body">
+  <td colspan="4" align="center">
+   <table width="100%" cellspacing="8" cellpadding="0" border="0">
+    <tr>
+     <td colspan="2"><font class="DefaultText">Search for a friend or family member with Webmail's Address Search! Enter the
+first or last name of the person below, then submit your search.<br>&nbsp;</font></td>
+    </tr>
+   </table><table width="100%" cellspacing="1" cellpadding="3" border="0">
+    <tr>
+     <td align="right"><font class="DefaultText">Look for names containing:</font></td>
+     <td><input type='text' name='search_sn' value="[+ &EMU::get_var('search_sn') +]" class="DefaultTextbox"></td>
+    </tr>
+[$ if (@hosts <= 1) $]
+<input type='hidden' name='ldap_search_host' value='[+ $hosts[0] +]'>
+[$ else $]
+    <tr>
+     <td align="right"><font class="DefaultText">Select a directory server:</td>
+     <td><select name='ldap_search_host' class="DefaultSelect">
+[$ foreach $h (@hosts) $]
+<option value='[+ $h +]'>[+ $h +]
+[$ endforeach $]
+</select></td>
+    </tr>
+[$ endif $]
+    <tr>
+     <td></td>
+     <td><input name='search.x' value="Start Search" type="submit" class="DefaultButton"><br>&nbsp;</td>
+    </tr>
+   </table>
+[$ if (&EMU::get_var('searched_for')) $]
+   <table width="100%" cellspacing="1" cellpadding="3" border="0">
+    <tr>
+     <td colspan="2" class="SubHeaderBar"><font class="DefaultText"><b>Search Results</b></font></td>
+    </tr><tr>
+     <td colspan=2><font class="DefaultText">You searched for <b><u>[+ &EMU::get_var('searched_for') +]</u></b>. [$ if (&EMU::get_var('ldap_entries')) $]<font class="default">Found [+ &EMU::get_var('ldap_entries') +] matches in [+ &EMU::get_var('total_ldap_pages') +] pages. Displaying entries [+ &EMU::get_var('start') +] through [+ &EMU::get_var('end') +]</font></td>
+    </tr>
+   </table>
+[$ endif $]
+[$ endif $]
+   <table border="0" cellpadding="0" cellspacing="3" width="100%">
+
+[$ foreach $a (@directory_array) $]
+[-
+   $name = $directory_data{"_name$a"};
+   $fullname = $directory_data{"_fullname$a"};
+   $email = $directory_data{"_email_link$a"};
+   $org = $directory_data{"_org$a"};
+-]
+    <tr>
+     <td colspan="2"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="7" alt=""></td>
+    </tr><tr>
+     <td colspan="2" class="MenuLine"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="1" alt=""></td>
+    </tr><tr>
+     <td colspan="2"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="7" alt=""></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">Given Name:</font></td>
+     <td width="80%"><font class="DefaultText">[+ $name +]</font></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">Full Name:</font></td>
+     <td><font class="DefaultText">[+ $fullname +]</font></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">E-mail:</font></td>
+     <td><font class="DefaultText">[+ $email +]</font></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">Organization:</font></td>
+     <td><font class="DefaultText">[+ $org +]</font></td>
+    </tr>
+[$ endforeach $]
+   </table></form>
+[$ if (&EMU::get_var('more_ldap')) $]
+   <form method="POST" action="[+ $EMU::EMU_URL +]">
+<input type="hidden" NAME="passed" VALUE="directory">
+<input type="hidden" value="cn|realname|o|mail|c|givenname|mailquota|ou|facsimiletelephoneNumber|telephoneNumber|title" name="ldap_search_fields">
+<input type=hidden name=search_sn value="[+ &EMU::get_var('search_sn') +]">
+<input type=hidden name=search_ou value="[+ &EMU::get_var('search_ou') +]">
+   <table border="0" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+     <td align="center"><INPUT TYPE="SUBMIT" NAME="ldap_jump.x" value="Go to" class="DefaultButton">&nbsp;<select name="ldap_position" class="DefaultSelect">
+[- 
+   $next = &EMU::get_var('next_ldap_page');
+   $last = &EMU::get_var('total_ldap_pages');
+-]
+[$ foreach $i (1..$last) $]
+[- $selected =  ($next == $i)?'selected':'' -]
+<option value='[+ $i +]' [+ $selected +]>Page [+ $i +] of [+ $last +]
+[$ endforeach $]
+      </select></td>
+     </tr>
+    </table></form>[$ endif $]</td>
+ </tr>
+</table>
+
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="DefaultText">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</body>
+</html>
+

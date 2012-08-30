@@ -1,0 +1,54 @@
+<?xml version="1.0"?> 
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN" 
+     "http://www.wapforum.org/DTD/wml_1.1.xml"> 
+
+
+<wml>
+
+
+<card id="emuwap_login1">
+
+  <do type="accept" label="NEXT">
+    <go href="#emuwap_login2"/>
+  </do>
+
+
+  <p align="center">$login_error  ({ (<br/>) if ($login_error != "") })
+     <img alt="EMU WAP" src="$img_url/wap_mail_logo.wbmp"/><br/> 
+     Enter Email Address:
+     <input type="text" name="email" format="*m" value="$user_name@$hostname"/>
+  </p>  
+
+</card>
+
+<card id="emuwap_login2">
+
+  <onevent type="onenterforward">
+    <refresh>
+      <setvar name="password" value=""/>
+    </refresh>
+  </onevent>
+
+  <onevent type="onenterbackward">
+    <refresh>
+      <setvar name="password" value=""/>
+    </refresh>
+  </onevent>
+
+  <p align="center"><img alt="EMU WAP" src="$img_url/wap_mail_logo.wbmp"/><br/>Enter Password:
+     <input type="password" name="password" format="*m"/>
+  </p>
+ 
+  <do type="accept" label="LOGIN">
+    <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="login_parse"/>
+      <postfield name="first" value="1"/>
+      <postfield name="user_name" value="$(email)"/>
+      <postfield name="password" value="$(password)"/>
+      <postfield name="type" value="$emu_type"/>
+    </go>
+  </do> 
+
+</card>
+
+</wml>

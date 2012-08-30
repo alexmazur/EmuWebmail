@@ -1,0 +1,729 @@
+##########################################################################
+# This is the master configuration file for EMU Webmail.  We recommend
+# that you make a backup of this file before making any changes.  For
+# help with settings, please read the comments in this file and the
+# software manual documentation.  More help may be available on our
+# website at http://www.emuwebmail.com.  You may also email 
+# support@emuwebmail.com for technical support.
+##########################################################################
+
+##########################################################################
+#
+# 			Common Options 
+#
+##########################################################################
+
+################### System ###############################
+
+	# The name of the main CGI script located in the html directory
+emu_url=emumail.cgi
+
+admins = 
+
+	# Specify your timezone here, using the standard abbreviation
+timezone = GMT
+
+
+################### Mail Hosts ############################
+
+	# The default POP or IMAP server used if only a username is
+	# inputted on the login page
+default_pop=localhost
+	# the smtp_host can be either a single entry or multiple entries
+	# separated by spaces. Multiple entries allow for emumail to
+	# utilize fallback outbound smtp servers
+#smtp_host=localhost my.other.smtp.server
+smtp_host=localhost
+
+	# Enable AUTHentication support for SMTP server.
+	# Set to true if your SMTP server requires AUTH. 
+#smtp_auth = true
+
+	# mail_host_input_box specifies whether to allow any domain 
+	# to be entered.
+mail_host_input_box=true
+	# The length of the mail host input box on the login page
+mail_host_input_box_length=20
+	# mail_hosts sets the <select> box on the login page
+#mail_hosts=yourdomain.com another.com pop.somewhere.net
+
+	# Will compare the given hostname for login and see if a mapping
+	# of hostname<->popserver matches
+	# For example: map2pop_emumail.net=mail.emumail.net will map
+	# users who supply host 'emumail.net' to use pop server
+	# 'mail.emumail.net'
+#map2pop_yourdomain=your.pop.server
+
+	# Play trick with hostname for user. This will cause the POP
+	# user name to have this domain appended to it. 
+	# Example: a typical username "joe" and domain "mydomain.com"
+	# would use POP server "mydomain.com". With the setting below, POP
+	# server remains "mydomain.com" but username becomes
+	# "joe@special.mydomain.com"
+#add_domain_to_user=mydomain.com my.mydomain.com
+	# keep domainname. This is also a special trick for manipulating
+	# usernames.  For each of the domains listed, we login as
+	# user@domain rather than simply just user. So 
+	# keepdomains= mydomain.com hisdomain.com
+	# would send a joe@mydomain.com to the pop server rather than joe
+	# and also joe@hisdomain.com
+#keepdomains= onedomain.com anotherdomain.net
+	# This is used in conjunction with map2pop.
+	# If you would like to append the domain to the username, set
+	# this to true.
+	# For example, appendhost_emumail.com=true would cause the user
+	# "joe" to appear as "joe@emumail.com" to the pop server since
+	# the domain gets appended. Do NOT set anything to true unless
+	# you specifically want this non-standard behavior to be
+	# implemented.
+
+################### Performance ###########################
+
+	# enable FastCGI support for improved performance
+	# Must have a FastCGI compatible web server
+use_fastcgi=false
+	
+	#Set true will allows to get signals from server
+disable_fcgi_signals=false
+
+################### Security ##############################
+
+	# allowed_domains specify which mail servers EMUmail can connect with
+	# leave blank for all domains.
+allowed_domains=
+
+	# timeout period for a user's session in seconds
+max_time=1800
+
+	# is session expire time automatically refreshed?
+	# true:
+	# 	means session will expire after max_time seconds from session start
+	#	i.e. auto freshen is disabled
+	# false:
+	# 	means session will expire after max_time seconds from last activity time
+	#	i.e. auto freshen
+disable_auto_session_freshen = false
+
+################### Quotas ################################
+
+	# quota_default = 1000000     # The default quota in bytes
+	# quota_@domainname = N       # the quota for the entire @domainname domain
+	# quota_user@domainname = N   # an individual's quota
+        # quota_source = custom       # use this if you want to have a custom
+        #                             # quota value processing in Custom.pm
+        #
+	# Use -1 to indicate an unlimited quota
+quota_default=2097152
+
+################### Default User Profiles #################
+
+# These are the default options that are set when a user logs in for
+# the first time.  After a user's options have been set after this
+# first login, any changes here will NOT be reflected in existing users.
+# It will only apply to users that have not logged in yet!
+
+	# Force default email on the options page...
+	# %u = username (before @). 
+	# %h = full host
+	# %1 ... %N = reverse order domain, so if you had foo.emumail.com,
+	#             %1 would be com, %2 emumail, and so on.
+	# %u@yourdomain.com would force that setting for example
+default_email = %u@%2.%1
+
+	# default entries for user's addressbooks
+#default_address1 = support||Tech Support||support@yourdomain.com
+	
+	# default filters for users
+#default_filter1 = From:||notcontains||(?:bob|yohan)@(?:emumail\.com|smoo\.net)||Oh my gosh!||yes
+
+        # filtering behavior. Set to true if you want messages filtered automatically
+	# when you're downloading new mail
+do_realtime_filter=false
+
+	# How often to check for new mail (in seconds)
+default_checkmail = 300
+	
+	# How often to check for new mail /popup-window/ (in seconds)
+	#If popup_checkmail = false - popup window is disabled
+	#If popup_checkmail = 30 /or any digits/ (in seconds)
+popup_checkmail = false
+
+	# The default skin for users
+default_skin = EMU_Original
+
+	# What to do when read receipt is requested?
+	# possible values are: 1 or 0 or undefined (just comment it)
+	# 1 - always send (users can't override)
+	# 0 - always don't send (users can't override)
+	# undefined - user decides
+#default_readreceiptaction =
+
+# WYSIWYG editor
+        # false - disable
+reditor = true
+
+################### User Interface ########################
+
+	# The string that is printed in the title bar of the Web browser
+publisher_name=EMUMAIL
+
+	# What parts of the compose show up by default for a new user.
+	# a comma separated list possibly containing:
+	# attach, emufile, cc, bcc, from, replyto, priority
+default_compose=cc, attach
+
+	# allow choice of multiple interfaces in a drop down box on
+	# login page
+multi_interfaces=true
+	# A space delimited list of valid interfaces
+ifaces=normal
+	# The interface to use by default
+default_interface=normal
+
+	# The skins users may choose from
+skins = EMU_Original Deep_Blue_Sea Industrial_Revolution
+
+################### LDAP ##################################
+
+	# LDAP hosts made available. Create a space separated list of 
+	# valid hosts, or use only one.
+	# ldap_search_host=ldap_host1 ldap_host2 ldap_host3
+ldap_search_host=ldap.bigfoot.com
+
+	# LDAP qualifiers. PLEASE append the ldap host name to the config,
+	# as follows:
+	# for example, for ldap_base use ldap_base_<ldap_host>
+	# for ldap_dn use ldap_dn_<ldap_host>
+	# for ldap_password use ldap_password_<ldap_host> and so on
+#ldap_base_ldap.bigfoot.com= c=US
+ldap_dn_some_host=
+ldap_password_your_host=
+
+
+##########################################################################
+#
+#			Advanced Options
+#
+##########################################################################
+
+
+################### System ################################
+
+	# The location of the image files
+img_url=emuimages
+	# The location of pop up html files
+html_url=html
+	# The location of the user help information
+help_url=help
+
+	# Setting this option to true forces EMU Webmail to create
+	# a log file in the data/ directory or in the directory that
+	# debug_path points to.  The log file is named emudebug.  
+	# This file contains an entry for most internal actions EMU
+	# Webmail performs during a session.  Event logging is very
+	# useful for investigating problems with EMU Webmail.  Since
+	# emubebug can grow very quickly, it is recommended that you
+	# leave debugging off when you do not absolutely need it.
+emu_debug=true
+	# Where to write debug info by default
+debug_path=/home/heath/sandbox/webmail/data
+	# set this to true if you wish the debug output to contain the
+	# webserver's hostname. Useful when running multiple servers,
+	# not useful otherwise
+debug_hostname=false
+	# Per user debug. Write here list (separated by space) of emails
+	# for which personal debug is on. If email doesn't contain host
+	# it'll be used as username for all hosts.
+	# Note that emu_debug option must be true!
+debug_users = tester
+
+	# Which device/file to use for outputting errors?
+QUIET_Fdev=/dev/null
+	# Some servers (like Netscape) dies on attempting to redirect stderr
+	# Disable the redirection of stderr.  Necessary for some operating
+	#systems.
+#Disable_QUIET=true
+
+	# cookie_path is used when you have more than one .cgi program
+	# When running multiple copies of EMU Webmail from the same domain
+	# name, this will be the path that the cookies will be valid for.
+	# This option allows multiple CGI files to be run on the same server
+	# and have two concurrent EMU Webmail sessions open at the same time.
+	# This is an advanced option and is NOT the preferred method of
+	# running multiple interfaces.
+#cookie_path=/mm/emumail
+
+	# The default encoding of MIME message parts.  Must be one of:
+	# quoted-printable, base64, 7-bit, binary, none
+default_encoding = base64
+	# Set this to true if you'd like to have message bodies downloaded
+	# immediately rather than only headers
+download_full_bodies=false
+	# set this if you want to limit the size of messages that get saved
+	# to each user's outbox (sent-mail folder). If a composed message
+	# is larger than configured below, then it doesnt get saved in 
+	# the outbox.
+#outbox_msg_size_limit=1000000
+
+	# Default umask for created files
+umask=006
+	# The default permissions for the user databases
+db_perms=666
+
+	# Sets an X-Advert: field in all outbound messages
+xadvert=http://emumail.com
+
+	# Disable caching of headers and POST
+disable_caching=false
+	# Disable the printing of the Pragma: no-cache HTTP header
+disable_cache_headers=true
+
+	# The dictionary server to use (don't forget the question mark ?)
+	# The word to look up will be appended to the end of the URL
+dictionary = http://work.ucsd.edu:5141/cgi-bin/http_webster?
+
+	# You can force a URL redirect to some specific URL upon a user
+	# logging out
+#redirect_logout=http://some.domain.com
+	# URL to display instead of showing the default login page.
+	# Useful for switching to https:// upon login.  Also useful
+	# when the site needs to be closed temporarily.
+#redirect_login=http://some.domain.com
+
+	# verify_nfs_presence is used for systems that run on nfs-mounted
+	# data directories. Create identifier files on the NFS server that
+	# would only be detected when mounted, not present when not mounted.
+	# If you specify this and EMUMAIL does not find the files specified,
+	# it will not run
+#verify_nfs_presence=/home/emumail/homes1/.im_here /home/emumail/homes2/.im_here
+
+	# DB files have a tendency to grow over time and not necessarily
+	# shrink when keys are deleted. And sometimes they'll get somewhat
+	# corrupted and will be simply huge. So on logout, we perform a
+	# "refresh" of all the db files for a particular user. If you do
+	# not want this to happen, set it to true!
+no_db_refresh=false
+	# Emumail by default performs some housekeeping on a user's messages
+	# directory upon a logout request. Set below to true if you want to
+	# prevent such action
+dont_flush_on_logout=false
+
+################### Mail Hosts ############################
+
+	# This option specifies which protocol(s) to use when logging
+	# a user in.  The order of the list determines the order in
+	# which the protocols will be attempted.  The available protocols
+	# are pop3 and imap.
+login_protocol=imap pop3
+	# To force the EMU Webmail engine to use a particular login
+	# protocol, set this to the protocol name (imap or pop3)
+force_protocol=
+
+	# This is the prefix that your imap server uses, or the directory
+	# in which imap folders are stored for each user's account. Normally
+	# an imap server will store mail folders under ~user/mail, so "mail"
+	# is the prefix here.
+default_imap_prefix = mail
+	# don't check imap server's message list unless new msgs added
+lax_mailbox_sync=false
+	
+	# This option specifies which protocols(s) to use when saving
+	# outgoing messages.  The order of the list determines the
+	# order in which the protocols will be attempted. The allowed
+	# protocols are imap and local.  An IMAP outbox allows users
+	# to store their outgoing mail on another server.  A local
+	# outbox stores outgoing messages in users' EMU home directories.
+outbox_protocol=local
+	# When allowing users to save outgoing messages on an IMAP
+	# server, this option tells the EMU Webmail engine which host
+	# to save on, if it is a different server
+#default_outbox_host = [default_pop]
+
+	# smtp_port allows for utilization of a port other than the default
+	# smtp port (25). Do NOT uncomment this line unless you want to
+	# connect to a nonstandard port!
+#smtp_port=1025
+
+	# force_mail_local is used to force all messages to be stored
+	# local to emumail. When set, ALL messages are immediately
+	# downloaded from the POP server and are DELETED from the pop
+	# server. This feature has NO EFFECT on IMAP...it is meant for
+	# POP server installations only. However, if your site runs
+	# users with both POP and IMAP access you may have trouble.
+	# BE VERY CAREFUL WITH THIS SETTING. IF YOU HAVE SET IT TO
+	# TRUE AND WISH TO SET IT BACK TO FALSE YOU MAY LOSE DATA!!
+	# CONTACT US FOR MORE INFO.
+force_mail_local=false
+
+	# If you're converting from one system to another, and your
+	# previous system had force_mail_local set and the newer system
+	# does not (or you don't want it to run as force_mail_local),
+	# then set this to true
+original_mail_local=
+
+	# This is used to write forwarding rules for a normal unix mail system.
+	# So for example if your smtp server uses ~user/.forward as the
+	# forwarding file for a particular user, you'd set the forward_file
+	# to .forward. This will ONLY work with smtp servers that will look 
+	# for a particular forwarding file. You can/should use the 
+	# perlsub_forward_file to create a sub which returns the path
+	# for the forward file that would be edited. Also, that forwarding
+	# file must be writeable by the user httpd runs as. An example
+	# perlsub is provided which returns the path to a user's system dir
+	# The perlsub will get passed the username portion of the user's
+	# email address (given in the options.html page)
+disable_forwarding=true
+forward_file=.forward
+#perlsub_forward_path = { my ($user) = @_; my @data=getpwnam($user); return $data[7] }
+
+	# An additional setting to the forward file thing is you can specify
+	# whether the forward file is a single setting or if it's like an
+	# aliases file which has multiple settings. If it's aliases-type,
+	# then the file will be edited, altering the entry that corresponds
+	# to the current user. If the file is not aliases-type, set below
+	# to false, and the forward file gets re-created every time.
+forward_file_multiple_aliases=false
+
+	# the host that mail is sent to if the user doesn't enter a
+	# domain on the address
+default_send_host = [smtp_host]
+
+
+################### Performance ###########################
+
+	# Number of times a FastCGI process should execute before quitting
+	# and reloading.  A higher number gives better performance, but
+	# causes higher memory use.  Lower this number if memory use grows
+	# too large.
+fcgi_counter=25
+
+
+################### Security ##############################
+
+	# Number of seconds to hold a lock. This can be annoying if users
+	# click STOP before the CGI is finished--they will be locked out
+	# this number of seconds.  It does prevent data corruption however.
+session_lock_timeout=5
+
+	# Enable this option if you're using NFS
+locks_on_nfs = false
+
+	# Setting this to true will disallow the creation of long term
+	# storage on the EMU Webmail server.  The users' options,
+	# addressbooks, and personal settings will be retained on the
+	# EMU Webmail server, but the mail messages and folders will not.
+remote_only=false
+	# Setting this to true will disallow users from saving ANY data on
+	# EMU Webmail server, including mail, folders, addressbooks,
+	# options, and personal settings.
+disable_account_persistence = false
+
+	# Use this if you want to disable security from login page (sessionID)
+	# Disables enhanced security cookie that prevents people from using the 
+	# back button to refresh other's login sessions
+#disable_sessionID=true
+
+	# ignore_session_expiration allows user to run indefinitely without
+	# no forced max_time. Use with caution because it affects session
+	# security.
+ignore_session_expiration=false
+
+	# If set to false will mandatethat each time during a single
+	# session that a user connects to the EMU Webmail server it
+	# connects using the same IP address. Causes problems if users
+	# come in through a proxy server or other means in which the
+	# IP addresses are masqueraded, however adds extra security
+	# on closed networks
+disable_ipaddr_check=true
+
+	# Spam filtering
+	# If you spam identification application (SIA), such as SpamAssassin etc,
+	# you may want to have the ability to make use of it
+	# So, you can configure SIA to insert specific field into message header,
+	# say, it may be "X-Spam-Status: yes" for example.
+	# Setting this option will allow user to filter such messages to specific folder.
+	# NOTE: 
+	# You must specify only name of the header - "X-Spam-Status", 
+	# without its value "yes" and trailing colon. (see example above)
+	# You can use Custom.pm special function, to parse this header field value.
+spam_determinative_header = X-Spam-Status
+
+################### Quotas ################################
+
+	# set to emumail or remote
+	#
+	# quota_type emumail means we use our own calculation
+	# methods (which tallies the amount of bytes in a user's
+	# messages, folders and files directories
+	#
+	# quota_type remote means to use a subroutine in EMU::Custom
+	# called quota_check instead.  EMU::Custom::quota_check($username)
+	# is how this is called. quota_check should return STAT,
+	# Allowed amount, Used Amount, Used Percent
+quota_type = emumail
+
+	# uncomment this if you want to customize your own quota value
+	# processing within Custom.pm (subroutine EMU::Custom::get_quota). This
+	# sub gets passed the user's login email address.
+#quota_source=custom
+
+
+################### Default User Profiles #################
+
+# These are the default options that are set when a user logs in for
+# the first time.  After a user's options have been set after this
+# first login, any changes here will NOT be reflected in existing users.
+# It will only apply to users that have not logged in yet!
+
+	# The default signature to be appended to users' outgoing mail.
+	# Should not be confused with the MSG_Tagline option in lang.emu,
+	# which may not be overridden by the user
+#default_signature = 
+	# The default Full Name for new users
+default_real_name =
+	# The default Organization for new users.  Useful within
+	# Intranets for placing your company name on outgoing mail.
+default_organization = 
+
+	# Sets the default autoload of images in messages
+default_autoload = true
+
+
+################### User Interface ###############################
+
+	# Check browser type for customized templates
+per_useragent_template = false
+
+	# Use a trash bin for deleting messages. By setting the trash folder
+	# to true, deleted messages do not get completely deleted, they get
+	# moved to a "trash" folder (whose name is controlled by 
+	# TRASH_Fold_Name in lang.emu)
+implement_trash_folder=false
+
+	# Behavior of FROM header. Normally emumail will display the 
+	# "reply-to" email address in the FROM header. Set below to
+	# false to disable that feature
+from_is_reply_to=false
+
+	# max messages per page
+max_messages = 15
+	# Practical limit to number of messages displayed on index. We don't
+	# want to let the user set this too high.
+max_messages_limit = 100
+
+	# how verbose should filtering be? If we filter fewer messages than this, we will display 
+	# information about each message that was filtered. If more than this number are filtered,
+	# no detailed information will be displayed.
+verbosefiltering_threshhold = 25
+
+	# Default options for Message View 
+	# Display HTMLized messages
+view_display_HTML=false
+	# Display Full headers by default
+view_display_full_headers=false
+
+	# Disable users from saving outgoing messages
+disable_outbox=false
+	# Default setting for the compose page  
+	# Set it to true to disable saving outgoing messages in compose page
+compose_dont_save_outgoing=false
+
+	# disable MS Word file conversion
+disable_msword=false
+
+	# spelling_suggestions - how many words to display in the suggestion
+	# list for spellcheck
+spelling_suggestions=40
+
+	# Waitscreen processing. This will enable progress indicators
+	# for certain functions, and is based on a timescale. The timeout
+	# value indicates the amount of time we want to wait before
+	# actually displaying a waitscreen. The timeout value is in seconds.
+disable_waitscreen=false
+waitscreen_timeout=10
+
+	# GARBAGE Filter behavior (from options.html). By default, the
+	# filter rule which says "move to GARBAGE" will automatically
+	# create a folder named GARBAGE and place the filtered message
+	# there. However, you have the option to change that behavior
+	# to "delete" which means the message is immediately deleted
+	# rather than moved to a folder. If using the folder option, the
+	# folder name (default "GARBAGE") can be controlled by
+	# GARBAGE_Filter_Name in the lang.emu file.  Valid options are
+	# Folder or Delete
+GARBAGE_Filter_Action=Delete
+
+	# Customized message header processing. These can be used for
+	# further customization any of the message index columns.
+	# Identify here the message header type and which column
+	# should be affected by it, as well as the action to be taken
+	# and if there needs to be a data match.
+	#
+	# The first necessary line is a list of the headers you need
+	# processed.  These should be exactly as they'll appear in the
+	# message header, and should have no blank spaces. Delimiter
+	# is a blank space. You can also use this as a column customization
+	# regardless of Header, by simply inserting DONTCARE in the
+	# Customized_Headers configuration. That will add in a column
+	# to your specifications without regard to Headers
+	#
+	# Affected Columns can be (exactly one of): 
+	# PRI, STATUS, DATE, FROM, SUBJECT, SIZE, NEW
+	# "NEW" means, create a NEW column and those are addressed in
+	# html as newcolumn1, newcolumn2, etc...
+	# Be sure to spell column affected exactly as above. Delimiter is 
+	# a blank space
+	#
+	# Action can be either headerdata (to replace with header data)
+	# or any text or html code to be used as replacement. Action 
+	# delimiter is ||
+	#
+	# The Data_Match is used if you want to do something only if the
+	# header data matches a specified value. However you MUST have a
+	# data match entry for every customized header entry. If you don't
+	# need to check for a match, enter DONTCARE. Match delimiter is ||
+Customized_Headers_Column=NEW
+Customized_Headers=Content-Type
+Customized_Headers_Action={ ($data =~ /multipart/i && $data !~ /multipart.alternative/i) ? "icon_attachment.gif":"" }
+
+	# Override sitewide config files with files in a user's home
+	# directory if true
+allow_user_config=false
+	# If set to true, this will allow a lang.emu file to be read from
+	# a user's home directory.
+allow_user_lang=false
+
+	# Default mailbox name...almost always just INBOX
+default_inbox_name=INBOX
+
+	# Setting to true will enable the automatic detection and
+	# conversion of Cyrillic character sets. Use this if you run
+	# a site that mixes in cyrillic characters and whose mail messages
+	# contain cyrillic characters. Typically you'll want to display
+	# in "win", so the charset gets converted to "win". To use this,
+	# you'll need to install additional perl modules, you must install
+	# Lingua::DetectCharset, Convert::Cyrillic, Unicode::Map8
+convert_cyrillic=false
+convert_cyrillic_to=win
+convert_cyrillic_from=koi8 iso-8859-5
+
+	# EMU now adds automatic language translation support, IF you have
+	# a corresponding account with WorldLingo and have licensed that
+	# feature with EMU. You may license a worldling account thru EMU,
+	# please contact sales@emumail.com for more info. Once you have
+	# an account, you'll need to fill in the appropriate fields below
+do_text_translation=false
+translation_url=
+translation_uname=
+translation_pword=
+
+	# set this to true if you have a professional license and yet still
+	# want to display EMU's internally generated ad banners. Normally
+	# a professional license forces ignoring of ads, even if the html
+	# template calls for an ad banner. Setting show_ads to true (in
+	# combination with professional) will allow for ads to be shown
+#show_ads=true
+
+	# Default number of columns to apply text wrapping to. All text
+	# displayed when viewed or when composing/forwarding/replying
+	# goes thru a wrapping  formatter. If you change this value,
+	# consider changing the number of columns in your textarea in
+	# compose.html.
+default_wrap_columns=74
+
+	# hyperlink behavior. Setting the disable_popup to true will
+	# disable the default behavior for most hyperlinks within the
+	# msgview page that emumail displays, which is to open the url
+	# in a new, pop-up browser window. This default behavior affects
+	# links within messages and links to msg attachments. If you wish
+	# to display within the same browser window rather than pop-up in
+	# a new window, set this to true. Otherwise leave the default of
+	# false
+disable_popup=false
+
+	# Specify pages where user want not to see the popup "New Message".
+	# Small description:
+	#
+	# go_index -       INBOX page
+	# compose -        Compose Message
+	# folders -        Folder Manager
+	# address -        Addressbook
+	# address_groups - Address Groups Manager
+	# parse -          Email Search, Options and  Filter Manager pages
+	# editor -         Administrator File Editor
+	# options -        Account Information
+	# mailboxes -      Mailbox Manager
+	#
+disabled_popup_pages = compose, go_index
+
+	# enable manual filtering. this will enable the "Apply Filters" button
+	# on the message list page. note that manual filtering could be very slow
+allow_manual_filtering = false
+
+################### Conversion ############################
+# Used to convert data from previous EMUMAIL versions
+
+##### For EMU 3 and 4.0 data
+	# DB implementations. Use original_dbm to convert from older
+	# versions. Leave dbm_isa blank unless you want to specifically
+	# use a db type. For example, on Solaris systems you may want
+	# to use DB_File. Don't set dbm_isa if you're not sure what to do.
+	# If your original userdb has a suffix like ".db" (eg. userdb.db)
+	# then specify the actual name of the userdb file under orig_userdb
+dbm_isa=
+original_dbm=
+
+##### For 2.7 and Alacer data
+	# For Alacer (2.7) users ONLY... In order to have your files
+	# properly converted you MUST configure the setting below. Set it
+	# to the db file type that your 2.7 system used. Uncomment below
+	# and configure it appropriately if you're moving up from a 2.7
+	# system
+#convert2x_file_type=DB_File
+
+##### For all versions
+	# This one is used if upgrading and your previous system created
+	# userdb files with a different name (like say with a ".db" suffix).
+	# In that case you configure here what the exact name of the
+	# original userdb files were.
+#orig_userdb=userdb.db
+
+
+################### Custom Programming ##############################
+
+	# perl sub to set the default email address for each user
+#perlsub_default_email={ # do whatever }
+
+	# You can customize where your EMUMAIL home directories go
+	# by appropriately coding a perl subroutine here
+#perlsub_user_home = { my ($user,$domain) = split('@', $_[0]); return "/some/special/path/homes/$domain/$user" }
+
+	# Customize your own perl subroutine for redirecting a user
+	# somewhere else upon logout
+#perlsub_redirect_logout={ # do whatever }
+	
+	# Customize your own perl subroutine for redirecting a user
+	# somewhere else upon login.  Useful for switching to https://
+	# upon login.  Also useful when the site needs to be closed
+	# temporarily.
+#perlsub_redirect_login={ # do whatever }
+
+	# customized subroutines in Custom.pm. Use these to do special
+	# processing. Set settings to true if you want to use the sub
+	# and provide your own custom code within Custom.pm
+	#
+	# The available calls are:
+	# pre_login_sub -> calls &EMU::Custom::login_sub($user_name)
+	# 	PRIOR to login.
+	# success_login_sub -> calls &EMU::Custom::success_login($user_name)
+	#	 upon a SUCCESSFUL login by the user.
+	# first_login_sub -> calls &EMU::Custom::first_login($user_name) 
+	# 	only during the first login by a user
+	# failed_login_sub -> calls &EMU::Custom::bad_login($user_name) if a
+	#	failed login attempt occurs. 
+pre_login_sub=false
+success_login_sub=false
+first_login_sub=false
+failed_login_sub=false
+
+# END

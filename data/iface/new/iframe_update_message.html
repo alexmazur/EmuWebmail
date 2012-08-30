@@ -1,0 +1,21 @@
+[-
+  $data = &EMU::get_var('data');
+  $refresh_frame = &EMU::get_var('refresh_frame');
+-]
+
+<html>
+<head>
+<META HTTP-EQUIV="Refresh" CONTENT="[+ $refresh_frame +]; URL=[+ $EMU::EMU_URL +]?&passed=mailcheck">
+</head>
+<body>
+[$ if ($data>0) $]
+<script language=JavaScript>
+var res = confirm('You have new mail. Do you want to refresh your INBOX?');
+if (res)
+{
+	parent.location = '[+ $EMU::EMU_URL +]?folder=INBOX&passed=go_index&variable=refresh';
+}
+</script>
+[$ endif $]
+</body>
+</html>

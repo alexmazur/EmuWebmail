@@ -1,0 +1,207 @@
+[-
+   $args = shift @param;
+
+   %contacts = %{ &EMU::get_var('contacts') };
+   @to = @{ &EMU::get_var('to') };
+   @cc = @{ &EMU::get_var('cc') };
+   @bcc = @{ &EMU::get_var('bcc') };
+   @groups = grep(/^addressgroup\./, keys %EMU::userdb);
+-]
+<html>
+<head>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<title>EMU Webmail - Add Recepients</title>
+<script language='Javascript'>
+
+function saveChanges() {
+   var to, cc, bcc;
+
+   to  = document.popup.to.value;
+   cc  = document.popup.cc.value;
+   bcc = document.popup.bcc.value;
+
+
+   for (var i=0; i<document.popup.elements.length; i++) {
+      var item = document.popup.elements[i];
+      if (item.type != 'checkbox' || !item.checked) { continue; }
+
+      switch (item.value) {
+         case  "to":
+            if (to == '') { to = item.name; }
+            else { to += ', '+item.name; }
+            break;
+         case  "cc":
+            if (cc == '') { cc = item.name; }
+            else { cc += ', '+item.name; }
+            break;
+         case "bcc":
+            if (bcc == '') { bcc = item.name; }
+            else { bcc += ', '+item.name; }
+            break;
+      }
+   }
+
+   arr_to=to.split(/, /);
+   arr1=[];
+   for (i in arr_to) {
+      if (arr_to[i])
+         arr1[arr_to[i]]++;
+   }
+   arr_to=[];
+   for (i in arr1) arr_to[arr_to.length]=i;
+
+   arr_cc=cc.split(/, /);
+   arr2=[];
+   for (i in arr_cc) {
+      if (arr_cc[i])
+         arr2[arr_cc[i]]++;
+   }
+   arr_cc=[];
+   for (i in arr2) arr_cc[arr_cc.length]=i;
+
+   arr_bcc=bcc.split(/, /);
+   arr3=[];
+   for (i in arr_bcc) {
+      if (arr_bcc[i])
+         arr3[arr_bcc[i]]++;
+   }
+   arr_bcc=[];
+   for (i in arr3) arr_bcc[arr_bcc.length]=i;
+
+   window.opener.setRecipients(arr_to, arr_cc, arr_bcc);
+   window.close();
+}   
+
+
+function handleClick(cbox) {
+   if (!cbox.checked) { return; }
+
+   var elements = document.popup.elements;
+   
+   for (var i=0; i < elements.length; i++) {
+      if (elements[i].name == cbox.name && elements[i] != cbox) {
+         elements[i].checked = false;
+      }
+   }
+}
+   
+</script>
+<link rel="stylesheet" type="text/css" href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css">
+</head>
+
+<body>
+
+<form name='popup' action='[+ $EMU::EMU_URL +]' method='POST'>
+  <input type='hidden' name='passed' value='address_select'>
+  <input type='hidden' name='to'  value='[+ join(', ',  @to) +]'>
+  <input type='hidden' name='cc'  value='[+ join(', ',  @cc) +]'>
+  <input type='hidden' name='bcc' value='[+ join(', ', @bcc) +]'>
+
+  <div class="mediumText centered">Select the addresses you would like to send your message to, then click
+        "Select".<br>&nbsp;
+  </div>
+  
+  <div id="folder-content">
+  <fieldset>
+    <legend align="bottom" class="blue">AddressBook</legend>
+    <table border="0" cellpadding="0" cellspacing="5" width="100%">
+      <tr>
+        <td>
+          <table width="100%" border="0" cellspacing="0" cellpadding="1">
+            <tr>
+              <th id=grid-header class="grid-header1 narrow">To:</th>
+              <th id=grid-header class="narrow">CC:</th>
+              <th id=grid-header class="narrow">BCC:</td>
+              <th id=grid-header class=left>Name:</th>
+              <th id=grid-header class=left>Email:</th>
+            </tr>
+            [$ if (%contacts) $]
+              [$ foreach $c (sort {lc($a) cmp lc($b)} keys %contacts) $]
+              [-
+                  $tochecked = $ccchecked = $bccchecked = "";
+  
+                  if ($contacts{$c}{to}) {
+                    $tochecked  = 'checked';
+                  } elsif ($contacts{$c}{cc}) {
+                    $ccchecked  = 'checked';
+                  } elsif ($contacts{$c}{bcc}) {
+                    $bccchecked = 'checked';
+                  }
+                  $contacts{$c}{email} =~ s/<(.*?@.*?)>/$1/g;
+              -]
+              <tr>
+                <td id=grid-data1 class=centered>
+                  <input type='checkbox' name="[+ $contacts{$c}{email} +]" value='to' onclick='handleClick(this)' [+ $tochecked +]>
+                </td>
+                <td id=grid-data class=centered>
+                  <input type='checkbox' name="[+ $contacts{$c}{email} +]" value='cc' onclick='handleClick(this)' [+ $ccchecked +]>
+                </td>
+                <td id=grid-data class=centered>
+                  <input type='checkbox' name="[+ $contacts{$c}{email} +]" value='bcc' onclick='handleClick(this)' [+ $bccchecked +]>
+                </td>
+                <td id=grid-data>[+ $c +]&nbsp;</td>
+                <td id=grid-data>[+ $contacts{$c}{email} +]&nbsp;</td>
+              </tr>
+              [$ endforeach $]
+            [$ else $]
+              <tr>
+                <td colspan="5" id=grid-data1 class="red centered"><br>Your Addressbook is Empty.<br>&nbsp;</td>
+              </tr>          
+            [$ endif $]
+            </table>
+        </td>
+      </tr>
+    </table>
+  </fieldset>
+  
+  <fieldset>
+  <legend align="bottom" class=blue>Groups</legend>
+  <table border="0" cellpadding="0" cellspacing="5" width="100%">
+    <tr>
+      <td>
+        <table width="100%" border="0" cellspacing="0" cellpadding="1">
+          <tr>
+            <th id=grid-header class="grid-header1 narrow">To:</th>
+            <th id=grid-header class="narrow">CC:</th>
+            <th id=grid-header class="narrow">BCC:</th>
+            <th id=grid-header class=left>Name:</th>
+            <th id=grid-header class=left>Email:</th>
+          </tr>
+          [$ if (@groups) $]
+            [$ foreach $ent (@groups) $]
+              [- $ent =~s/^addressgroup\.// -]
+              [-
+                 $maile=$EMU::userdb{"addressgroup.$ent"};
+                 $maile =~ s/<(.*?@.*?)>/$1/g;
+                 $maile=~s/('.*?'\|\|)//gs;
+                 $maile=~s/:/, /gs;
+              -]
+  
+            <tr>
+              <td id=grid-data1 class=centered><input type='checkbox' name='[+ $maile +]' value='to' onclick='handleClick(this)'></td>
+              <td id=grid-data class=centered><input type='checkbox' name='[+ $maile +]' value='cc' onclick='handleClick(this)'></td>
+              <td id=grid-data class=centered><input type='checkbox' name='[+ $maile +]' value='bcc' onclick='handleClick(this)'></td>
+              <td id=grid-data>[+ $ent +]&nbsp;</td>
+              <td id=grid-data>[+ $maile +]&nbsp;</td>
+            </tr>
+           [$ endforeach $]
+      
+         [$ else $]
+         <tr>
+           <td colspan="5" align="center"><font class="alert">&nbsp;<br>You have no Groups<br>&nbsp;</td>
+         </tr>
+         [$ endif $]
+       </table>
+     </td>
+   </tr>
+  </table>
+  </fieldset>
+  </div>
+
+<div align="center">&nbsp;<br>
+<input type="image" value="Select" onclick="saveChanges()"src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/selectButton.gif">
+<input type="image" value="Cancel" onclick="window.close()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/cancelButton.gif">
+</div>
+</form>
+</body>
+</html>

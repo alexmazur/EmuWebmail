@@ -1,0 +1,113 @@
+[- 
+   $args = shift @param;
+
+   # We were passed the subscribed folders
+   @subscribed = @{ $args->{folders} };
+
+   # This get_folders should be calling up cached data since we recently did a Folder Manager request.
+   foreach my $f (&EMU::get_folders()) {
+      if ($f ne $EMU::inbox &&
+          $f ne 'Search Results' &&
+          !$EMU::userdb{"folder:$f:external"} &&
+          !grep($_ eq $f, @subscribed)) {
+          push(@unsubscribed, $f);
+      }
+   }
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Folder Subscriptions</title>
+<script language='Javascript'>
+
+function saveChanges(form) {
+   
+   var dataArray = new Array(form.subscribed.options.length);
+
+   for (var i=0; i < form.subscribed.options.length; i++) {
+      dataArray[i] = form.subscribed.options[i].text;
+   }
+   
+   window.opener.saveSubscriptions(dataArray);
+   window.close();
+}   
+
+function cleanSelects()
+{
+   document.emuform.subscribed.options[0] = null;
+   document.emuform.unsubscribed.options[0] = null;
+}
+
+function moveSelected(from, to)
+{
+   var i=0;
+   while (i<from.options.length) {
+      if (from.options[i].selected) {
+         to.options[to.options.length] = new Option(from.options[i].text, from.options[i].value);
+         from.options[i] = null;
+      } else {
+         i++;
+      }
+   }
+}
+
+function moveAll(from, to)
+{
+
+   while (from.options.length > 0) {
+      to.options[to.options.length] = new Option(from.options[0].text, from.options[0].value);
+      from.options[0] = null;
+   }
+}
+
+</script>
+<link rel="stylesheet" type="text/css" href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css">
+</head>
+
+<body class="popup" onLoad='cleanSelects()'>
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+
+<table border="0" cellpadding="0" cellspacing="15" align="center">
+ <tr>
+  <td><font class="DefaultText">Using the select boxes below, choose
+  which Folders you would like to be flagged as 'Subscribed'. Only
+  Subscribed folders will show up when saving messages, or on the left menu.
+  This can be very useful if you have a large quantity of folders. If you're
+  unsure, just click 'Subscribe All'.</font></td>
+ </tr>
+</table>
+<table border="0" cellspacing="0" cellpadding="6" align="center">
+ <tr class="BodyButtonBar">
+  <td><font class="GridHeader">Subscribed Folders</font></td>
+  <td><font class="GridHeader">&nbsp;</font></td>
+  <td><font class="GridHeader">Unsubscribed Folders</font></td>
+ </tr><tr class="BodyButtonBar"> 
+  <td align="center"><select name='subscribed' style="width: 200px" size="12" multiple class="DefaultSelect">
+         <option>xxxxxxxxxxxxxxxxxxxxx
+         [$ foreach $f (@subscribed) $]
+            <option>[+ $f +]
+         [$ endforeach $]
+        </select></td>
+  <td align="center"><input type='button' value='Unsubscribe -->'
+onclick='moveSelected(this.form.subscribed,
+this.form.unsubscribed)' class="DefaultButton"><br><br><input type='button' value='<-- Subscribe' onclick='moveSelected(this.form.unsubscribed, this.form.subscribed)'
+class="DefaultButton"></td>
+  <td align="center"><select name='unsubscribed' style="width: 200px" size="12" multiple class="DefaultSelect">
+         <option>xxxxxxxxxxxxxxxxxxxxx
+         [$foreach $f (@unsubscribed) $]
+            <option>[+ $f +]
+         [$ endforeach $]
+        </select></td>
+ </tr><tr class="BodyButtonBar">
+  <td align="center"><input type='button' value='Unsubscribe All' onclick='moveAll(this.form.subscribed, this.form.unsubscribed)' class="DefaultButton"></td>
+  <td>&nbsp;</td>
+  <td align="center"><input type='button' value='Subscribe All' onclick='moveAll(this.form.unsubscribed, this.form.subscribed)' class="DefaultButton"></td>
+ </tr>
+</table>
+<div align="center">
+&nbsp;<br>
+<input type="button" value="Save Changes" onclick='saveChanges(this.form)' class="DefaultButton">&nbsp;<input type="button" value="Cancel" onclick="window.close()" class="DefaultButton">
+</div>
+</form>
+</body>
+</html>
+

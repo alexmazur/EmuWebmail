@@ -1,0 +1,75 @@
+GMT	(GMT) Casablanca, Monrovia						Greenwich	
+GDST	(GMT) Greenwich Mean Time : Dublin, Edinburgh, Lisbon, London		GMT					
+WEUR	(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna		W. Europe					
+CEUR1	(GMT+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague		Central Europe					
+ROM	(GMT+01:00) Brussels, Copenhagen, Madrid, Paris				Romance			
+CEUR2	(GMT+01:00) Sarajevo, Skopje, Sofija, Vilnius, Warsaw, Zagreb		Central European					
+WCAFR	(GMT+01:00) West Central Africa						W. Central Africa	
+GTB	(GMT+02:00) Athens, Istanbul, Minsk					GTB		
+EEUR	(GMT+02:00) Bucharest							E. Europe
+EGYPT	(GMT+02:00) Cairo							Egypt
+SAFR	(GMT+02:00) Harare, Pretoria						South Africa	
+FLE	(GMT+02:00) Helsinki, Riga, Tallinn					FLE		
+JERUS	(GMT+02:00) Jerusalem							Jerusalem
+ARAB1	(GMT+03:00) Baghdad							Arabic
+ARAB2	(GMT+03:00) Kuwait, Riyadh						Arab	
+RUSS	(GMT+03:00) Moscow, St. Petersburg, Volgograd				Russian			
+EAFR	(GMT+03:00) Nairobi							E. Africa
+IRAN	(GMT+03:30) Tehran							Iran
+ARAB3	(GMT+04:00) Abu Dhabi, Muscat						Arabian	
+CAUCA	(GMT+04:00) Baku, Tbilisi, Yerevan					Caucasus		
+AFGH	(GMT+04:30) Kabul							Afghanistan
+EKAT	(GMT+05:00) Ekaterinburg						Ekaterinburg	
+WASIA	(GMT+05:00) Islamabad, Karachi, Tashkent				West Asia			
+INDIA	(GMT+05:30) Calcutta, Chennai, Mumbai, New Delhi			India				
+NEPAL	(GMT+05:45) Kathmandu							Nepal
+NCAS	(GMT+06:00) Almaty, Novosibirsk						N. Central Asia	
+CASIA	(GMT+06:00) Astana, Dhaka						Central Asia	
+SRI	(GMT+06:00) Sri Jayawardenepura						Sri Lanka	
+MYAN	(GMT+06:30) Rangoon							Myanmar
+SEAS	(GMT+07:00) Bangkok, Hanoi, Jakarta					SE Asia		
+NASIA	(GMT+07:00) Krasnoyarsk							North Asia
+CHINA	(GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi			China				
+NEAS	(GMT+08:00) Irkutsk, Ulaan Bataar					North East Asia		
+MALAY	(GMT+08:00) Kuala Lumpur, Singapore					Malay Peninsula		
+WAUS	(GMT+08:00) Perth							W. Australia
+TAIPE	(GMT+08:00) Taipei							Taipei
+JAPAN	(GMT+09:00) Osaka, Sapporo, Tokyo					Tokyo		
+KOREA	(GMT+09:00) Seoul							Korea
+YAKUT	(GMT+09:00) Yakutsk							Yakutsk
+CAUS	(GMT+09:30) Adelaide							Cen. Australia
+AUSC	(GMT+09:30) Darwin							AUS Central
+EAUS	(GMT+10:00) Brisbane							E. Australia
+AUSE	(GMT+10:00) Canberra, Melbourne, Sydney					AUS Eastern		
+WPAS	(GMT+10:00) Guam, Port Moresby						West Pacific	
+TASM	(GMT+10:00) Hobart							Tasmania
+VLAD	(GMT+10:00) Vladivostok							Vladivostok
+CPAS	(GMT+11:00) Magadan, Solomon Is., New Caledonia				Central Pacific			
+NZEA	(GMT+12:00) Auckland, Wellington					New Zealand		
+FIJI	(GMT+12:00) Fiji, Kamchatka, Marshall Is.				Fiji			
+TONGA	(GMT+13:00) Nuku'alofa							Tonga
+AZORE	(GMT-01:00) Azores							Azores
+CAPE	(GMT-01:00) Cape Verde Is.						Cape Verde
+MATL	(GMT-02:00) Mid-Atlantic						Mid-Atlantic	
+ESAM	(GMT-03:00) Brasilia							E. South America
+SAME	(GMT-03:00) Buenos Aires, Georgetown					SA Eastern		
+GREEN	(GMT-03:00) Greenland							Greenland
+NEWF	(GMT-03:30) Newfoundland						Newfoundland	
+ALTL	(GMT-04:00) Atlantic Time (Canada)					Atlantic		
+SAMW	(GMT-04:00) Caracas, La Paz						SA Western	
+PASSA	(GMT-04:00) Santiago							Pacific SA
+SAPAS	(GMT-05:00) Bogota, Lima, Quito						SA Pacific	
+EAST	(GMT-05:00) Eastern Time (US & Canada)					Eastern		
+USEAS	(GMT-05:00) Indiana (East)						US Eastern	
+CAM	(GMT-06:00) Central America						Central America	
+CENTR	(GMT-06:00) Central Time (US & Canada)					Central		
+MEX	(GMT-06:00) Mexico City							Mexico
+CANC	(GMT-06:00) Saskatchewan						Canada Central	
+USMOU	(GMT-07:00) Arizona							US Mountain
+MOUNT	(GMT-07:00) Mountain Time (US & Canada)					Mountain		
+PAS	(GMT-08:00) Pacific Time (US & Canada); Tijuana				Pacific			
+ALASK	(GMT-09:00) Alaska							Alaska
+HAWAI	(GMT-10:00) Hawaii						 	Hawaii
+SAMOA	(GMT-11:00) Midway Island, Samoa					Samoa		
+DATE	(GMT-12:00) Eniwetok, Kwajalein						Dateline	
+

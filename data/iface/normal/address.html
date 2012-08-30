@@ -1,0 +1,238 @@
+[-
+   $args = shift @param;
+
+   my @data = &EMU::get_addrs_array();
+   @addrnums = @{ $data[0] };
+   %addrdata = %{ $data[1] };
+
+   $theme = $args->{theme};
+
+   foreach $a (@addrnums) {
+      $nick  = $addrdata{"n$a"};
+      push(@nicknames, $nick);
+   }
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Addressbook</title>
+<script language="JavaScript">
+
+var Nicknames = new Array();
+
+[- $i = 0; -]
+[$ foreach $n (@nicknames) $]
+   [- $n =~ s/'/\\'/g; -]
+   Nicknames[ [+ $i +] ] = '[+ $n +]';
+   [- $i++; -]
+[$ endforeach $]
+
+function edit_contact(nick_index) {
+    document.addrform.passed.value="parse";
+    document.addrform.variable.value="contact_editor.html";
+    document.addrform.orig.value=Nicknames[nick_index];
+    document.addrform.submit();
+}
+
+function composeEmail() {
+    document.addrform.passed.value="compose";
+    var email = "";
+[$ foreach $a (@addrnums) $]
+[- $addrdata{"e$a"} =~ s!'!\\'!g; -]
+    if (document.addrform.d[+ $a +].checked) {
+
+        if (email == "")
+            email = '[+ $addrdata{"e$a"} +]';
+        else
+            email = email + ',[+ $addrdata{"e$a"} +]';
+    }
+[$ endforeach $]
+
+    if (email != "") {
+        document.addrform.to.value = email;
+        document.addrform.submit();
+    } else {
+        alert("You must select recipients.");
+        return;
+    }
+}
+
+function checkAll(val) {
+   if (document.addrform.d.length) {
+      for (var i=0; i<document.addrform.d.length; i++) {
+         eval("document.addrform.d"+i+".checked = val");
+      }
+   } else {
+      document.addrform.d.checked = val;
+   }
+}
+
+</script>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='addrform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='address_parse'>
+<input type='hidden' name='variable' value='address_parse'>
+<input type='hidden' name='orig' value=''>
+<input type='hidden' name='nick' value=''>
+<input type='hidden' name='full' value=''>
+<input type='hidden' name='email' value=''>
+<input type='hidden' name='to' value=''>
+
+[$ if (&EMU::get_var('passed') eq 'address') $]
+<input type='hidden' name='new_nick' value='[+ &EMU::get_var('nick') +]'>
+<input type='hidden' name='new_full' value='[+ &EMU::get_var('full') +]'>
+<input type='hidden' name='new_email' value='[+ &EMU::get_var('addr') +]'>
+[$endif $]
+
+<!/form>
+
+<!form name='delform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<!input type='hidden' name='passed' value='address_parse'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="2" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Addressbook</td>   
+ </tr>
+</table>
+[# Close PreBody #]
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu"> 
+  <td valign="top">
+
+
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args, \@folders) -]
+[# Close Menu #]
+
+
+</td>
+
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>  
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="BodyGridOutline">
+  <td><table width="100%" border="0" cellspacing="1" cellpadding="3">
+    <tr class="BodyButtonBar">
+     <td colspan="4"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr>
+        <td>
+[$ if (@addrnums) $]
+<input type="submit" value="Delete Selected" class="DefaultButton">&nbsp;<input type="button" value="Email Selected" class="DefaultButton" onClick="composeEmail();">
+[$ endif $]
+</td>
+        <td align="right"><input type="button"
+value="Import/Export"  onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=address_import_export.html'
+class="DefaultButton">
+[$ if ($EMU::c{ldap_search_host}) $]
+&nbsp;<input type="button" value="LDAP Search" onClick="window.location='[+ &EMU::make_url('directory') +]'" class="DefaultButton">
+[$ endif $]
+&nbsp;<input type="button" value="Add Contact"
+onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html' class="DefaultButton"></td>
+       </tr>
+      </table></td>
+    </tr>
+
+[$ if (&EMU::get_status()) $]
+    <tr class="GridData">
+     <td colspan="4" align="center"><font class="Alert">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;</font></td>
+    </tr>
+[$ endif $]
+
+[$ if (!@addrnums) $]
+    <tr class="GridData">
+     <td colspan="4"><table width="100%" cellpadding="0" cellspacing="20" border="0">
+        <tr>
+         <td height="300" align="center"><font class="alert">&nbsp;<br>Your Addressbook is empty.<br>&nbsp;<br><a
+href="#" class="Default" onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html' class="DefaultButton">
+Add Contact</a><br>&nbsp;</font></td>
+        </tr>
+       </table></td>
+    </tr>
+[$ else $]
+    <tr class="GridHeader">
+     <td align="center">&nbsp;<input type="checkbox" onClick='checkAll(this.checked)'></td>
+     <td width="30%"><font class='DefaultHeader'>Nickname</font></td>
+     <td width="30%"><font class='DefaultHeader'>Name</font></td>
+     <td width="40%"><font class='DefaultHeader'>Email</font></td>
+    </tr>
+[$ endif $]
+
+[- $i = 0; -]
+[$ foreach $a (@addrnums) $]
+
+[- 
+  # A few specifics
+  $nick  = $addrdata{"n$a"} || '[Blank]';
+  ($safenick = $nick) =~ s/'/\&#39;/g;
+  $email = $addrdata{"e$a"};
+  $email =~ s/<(.*?)>/$1/;
+  $full  = $addrdata{"f$a"};
+  $email =~ s!\\'!'!g;
+-]
+
+<input type='hidden' name='orig[+ $a +]' value='[+ $safenick +]'>
+
+    <tr class="GridData">
+     <td nowrap align="center"><font size="1"><input type="hidden" name="d" value="[+ $a +]">&nbsp;<input type="checkbox" name="d[+ $a +]"></font></td>
+     <td><a href='#' onclick="edit_contact([+ $i +]);return false;" class="GridData">[+ $nick +]</a></td>
+     <td><font class='GridData'>[+ $full +]&nbsp;</font></td>
+     <td><font class="GridData">[+ $email +]&nbsp;</font></td>
+    </tr>
+[- $i++; -]
+[$ endforeach $]
+    <tr class="BodyButtonBar"> 
+     <td colspan="4"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr> 
+        <td>
+[$ if (@addrnums) $]
+<input type="submit" value="Delete Selected" class="DefaultButton">&nbsp;<input type="button" value="Email Selected" class="DefaultButton" onClick="composeEmail();">
+[$ endif $]
+</td>
+        <td align="right"><input type="button" value="Import/Export"  onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=address_import_export.html'
+class="DefaultButton">
+[$ if ($EMU::c{ldap_search_host}) $]
+&nbsp;<input type="button" value="LDAP Search" onClick="window.location='[+ &EMU::make_url('directory') +]'" class="DefaultButton">
+[$ endif $]
+&nbsp;<input type="button" value="Add Contact" onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html' class="DefaultButton"></td>
+       </tr>
+      </table></td>
+    </tr>
+   </table></td>
+ </tr>
+</table>
+[# Close Body #]
+</td>
+</tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+
+</form>
+</body>
+</html>
+

@@ -1,0 +1,177 @@
+[-
+   $args = shift @param;
+
+   $theme = $args->{theme};
+   $log = &EMU::get_var('log');;
+   $addr = &EMU::get_var('data');
+   $addr =~s/addresses\.//g;
+   @addr = split(/\|\|/, $addr);
+   @used=();
+-]
+
+<html>
+<head>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<title>[+ $EMU::c{publisher_name} +] - Address Group Editor</title>
+<script language="JavaScript">
+
+function deleteOption(object,index) {
+    object.options[index] = null;
+}
+
+function addOption(object,text,value) {
+    var defaultSelected = true;
+    var selected = true;
+    var optionName = new Option(text, value, defaultSelected, selected)
+    object.options[object.length] = optionName;
+}
+
+function copySelected(fromObject,toObject) {
+    for (var i=0, l=fromObject.options.length;i<l;i++) {
+        if (fromObject.options[i].selected)
+            addOption(toObject,fromObject.options[i].text,fromObject.options[i].value);
+    }
+    for (var i=fromObject.options.length-1;i>-1;i--) {
+        if (fromObject.options[i].selected)
+            deleteOption(fromObject,i);
+    }
+}
+
+function copyAll(fromObject,toObject) {
+    for (var i=0, l=fromObject.options.length;i<l;i++) {
+        addOption(toObject,fromObject.options[i].text,fromObject.options[i].value);
+    }
+    for (var i=fromObject.options.length-1;i>-1;i--) {
+        deleteOption(fromObject,i);
+    }
+}
+
+function saveChanges() {
+
+    for(ii=0;ii<document.emuform.select2.options.length;ii++){
+         document.emuform.select2.options[ii].selected=true;
+    }
+    document.emuform.submit();
+}
+</script>
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name="emuform" action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='passed' value='edit_address_group'>
+          <input type='hidden' name='folder_selected' value='[+ $EMU::inbox  +]'>
+          <input type='hidden' name='select_group' value='[+ $log +]'>
+
+          <div id=folder-title> 
+            <div id=folder-name>[$ if ($log) $]Modify Group "[+ $log +]"[$ else $]Modify Group Settings[$ endif $]</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              <input type="image" value="Save Changes" onclick="saveChanges()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveChangesButton.gif">
+              <input type="image" value="Cancel" onclick="window.location='[+ $EMU::EMU_URL +]?passed=address_groups'; return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/cancelButton.gif">
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+          [$ if (@addr) $]
+          <table width="100%" border="0" cellspacing="2" cellpadding="0">
+            <tr>
+               <td align="right">Address Group Name:&nbsp;</td>
+               <td><input type="text" name="groupname" size="25" value="[+ $log +]"></td>
+            </tr>
+            <tr>
+              <td align="right">Select Address Name:&nbsp;</td>
+              <td>
+                <table>
+                  <tr>
+                    <td align="center">
+                      <fieldset>
+                        <legend align="bottom">Users Not Affiliated></legend>
+                        <select name="select1" multiple size="12" style="width:240px">
+                        [$ foreach $name (@addr) $]
+                          [-
+                             $usrdb = $EMU::userdb{"addresses.$name"};
+                             ($email, $nick) = split/:/, $usrdb;
+                          -]
+                          [$ if ($EMU::userdb{"addressgroup.$log"}=~m/\'$nick\'\|\|$email/g) $]
+                            [- push(@used, "$nick:$email") -]
+                          [$ else $]
+                            <option value="'[+ $nick +]'||[+ $email +]" title="[+ $email +]">[+ $nick +] < [+ $email +] ></option>
+                          [$endif $]
+                        [$ endforeach $]
+                        </select>
+                      </fieldset>
+                    </td>
+                    <td align="right">
+                      <input type="image" value=" > " onClick="if (document.images) { copySelected(this.form.select1,this.form.select2); return false;}" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/rCopyButton.gif">
+                      <p>
+                      <input type="image" value=" < " onClick="if (document.images) { copySelected(this.form.select2,this.form.select1); return false;}" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/lCopyButton.gif">
+                      <p>
+                      <input type="image" value=">>" onClick="if (document.images) { copyAll(this.form.select1,this.form.select2); return false;}" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/rCopyAllButton.gif">
+                      <p>
+                      <input type="image" value="<<" onClick="if (document.images) { copyAll(this.form.select2,this.form.select1); return false;}" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/lCopyAllButton.gif">
+                    </td>
+                    <td align="center">
+                      <fieldset>
+                        <legend align="bottom">Users Affiliated</legend>
+                        <select name="select2" multiple size="12" style="width:240px">
+                        [$ if (@addr) $]
+                          [$ foreach $name_ex (@used) $]
+                            [- ($name, $maile) = split(/:/, $name_ex) -]
+                            <option value="'[+ $name +]'||[+ $maile +]" title="[+ $maile +]">[+ $name +] < [+ $maile +] ></option>
+                          [$ endforeach $]
+                        [$ endif $]
+                        </select>
+                      </fieldset>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          [$ else $]
+            <div class="mediumText red centered"><br>Your Addressbook is empty.<br>&nbsp;</div>
+            <br>
+            <div class="mediumText blue centered"><a href="#" onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html'>
+                  Add Contact</a></div>
+          [$ endif $]
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              <input type="image" value="Save Changes" onclick="saveChanges()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveChangesButton.gif">
+              <input type="image" value="Cancel" onclick="window.location='[+ $EMU::EMU_URL +]?passed=address_groups'; return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/cancelButton.gif">
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

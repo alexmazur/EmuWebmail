@@ -1,0 +1,190 @@
+/* ************************************************************** */
+/*                                                                */
+/*    SKIN FILE for EMU WEBMAIL 5.X                               */
+/*    Copyright 2001, EMUMAIL Inc.                                */
+/*                                                                */
+/*     Skin Name: Classic                                         */
+/*       Created: Dec 5, 2001 by WELJR                            */
+/*   Description: This is a preset skin that comes packaged       */
+/*                with Webmail 5.x                                */
+/*         Notes: EMU Skin files consist of code that is          */
+/*                compliant with the Cascading Style Sheets,      */
+/*                Level 2, Specification (CSS2) recommended by    */
+/*                the World Wide Web Consortium (W3C). For more   */
+/*                information or for a reference on CSS2,         */
+/*                visit http://www.w3.org/Style/CSS/              */
+/*                                                                */
+/* ************************************************************** */
+
+
+/* Styles Common to Webmail and other integrated EMU Products     */
+/* ************************************************************** */
+
+
+body			{ background-color: #FFFFFF; background-image: url(); 
+			  margin-top: 10px; margin-left: 20px; scrollbar-track-color: ; 
+			  scrollbar-face-color: ; scrollbar-highlight-color: ; 
+			  scrollbar-3dlight-color: ; scrollbar-darkshadow-color: ; 
+			  scrollbar-shadow-color: ; scrollbar-arrow-color: ; }
+
+body.popup		{ background-color: #FFFFFF; background-image: url(); 
+			  margin-top: 20px; margin-left: 20px; scrollbar-track-color: ; 
+			  scrollbar-face-color: ; scrollbar-highlight-color: ; 
+			  scrollbar-3dlight-color: ; scrollbar-darkshadow-color: ; 
+			  scrollbar-shadow-color: ; scrollbar-arrow-color: ; }
+
+input.DefaultButton	{ background-color: #D9EAF0; border-bottom: #000000 2px solid; 
+			  border-left: #333333 1px solid; border-right: #000000 2px solid; 
+			  border-top: #333333 1px solid; color: #000000; font-size: 11px;
+			  font-weight: normal; }
+
+input.DefaultTextbox	{ background-color: #FFFFFF; width: 200px; 
+			  border-bottom: #333333 1px solid; border-left: #666666 2px solid; 
+			  border-right: #333333 1px solid; border-top: #666666 2px solid; 
+			  color: #000000; font-size: 11px; font-weight: normal; }
+
+textarea.Default	{ background-color: #FFFFFF; border-bottom: #333333 1px solid; 
+			  border-left: #666666 2px solid; border-right: #333333 1px solid; 
+			  border-top: #666666 2px solid; color: #000000; 
+			  font-family: Verdana, Arial; font-size: 11px;
+			  font-weight: normal; }
+
+select.DefaultSelect	{ background-color: #FFFFFF; border-bottom: #333333 1px solid;
+			  border-left: #000000 1px solid; border-right: #333333 1px solid; 
+			  border-top: #000000 2px solid; color: #000000; font-size: 10px;
+			  font-weight: normal; }
+
+input.DefaultFile	{ border-bottom: #000000 1px solid; border-left: #333333 1px solid;
+			  border-right: #000000 1px solid; border-top: #333333 1px solid;
+			  color: #000000; font-size: 10px; font-weight: normal; }
+
+tr.RibbonTop		{ height: 6px; }
+
+tr.RibbonBot		{ height: 6px; }
+
+tr.Menu			{ background-color: #006699; background-image: url(); 
+			  vertical-align: top; }
+
+td.Body			{ background-color: #FFFFFF; background-image: url(); 
+			  vertical-align: top; width: 85%; }
+
+tr.Body			{ background-color: #FFFFFF; background-image: url(); 
+			  vertical-align: top; }
+
+tr.PreBody		{ background-color: #006699; }
+
+tr.PostBody		{ background-color: #006699; }
+
+font.MenuTitle		{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #FFFFFF; font-weight: bold; }
+
+font.MenuSpacer		{ font-family: Verdana, Arial; font-size: 7pt; }
+
+font.MenuSubTitle	{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #FFFFFF; font-weight: bold; }
+
+a.MenuLink		{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #FFFFFF; text-decoration: underline; }
+
+a.MenuLink:hover	{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #E8F9FF; text-decoration: underline; }
+
+tr.MenuLine		{ background-color: #4193BA; }
+
+font.Copyright		{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #006699; text-decoration: underline; }
+
+a.Copyright		{ font-family: Verdana, Arial; font-size: 8pt; 
+			  color: #006699; text-decoration: underline; }
+
+a.Copyright:hover	{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #000000; text-decoration: underline; }
+
+font.Alert		{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #CC0000; font-weight: bold; }
+
+font.PageTitle		{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #FFFFFF; font-weight: bold; }
+
+font.EditionTag		{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #D3445E; font-weight: bold; }
+
+font.PageOptions        { font-family: Verdana, Arial; font-size: 8pt;
+			  color: #FFFFFF; }
+
+font.PageOptionsSpacer  { font-family: Verdana, Arial; font-size: 8pt;
+			  color: #4193BA; }
+
+a.PageOptions		{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #FFFFFF; text-decoration: underline; }
+
+a.PageOptions:hover	{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #E8F9FF; text-decoration: underline; }
+
+font.Login		{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #FFFFFF; }
+
+font.LoginForm		{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #000000; font-weight: normal; }
+
+font.DefaultHeader	{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #000000; font-weight: bold; }
+
+font.DefaultText	{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #000000; font-weight: normal; }
+
+font.DefaultTextReq	{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #CC0000; font-weight: normal; }
+
+font.PopupDefault	{ font-family: Verdana, Arial; font-size: 8pt;
+			  color: #000000; font-weight: normal; }
+
+a.Default		{ color: #006699; text-decoration: underline; }
+
+a.Default:hover		{ color: #000000; text-decoration: underline; }
+
+tr.BodyGridOutline	{ background-color: #006699; }
+
+tr.BodyButtonBar	{ background-color: #4193BA; height: 25px; }
+
+tr.GridHeader		{ background-color: #D9EAF0; }
+
+font.GridHeader         { font-family: Verdana, Arial;
+                          font-size: 9pt; color: #000000; font-weight: bold; }
+
+a.GridHeader		{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #006699; text-decoration: underline;
+			  font-weight: bold; }
+
+a.GridHeader:hover	{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #000000; text-decoration: underline;
+			  font-weight: bold; }
+
+tr.GridData		{ background-color: #FFFFFF; }
+
+font.GridData		{ font-family: Verdana, Arial; font-size: 8pt; color: #000000; }
+
+a.GridData		{ font-family: Verdana, Arial; font-size: 8pt; color: #006699;
+			  text-decoration: underline; }
+
+a.GridData:hover	{ font-family: Verdana, Arial; font-size: 8pt; color: #000000;
+			  text-decoration: underline; }
+
+
+
+/* Styles Specific to Webmail                                     */
+/* ************************************************************** */
+
+
+td.LogoWindow		{ height: 70px; width: 250px; background-repeat: no-repeat; }
+
+font.MessageText	{ font-family: Verdana, Arial; font-size: 9pt;
+			  color: #000000; font-weight: normal; }
+
+tr.SubHeaderBar		{ background-color: #D9EAF0; }
+
+input.ContactsTextbox	{ background-color: #FFFFFF; width: 150px;
+			  border-bottom: #333333 1px solid; border-left: #666666 2px solid; 
+			  border-right: #333333 1px solid; border-top: #666666 2px solid; 
+			  color: #000000; font-size: 10px; font-weight: normal; }
+

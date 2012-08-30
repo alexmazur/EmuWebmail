@@ -1,0 +1,158 @@
+[-
+   ($args) = (@param);
+   $folders = &EMU::get_organized_folders();
+
+
+   # Don't show sub menu's if the top level is closed
+   if ($folders && !&EMU::get_menu_setting('main')) {
+      $folders = '';
+   } elsif ($folders) {
+      # Don't show folders for closed menus
+      foreach my $f (keys %$folders) {
+         if (!&EMU::get_menu_setting($f)) {
+            $folders->{$f} = '';
+         }
+      }
+   }
+
+   %sections = (local => 'Local Folders',
+                imap => 'IMAP Folders',
+                mailboxes => 'Mailboxes',
+                other => 'OTHER'
+               );
+
+   sub get_menu_img {
+      if ($_[0]) { return 'menu_minus.gif' }
+      else       { return 'menu_plus.gif'  }
+   }
+
+   $name = $EMU::userdb{'options.real_name'};
+   if (defined $EMU::userdb{'options.email'}) {
+      $email  = $EMU::userdb{'options.email'};
+   } else {
+      $email = &EMU::get_var('user_name');
+   }
+   $now = &EMU::get_date(undef,undef,undef,1);
+   $theme = $args->{theme};
+
+   @admins = split(/(,|\s)+/, $EMU::c{admins});
+-]
+</script>
+
+[# Open Greeting #]
+<table width="100%" border="0" cellspacing="0" cellpadding="2">
+ <tr>
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+ </tr><tr>
+  <td align="center"><font class="MenuTitle">[$ if $name $]<b>[+ $name +]</b><br>[$ endif $]&nbsp;[+ $email +]&nbsp;<br>[+ $now +]</font></td>
+ </tr>
+</table>
+[# Close Greeting #]
+
+[# Open Product Menu #]
+<table width="100%" border="0" cellspacing="4" cellpadding="0">
+[$ if ($EMU::c{cal_url}) $]
+ <tr>
+  <td colspan="2"><img src="[+ $args->{IMGURL} +]/point.gif" height="5" width="3"></td>
+ </tr><tr class="MenuLine">
+  <td colspan="3"><img src="[+ $args->{IMGURL} +]/point.gif" height="1" width="1"></td>
+ </tr><tr>
+  <td colspan="3"><img src="[+ $args->{IMGURL} +]/point.gif" height="5" width="3"></td>
+ </tr><tr>
+  <td align=right><img border=0 src='[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/menu_bullet.gif' alt="Currently Viewing Email"></td>
+  <td colspan="2"><a href='[+ $EMU::EMU_URL +]?passed=go_index' class="MenuLink"><b>Email</b></a></td>
+ </tr><tr>
+  <td><font class="MenuSpacer">&nbsp;</font></td>
+  <td colspan="2"><a href='[+ $EMU::c{cal_url} +]' class="MenuLink">Calendar</font></a></td>
+ </tr><tr>
+  <td colspan="3"><img src="[+ $args->{IMGURL} +]/point.gif" height="5" width="3"></td>
+ </tr><tr class="MenuLine">
+  <td colspan="3"><img src="[+ $args->{IMGURL} +]/point.gif" height="1" width="1"></td>
+ </tr><tr>
+  <td colspan="3"><img src="[+ $args->{IMGURL} +]/point.gif" height="5" width="3"></td>
+ </tr>
+[$ endif $]
+[# Close Product Menu #]
+
+[# Open Calendar Menu #]
+ <tr> 
+  <td></td>
+  <td colspan="2"><a href="[+ &EMU::make_url('go_index','refresh') +]" class="MenuLink">Get New Email</a></td>
+ </tr> <tr> 
+  <td></td>
+  <td colspan="2"><a href="[+ &EMU::make_url('compose') +]" class="MenuLink">Compose Message</a></td>
+ </tr><tr> 
+  <td align="right">
+[$ if (defined $folders) $]<a href='[+ $EMU::EMU_URL +]?passed=toggle_menu&next=go_index&menu=main'><img border=0 src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/".&get_menu_img(ref $folders) +]" height="9" width="9" alt="" hspace="2"></a>[$ endif $]</td>
+  <td colspan="2"><a href="[+ $EMU::EMU_URL +]?passed=go_index&folder=[+ &EMU::get_var('inbox') +]" class="MenuLink">[+ &EMU::get_var('inbox') +]</a></td>
+ </tr>
+[$ if (ref $folders) $]
+ [$ foreach $t (qw/local imap mailboxes/) $]
+  [$ if (exists $folders->{$t}) $]
+ <tr>
+  <td></td>
+  <td align="right"><a href='[+ $EMU::EMU_URL +]?passed=toggle_menu&next=go_index&menu=[+ $t +]'><img border=0 src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/".&get_menu_img(ref $folders->{$t}) +]" height="9" width="9" alt="" hspace="2"></a></td>
+  <td><font class="MenuSubTitle">[+ $sections{$t} +]</font></td>
+ </tr>
+[$ foreach $f ( sort { lc($a) cmp lc ($b) } keys %{$folders->{$t}} ) $]
+ <tr>
+  <td></td>
+  <td></td>
+  <td width="100%" align="top"><nobr><a href="[+ $EMU::EMU_URL +]?passed=select&reload.x=19&folder=[+ &CGI::escape($f) +]" class="MenuLink">[+ $f +]</a></nobr></td>
+ </tr>
+  [$ endforeach $]
+ [$ endif $]
+[$ endforeach $]
+[$ endif $]
+ <tr> 
+  <td></td>
+  <td colspan="2"><a href="[+ &EMU::make_url('folders') +]" class="MenuLink">Folder Manager</a></td>
+  </tr><tr> 
+  <td align="right"><a href='[+ $EMU::EMU_URL +]?passed=toggle_menu&next=go_index&menu=address_groups'><img border=0 src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/".&get_menu_img(&EMU::get_menu_setting('address_groups')) +]" height="9" width="9" alt="" hspace="2"></a></td>
+  <td colspan="2"><a href="[+ &EMU::make_url('address') +]" class="MenuLink">Addressbook</a></td>
+ </tr>
+ [$ if (&EMU::get_menu_setting('address_groups')) $]
+  <td></td>
+  <td></td>
+ <td colspan="2"><a href="[+ &EMU::make_url('address_groups') +]" class="MenuLink">Group List</a></td>
+ [$ endif $]
+ <tr>
+  <td></td>
+  <td colspan="2"><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=search.html" class="MenuLink">Search</a></td>
+ </tr><tr> 
+  <td align="right"><a href='[+ $EMU::EMU_URL +]?passed=toggle_menu&next=go_index&menu=options'><img border=0 src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/".&get_menu_img(&EMU::get_menu_setting('options')) +]" height="9" width="9" alt="" hspace="2"></a></td>
+  <td colspan="2"><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=options_list.html" class="MenuLink">Options</a></td>
+ </tr>
+[$ if (&EMU::get_menu_setting('options')) $]
+
+[$ if (grep { $_ eq $EMU::user_name } @admins) $]
+  <tr>
+   <td></td>
+   <td></td>
+   <td><a class="MenuLink" href='[+ $EMU::EMU_URL +]?passed=editor'>Admin File Editor</a></td>
+  </tr>
+[$ endif $]
+
+ <tr> 
+  <td></td>
+  <td><font size="1">&nbsp;&nbsp;</font></td>
+  <td><a href="[+ &EMU::make_url('options') +]" class="MenuLink">Account Info</a></td>
+ </tr><tr> 
+  <td></td>
+  <td></td>
+  <td><a href="[+ &EMU::make_url('mailboxes') +]" class="MenuLink">Mailboxes</a></td>
+ </tr><tr> 
+  <td></td>
+  <td></td>
+  <td><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=filters.html" class="MenuLink">Filters</a></td>
+ </tr>
+[$ endif $]
+ <tr>
+  <td></td>
+  <td colspan="2"><a href="#" onClick="window.open('[+ &EMU::get_var('help_url') +]','WebmailHelp','width=750,height=500,toolbar=yes,location=no,directories=no,status=yes,menubar=yes,resizable=yes,copyhistory=no,scrollbars=yes');return false;" class="MenuLink">Help</a></td>
+ </tr><tr> 
+  <td></td>
+  <td colspan="2"><a href="[+ &EMU::make_url('logout') +]" class="MenuLink">Logout</a></td>
+ </tr>
+</table>
+[# Close Menu #]

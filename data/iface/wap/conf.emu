@@ -1,0 +1,72 @@
+## EMUmail Config file#
+#######################
+#
+# Any values in the iface/BAZ directory will override the site.emu default file
+#	Most values in this file are *interface related* (but don't have to be)
+#
+# The format of the EMUmail3.0 config file is similar to EMUmail2.7 and below, except
+# now it is easier to manage and offers less room for mistakes (no longer are quotes or
+# semicolons or care for special characters needed)
+#
+# There are 6 special values within the config file:
+#  false and true. Which are booleans, equally replaceable with 0 and 1.
+#  no and yes. (which follows suite with false and true)
+#  none. Becomes a blank entry.
+#  [SomeNameHere]. If a config entry called SomeNameHere exists then the value
+#    of that is used in substitution. 
+#
+# If you need to insert a newline into a field, use \n
+#
+# Lists are created with SPACE or , between list items.
+
+global_content_type=text/vnd.wap.wml
+EMU_BGCOLOR=ffffff
+EMU_STATUSCOLOR=002244
+EMU_LINKCOLOR=black
+EMU_VLINKCOLOR=black
+PRIORITY_URGENT=ffe6e6
+PRIORITY_NURGENT=e6e6e6
+PRIORITY_NORMAL=white
+#TOP_IMAGE = <img src=http://ad.vert.net/advert.cgi>
+COLOR_URGENT=red
+COLOR_NURGENT=
+COLOR_NORMAL=
+FONT = Arial,Helvetica
+FONT_COLOR = ff0000
+FONT_FULL  = <FONT FACE="[FONT]" SIZE=2>
+FONT_BIG   = <FONT FACE="[FONT]" SIZE=4>
+FONT_BIG2  = <FONT FACE="[FONT]" SIZE=4 COLOR="ffffff">
+FONT_IND   = <FONT FACE="[FONT]" SIZE=2>
+FONT_IND2  = <FONT FACE="[FONT]" SIZE=2 COLOR="white">
+FONT_SML   = <FONT FACE="[FONT]" SIZE=1>
+FONT_SML2  = <FONT FACE="[FONT]" SIZE=1 COLOR="white">
+FONT_BOD   = <FONT FACE="[FONT]" SIZE=3>
+FONT_MONO  = <FONT FACE="Courier,[FONT]" SIZE=3>
+FONT_IHELP = <FONT FACE="[FONT]" SIZE=1 COLOR="darkblue">
+FONT_ERROR = <FONT FACE="[FONT]" SIZE=4 COLOR="red">
+FONT_GRFX  = <FONT FACE="[FONT]" SIZE=2 COLOR="#0066cc">
+FONT_GRFX2 = <FONT FACE="[FONT]" SIZE=5 COLOR="#ff0000">
+FONT_GRFX3 = <FONT FACE="[FONT]" SIZE=1 COLOR="#0066cc">
+FONT_BASE  = <FONT FACE="[FONT]">
+
+# maximum length for folder names
+folder_namelen = 10
+default_signature = 
+addressbook_length = 10
+index_sender_mode = 0
+index_sender_length=5
+index_subject_length=10
+quickjump_sender_length = 5
+quickjump_subject_length = 10
+Status = <font face="Arial,Helvetica" size=1>N</font>
+Status0 = <font face="Arial,Helvetica" size=1>N</font>
+Status1 = <font face="Arial,Helvetica" size=1>R</font>
+Status2 = <font face="Arial,Helvetica" size=1>A</font>
+
+disable_sessionID=true
+#indicates whether we are in WAP mode
+is_wap=true
+disable_waitscreen=true
+chunk_messages=true
+chunk_size=250
+max_messages_limit=9

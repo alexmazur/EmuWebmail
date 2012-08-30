@@ -1,0 +1,186 @@
+[-
+   $args = shift @param;
+
+   $theme = $args->{theme};
+   $addrs = &EMU::get_var('data');
+   @addrs = split(/ /, $addrs);
+   $log = &EMU::get_var('log');
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Address Groups Manager</title>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<script language="JavaScript">
+<!--
+var Groupes = new Array();
+var current;
+
+function Group(name) {
+   this.name = name;
+   return this;
+}
+
+function getCurrent() {
+   return current;
+}
+
+function editGroup(add) {
+
+   if (add) {
+      current = new Group('');
+      current.fresh = true;
+   } else
+   if (!current) {
+      alert('No Group selected!');
+      return;
+   }
+
+   document.emuform.editfolder.value = current.name;
+
+   window.open('[+ $args->{HTMLURL} +]/groups_editor.html','groups_editor','scrollbars=yes,resizable=yes,width=350,height=100');
+}
+
+function confirmDelete() {
+   var cur = getCurrent();
+   
+   if (!cur) {
+      return false;
+   }
+   
+   if (confirm("Are you certain you wish to delete group '"+cur.name+"'?")) {
+      document.emuform.deleted.value=cur.name;
+      submitForm('delete');
+      return true;
+   } else {
+      return false;
+   }
+}
+
+function setCurrent(index) {
+   current = Groupes[index];
+   document.emuform.folder_selected.value = current.name;
+}
+
+function getCurrent() {
+   return current;
+}
+
+function submitForm(fn) {
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+
+function saveGroup(me) {
+   document.emuform.new_group.value = me.name;
+   submitForm('save');
+}
+//-->
+</script>
+</style>
+
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='name' value="">
+          <input type='hidden' name='fillme' value='42'>
+          <input type='hidden' name='passed' value='edit_address_group'>
+          <input type='hidden' name='folder_selected' value='[+ $EMU::inbox  +]'>
+          <input type='hidden' name='new_group' value="">
+          <input type='hidden' name='fold_type' value='local'>
+          <input type='hidden' name='folder_selected' value="">
+          <input type='hidden' name='deleted' value="">
+          <input type='hidden' name='editfolder' value="">
+
+          <div id=folder-title> 
+            <div id=folder-name>Address Groups Manager</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+            [$ if (@addrs) $]
+              <input type="image" name="delete.x" onclick="confirmDelete()" value="Delete Selected" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif">
+            [$ endif $]
+              <input type="image" value="Add New Address Group" onClick='editGroup(true); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addAddressGroupButton.gif">
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+
+            [$ if (@addrs) $]
+            <table>
+              <tr> 
+                <th id=grid-header class="grid-header1 narrow"> </th>
+                <th id=grid-header>Group &nbsp;Name</th>
+                <th id=grid-header>Entries</th>
+              </tr>
+              [- $i = 0 -]
+              [$ foreach $f (@addrs) $]
+              [-
+                  $f=~s/^addressgroup\.//;
+                  @kol=split(':', $EMU::userdb{"addressgroup.$f"});
+              -]
+              <tr>
+              <script>
+                Groupes[ [+ $i +] ] = new Group("[+ $f +]");
+              </script>
+                <td id=grid-data1 class=centered><input type='radio' name='radio' value'[+ $f +]' onclick='setCurrent([+ $i++ +])'></td>
+                <td id=grid-data><a href="[+ $EMU::EMU_URL +]?passed=edit_address_group&group=[+ &CGI::escape($f) +]">[+ $f +]</a>&nbsp;</td>
+                <td id=grid-data>[+ $#kol+1 +]</td>
+              </tr>
+              [$ endforeach $]
+            </table>
+            [$ else $]
+            <div class="mediumText red centered"><br>Your Group list is empty.<br>&nbsp;</div>
+            <br>
+            <div class="mediumText blue centered"><a href="#" onClick="editGroup(true)">Add a new Group</a></div>
+            <br>&nbsp;
+            [$ endif $]
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+            [$ if (@addrs) $]
+              <input type="image" name="delete.x" onclick="confirmDelete()" value="Delete Selected" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif">
+            [$ endif $]
+              <input type="image" value="Add New Address Group" onClick='editGroup(true); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addAddressGroupButton.gif">
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>
+            
+
+

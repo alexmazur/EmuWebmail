@@ -1,0 +1,266 @@
+[-
+
+   $args = shift @param;
+   $theme = $args->{theme};
+   @subscribed = @{ $args->{folders} };
+   @folders = grep {   $_ ne $EMU::inbox &&
+                       $_ ne 'Search Results' &&
+                       !$EMU::userdb{"folder:$_:external"}
+                   } &EMU::get_folders(1);
+   
+   ($i_total, $i_unread, $i_read, $i_answered, $i_size) = &EMU::get_folder_msginfo('INBOX');
+   $i_size = &EMU::get_size($size) if ($size);
+   $i_total = &EMU::commas($i_total) if ($i_total);
+   $i_unread = &EMU::commas($i_unread) if ($i_unread);
+
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Folder Manager</title>
+<script language="JavaScript">
+
+var Folders = new Array();
+var Dirs = new Array([+ join(',', map { "'$_'" } &EMU::get_imap_dirs) +]);
+var current;
+
+function Folder(name, protocol) {
+   this.name = name;
+   this.protocol = protocol;
+   this.dir = '';
+
+   return this;
+}
+
+function editFolder(add) {
+
+   if (add) {
+      current = new Folder('','');
+      current.fresh = true;
+   } else
+   if (!current) {
+      alert('No folder selected!');
+      return;
+   }
+
+   document.emuform.editfolder.value = current.name;
+
+   window.open('[+ $args->{HTMLURL} +]/folder_editor.html','folder_editor','scrollbars=yes,resizable=yes,width=350,height=275');
+}
+
+function editSubscriptions() {
+   window.open('[+ $EMU::EMU_URL +]?passed=parse&variable=folder_subscriptions_popup.html','folder_subscriptions','scrollbars=yes,resizable=yes,width=600,height=400');
+}
+
+function saveSubscriptions(folders) {
+   if (document.emuform.subscribed.length) {
+      for (var i=0; i<folders.length; i++) {
+         document.emuform.subscribed[i].value = folders[i];
+      }
+   }
+   else if (folders.length) {
+      document.emuform.subscribed.value=folders[0];
+   }
+
+   document.emuform.passed.value='update_subscriptions';
+   document.emuform.submit();
+}
+
+
+function setCurrent(index) {
+   current = Folders[index];
+   document.emuform.folder_selected.value = current.name;
+   document.emuform.fold_type.value = current.protocol;
+}
+
+function getCurrent() {
+   return current;
+}
+
+function getDirs() {
+   return Dirs;
+}
+
+function submitForm(fn) {
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+
+function saveFolder(me) {
+   document.emuform.new_fold.value = me.name;
+   document.emuform.fold_type.value = me.protocol;
+   document.emuform.folder_selected.value = me.name;
+   document.emuform.folddir.value = me.dir;
+
+   submitForm('save');
+}
+
+function confirmDelete() {
+   var cur = getCurrent();
+
+   if (!cur) {
+      return false;
+   }
+   
+   if (confirm("Deleting a folder will also delete all its messages. Are you certain you wish to delete folder '"+cur.name+"'?")) {
+      return true;
+   } else {
+      return false;
+   }
+}
+
+function confirmEmpty() {
+   var cur = getCurrent();
+
+   if (!cur) {
+      return false;
+   }
+
+   if (confirm("Are you certain you wish to delete all messages in '"+cur.name+"'?")) {
+      return true;
+   } else {
+      return false;
+   }
+
+}
+
+</script>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='fillme' value='42'>
+          <input type='hidden' name='passed' value='folders_parse'>
+          <input type='hidden' name='new_fold' value=''>
+          <input type='hidden' name='fold_type' value='local'>
+          <input type='hidden' name='folder_selected' value=''>
+          <input type='hidden' name='folddir' value=''>
+          <input type='hidden' name='editfolder' value=''>
+          <input type='hidden' name='export_type' value=''>
+
+          <div id=folder-title> 
+            <div id=folder-name>Folder Manager</div>
+          </div>
+
+[$ if (&EMU::get_status()) $]
+          <div id=folder-status> 
+            <div class="red" align="center"><b>[+ &EMU::get_status() +]</b></div>
+          </div>
+[$ endif $]
+  
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+            [$ if (@folders) $]
+              <input type="image" value="Edit Selected" onclick='editFolder(false); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/editButton.gif" align="left"> 
+              <input type="image" name="delete" value="Delete Selected" onclick="return confirmDelete()"src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif" align="left">
+              <input type="image" name="empty" value="Empty" onclick="return confirmEmpty()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/emptyButton.gif" align="left"> 
+              <input type="image" name="export" onclick="document.emuform.export_type.value = ''; document.emuform.submit();" value="Export" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/exportButton.gif" align="left">
+              <input type="image" name="export" onclick="document.emuform.export_type.value = 'eml'; document.emuform.submit();" value="Export .eml format" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/exportEMLButton.gif" align="left">
+            [$ endif $]
+              <input type="image" value="Add New Folder" onClick='editFolder(true); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addNewFolderButton.gif" align="right">
+            [$ if (@folders) $]
+              <input type="image" value='Subscriptions' onclick='editSubscriptions(); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/subscriptionButton.gif" align="right">
+            [$ endif $]
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+          [$ if (@folders) $]
+            <table>
+              <tr> 
+                <th id=grid-header class="grid-header1 narrow"> </th>
+                <th id=grid-header>Folder Name</th>
+                <th id=grid-header> Subscribed? </th>
+                <th id=grid-header class=narrow>Type</th>
+                <th id=grid-header class=narrow>Total</th>
+                <th id=grid-header class=narrow>Unread</th>
+                <th id=grid-header class=narrow>Size</th>
+              </tr>
+               [- $i = 0 -]
+               [$ foreach $f (@folders) $]
+               [- 
+                ($total, $unread, undef, undef, $size) = &EMU::get_folder_msginfo($f);
+                $proto = ucfirst(&EMU::get_folder_protocol($f));
+                 $subscribed=(grep($_ eq $f, @subscribed))?1:0;
+                ($safef = $f) =~ s/'/\\'/g;
+                $size = &EMU::get_size($size) if ($size);
+                $total = &EMU::commas($total) if ($total);
+                $unread = &EMU::commas($unread) if ($unread); 
+               -]
+              <tr> 
+                <input type='hidden' name='subscribed' value=''>
+                <script>
+                Folders[ [+ $i +] ] = new Folder('[+ $safef +]','[+ $proto +]');
+                </script>
+                <td id=grid-data1 class=centered><input type="radio" name='radio' onclick="setCurrent([+ $i++ +])"></td>
+                <td id=grid-data><a href="[+ $EMU::EMU_URL +]?passed=select&reload.x=22&folder=[+ &CGI::escape($f) +]">[+ CGI::escapeHTML($f) +]</a></td>
+                <td id=grid-data class=centered>
+                [$ if ($subscribed) $]
+                  <img src='[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/16x16/subscribed.gif' alt="Currently Subscribed">
+                [$ else $]
+                  &nbsp;
+                [$ endif $]
+                </td>
+                <td id=grid-data>[+ $proto +]</td>
+                <td id=grid-data>[+ $total || 0 +]</td>
+                <td id=grid-data>[+ $unread || 0  +]</td>
+                <td id=grid-data>[+ $size || 0 +]</td>
+              </tr>
+            [$ endforeach $]
+            </table>
+
+          [$ else $]
+            <div class="mediumText red centered"><br>Your Folder list is empty<br>&nbsp;</div>
+            <br>
+            <div class="mediumText blue centered"><a href="#" onClick="editFolder(true); return false;">Add a new Folder</a></div>
+            <br>&nbsp;
+          [$ endif $]
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+            [$ if (@folders) $]
+              <input type="image" value="Edit Selected" onclick='editFolder(false); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/editButton.gif" align="left"> 
+              <input type="image" name="delete" value="Delete Selected" onclick="return confirmDelete()"src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif" align="left">
+              <input type="image" name="empty" value="Empty" onclick="return confirmEmpty()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/emptyButton.gif" align="left"> 
+              <input type="image" name="export" onclick="document.emuform.export_type.value = ''; document.emuform.submit();" value="Export" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/exportButton.gif" align="left">
+              <input type="image" name="export" onclick="document.emuform.export_type.value = 'eml'; document.emuform.submit();" value="Export .eml format" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/exportEMLButton.gif" align="left">
+            [$ endif $]
+              <input type="image" value="Add New Folder" onClick='editFolder(true); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addNewFolderButton.gif" align="right">
+            [$ if (@folders) $]
+              <input type="image" value='Subscriptions' onclick='editSubscriptions(); return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/subscriptionButton.gif" align="right">
+            [$ endif $]
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

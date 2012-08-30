@@ -1,0 +1,199 @@
+[-
+   $args = shift @param;
+
+   %contacts = %{ &EMU::get_var('contacts') };
+   @to = @{ &EMU::get_var('to') };
+   @cc = @{ &EMU::get_var('cc') };
+   @bcc = @{ &EMU::get_var('bcc') };
+   @groups = grep(/^addressgroup\./, keys %EMU::userdb);
+-]
+<html>
+<head>
+<title>EMU Webmail - Add Recepients</title>
+<script language='Javascript'>
+
+function saveChanges() {
+   var to, cc, bcc;
+
+   to  = document.popup.to.value;
+   cc  = document.popup.cc.value;
+   bcc = document.popup.bcc.value;
+
+
+   for (var i=0; i<document.popup.elements.length; i++) {
+      var item = document.popup.elements[i];
+      if (item.type != 'checkbox' || !item.checked) { continue; }
+
+      switch (item.value) {
+         case  "to":
+            if (to == '') { to = item.name; }
+            else { to += ', '+item.name; }
+            break;
+         case  "cc":
+            if (cc == '') { cc = item.name; }
+            else { cc += ', '+item.name; }
+            break;
+         case "bcc":
+            if (bcc == '') { bcc = item.name; }
+            else { bcc += ', '+item.name; }
+            break;
+      }
+   }
+
+   arr_to=to.split(/, /);
+   arr1=[];
+   for (i in arr_to) {
+      if (arr_to[i])
+         arr1[arr_to[i]]++;
+   }
+   arr_to=[];
+   for (i in arr1) arr_to[arr_to.length]=i;
+
+   arr_cc=cc.split(/, /);
+   arr2=[];
+   for (i in arr_cc) {
+      if (arr_cc[i])
+         arr2[arr_cc[i]]++;
+   }
+   arr_cc=[];
+   for (i in arr2) arr_cc[arr_cc.length]=i;
+
+   arr_bcc=bcc.split(/, /);
+   arr3=[];
+   for (i in arr_bcc) {
+      if (arr_bcc[i])
+         arr3[arr_bcc[i]]++;
+   }
+   arr_bcc=[];
+   for (i in arr3) arr_bcc[arr_bcc.length]=i;
+
+   window.opener.setRecipients(arr_to, arr_cc, arr_bcc);
+   window.close();
+}   
+
+
+function handleClick(cbox) {
+   if (!cbox.checked) { return; }
+
+   var elements = document.popup.elements;
+   
+   for (var i=0; i < elements.length; i++) {
+      if (elements[i].name == cbox.name && elements[i] != cbox) {
+         elements[i].checked = false;
+      }
+   }
+}
+   
+</script>
+<link rel="stylesheet" type="text/css" href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css">
+</head>
+
+<body class="Popup">
+
+<form name='popup' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='address_select'>
+<input type='hidden' name='to'  value='[+ join(', ',  @to) +]'>
+<input type='hidden' name='cc'  value='[+ join(', ',  @cc) +]'>
+<input type='hidden' name='bcc' value='[+ join(', ', @bcc) +]'>
+
+<table border="0" cellpadding="0" cellspacing="10" width="95%">
+ <tr>
+  <td><font class="PopupDefault">Select the addresses you would like to send your message to, then click
+"Select".<br>&nbsp;</font></td>
+ </tr>
+</table>
+<fieldset>
+<legend align="bottom">AddressBook</legend>
+<table border="0" cellpadding="0" cellspacing="10" width="100%">
+ <tr class="BodyGridOutline">
+  <td><table width="100%" border="0" cellspacing="1" cellpadding="4">
+    <tr class="GridHeader">
+     <td><font class="GridHeader">To:</font></td>
+     <td><font class="GridHeader">CC:</font></td>
+     <td><font class="GridHeader">BCC:</font></td>
+     <td width="50%"><font class="GridHeader">Name:</font></td>
+     <td width="50%"><font class="GridHeader">Email:</font></td>
+    </tr>
+[$ if (%contacts) $]
+[$ foreach $c (sort {lc($a) cmp lc($b)} keys %contacts) $]
+[-
+   $tochecked = $ccchecked = $bccchecked = "";
+
+   if ($contacts{$c}{to}) {
+      $tochecked  = 'checked';
+   } elsif ($contacts{$c}{cc}) {
+      $ccchecked  = 'checked';
+   } elsif ($contacts{$c}{bcc}) {
+      $bccchecked = 'checked';
+   }
+   $contacts{$c}{email} =~ s/<(.*?@.*?)>/$1/g;
+-]
+   <tr class="GridData">
+    <td><input type='checkbox' name="[+ $contacts{$c}{email} +]" value='to' onclick='handleClick(this)' [+ $tochecked +]></td>
+    <td><input type='checkbox' name="[+ $contacts{$c}{email} +]" value='cc' onclick='handleClick(this)' [+ $ccchecked +]></td>
+    <td><input type='checkbox' name="[+ $contacts{$c}{email} +]" value='bcc' onclick='handleClick(this)' [+ $bccchecked +]></td>
+    <td width='40%'><font class='DefaultText'>[+ $c +]&nbsp;</font></td>
+    <td width='45%'><font class='DefaultText'>[+ $contacts{$c}{email} +]&nbsp;</font></td>
+   </tr>
+[$ endforeach $]
+
+[$ else $]
+
+   <tr class="GridData">
+    <td colspan="5" align="center"><font class="alert">&nbsp;<br>Your Addressbook is Empty.<br>&nbsp;</font></td>
+   </tr>
+[$ endif $]
+
+</table>
+</td></tr>
+</table>
+</fieldset>
+
+<fieldset>
+<legend align="bottom">Groups</legend>
+<table border="0" cellpadding="0" cellspacing="10" width="100%">
+ <tr class="BodyGridOutline">
+  <td><table width="100%" border="0" cellspacing="1" cellpadding="4">
+    <tr class="GridHeader">
+     <td><font class="GridHeader">To:</font></td>
+     <td><font class="GridHeader">CC:</font></td>
+     <td><font class="GridHeader">BCC:</font></td>
+     <td width="50%"><font class="GridHeader">Name:</font></td>
+     <td width="50%"><font class="GridHeader">Email:</font></td>
+    </tr>
+[$ if (@groups) $]
+[$ foreach $ent (@groups) $]
+[- $ent =~s/^addressgroup\.// -]
+[-
+   $maile=$EMU::userdb{"addressgroup.$ent"};
+   $maile =~ s/<(.*?@.*?)>/$1/g;
+   $maile=~s/('.*?'\|\|)//gs;
+   $maile=~s/:/, /gs;
+-]
+
+   <tr class="GridData">
+    <td><input type='checkbox' name='[+ $maile +]' value='to' onclick='handleClick(this)'></td>
+    <td><input type='checkbox' name='[+ $maile +]' value='cc' onclick='handleClick(this)'></td>
+    <td><input type='checkbox' name='[+ $maile +]' value='bcc' onclick='handleClick(this)'></td>
+    <td width='40%'>[+ $ent +]&nbsp;</td>
+    <td width='45%'>[+ $maile +]&nbsp;</td>
+   </tr>
+[$ endforeach $]
+
+[$ else $]
+
+   <tr class="GridData">
+    <td colspan="5" align="center"><font class="alert">&nbsp;<br>You have no Groups<br>&nbsp;</font></td>
+   </tr>
+[$ endif $]
+</table>
+</td></tr>
+</table>
+</fieldset>
+<div align="center">&nbsp;<br>
+<input type="button" value="Select" onclick="saveChanges()" class="DefaultButton">
+<input type="button" value="Cancel" onclick="window.close()" class="DefaultButton">
+</div>
+</form>
+</body>
+</html>

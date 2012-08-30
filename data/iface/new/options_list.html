@@ -1,0 +1,75 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   @admins = split(/(,|\s)+/, $EMU::c{admins});
+-]
+<html>
+<head>
+  <link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+  <title>[+ $EMU::c{publisher_name} +] - Options</title>
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+        <div id=folder-title> 
+          <div id=folder-name>Options</div>
+        </div>
+
+        <div id="action-buttons">&nbsp;</div>
+
+        <div id="folder-content"> 
+          [$ if (&EMU::get_status()) $]
+          <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+          [$ endif $]
+
+          [$ if (grep { $_ eq $EMU::user_name } @admins) $]
+          <div><a href='[+ $EMU::EMU_URL +]?passed=editor' class=blue><b>Administrator
+          File Editor</b></a><br>
+          Allows Administrators to review and modify their installation of Webmail.<br>&nbsp;</div>
+          [$ endif $]
+          
+          <div><a href="[+ &EMU::make_url('options') +]" class=blue><b>Account Info</b></a><br>
+            Change your personal information and setup account preferences, such 
+            as your name, your signature, how many messages per page, and more.<br>&nbsp;
+          </div>
+
+          <div><a href="[+ &EMU::make_url('mailboxes') +]" class=blue><b>Mailboxes</b></a><br>
+          Setup one or more of your email accounts from other sites to be checked 
+          at the same time using [+ $EMU::c{publisher_name} +].<br>&nbsp;
+          </div>
+
+          <div><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=filters.html" class=blue><b>Filters</b></a><br>
+          Create rules for sorting and filtering your new email, such as sorting 
+          out email from specific people, automatically deleting email solicitations, 
+           and more.<br>&nbsp;
+          </div>
+        </div>
+        <div id="action-buttons">&nbsp;</div>
+
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

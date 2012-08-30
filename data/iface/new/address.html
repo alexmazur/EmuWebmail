@@ -1,0 +1,198 @@
+[-
+   $args = shift @param;
+
+   my @data = &EMU::get_addrs_array();
+   @addrnums = @{ $data[0] };
+   %addrdata = %{ $data[1] };
+
+   $theme = $args->{theme};
+
+   foreach $a (@addrnums) {
+      $nick  = $addrdata{"n$a"};
+      push(@nicknames, $nick);
+   }
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Addressbook</title>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<script language="JavaScript">
+
+var Nicknames = new Array();
+
+[- $i = 0; -]
+[$ foreach $n (@nicknames) $]
+   [- $n =~ s/'/\\'/g; -]
+   Nicknames[ [+ $i +] ] = '[+ $n +]';
+   [- $i++; -]
+[$ endforeach $]
+
+function edit_contact(nick_index) {
+    document.addrform.passed.value="parse";
+    document.addrform.variable.value="contact_editor.html";
+    document.addrform.orig.value=Nicknames[nick_index];
+    document.addrform.submit();
+}
+
+function composeEmail() {
+    document.addrform.passed.value="compose";
+    var email = "";
+[$ foreach $a (@addrnums) $]
+[- $addrdata{"e$a"} =~ s!'!\\'!g; -]
+    if (document.addrform.d[+ $a +].checked) {
+
+        if (email == "")
+            email = '[+ $addrdata{"e$a"} +]';
+        else
+            email = email + ',[+ $addrdata{"e$a"} +]';
+    }
+[$ endforeach $]
+
+    if (email != "") {
+        document.addrform.to.value = email;
+        document.addrform.submit();
+    } else {
+        alert("You must select recipients.");
+        return false;
+    }
+}
+
+function checkAll(val) {
+
+   if (document.addrform.d.length) {
+      for (var i=0; i<document.addrform.d.length; i++) {
+         eval("document.addrform.d"+i+".checked = val");
+      }
+   } else {
+      document.addrform.d0.checked = val;
+   }
+}
+
+</script>
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+        <form name='addrform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='passed' value='address_parse'>
+          <input type='hidden' name='variable' value='address_parse'>
+          <input type='hidden' name='orig' value=''>
+          <input type='hidden' name='nick' value=''>
+          <input type='hidden' name='full' value=''>
+          <input type='hidden' name='email' value=''>
+          <input type='hidden' name='to' value=''>
+        
+          [$ if (&EMU::get_var('passed') eq 'address') $]
+          <input type='hidden' name='new_nick' value='[+ &EMU::get_var('nick') +]'>
+          <input type='hidden' name='new_full' value='[+ &EMU::get_var('full') +]'>
+          <input type='hidden' name='new_email' value='[+ &EMU::get_var('addr') +]'>
+          [$endif $]
+        
+<!--
+          <!/form>
+        
+          <!form name='delform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <!input type='hidden' name='passed' value='address_parse'>
+-->
+
+          <div id=folder-title> 
+            <div id=folder-name>Addressbook</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+             [$ if (@addrnums) $]
+                <input type="image" value="Delete Selected" onClick="document.addrform.submit()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif" alt="Delete Selected" title="Delete Selected" align="left">
+                <input type="image" value="Email Selected" onClick="composeEmail(); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/emailSelectedButton.gif" alt="Email Selected" title="Email Selected" align="left">
+             [$ endif $]
+                <input type="image" value="Import/Export"  onClick="window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=address_import_export.html';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/impot-exportButton.gif" align="left">
+                <input type="image" value="Add Contact" onClick="window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addContactButton.gif" align="right" alt="Add Contact" title="Add Contact">
+                <input type="image" value="Group Manager" onClick="window.location='[+ $EMU::EMU_URL +]?folder=INBOX&passed=address_groups';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/groupManagerButton.gif" align="right" alt="Group Manager" title="Group Manager">
+             [$ if ($EMU::c{ldap_search_host}) $]
+                <input type="image" value="LDAP Search" onClick="window.location='[+ &EMU::make_url('directory') +]';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/LDAPSearchButton.gif" align="right" alt="LDAP Search" title="LDAP Search"> 
+             [$ endif $]
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+          [$ if (!@addrnums) $]
+            <div class="mediumText red centered">&nbsp;<br>Your Addressbook is empty.</div><br>&nbsp;<br>
+            <div class="mediumText blue centered"><a href="#" onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html'>Add Contact</a></div>
+            <br>&nbsp;<br>
+          [$ else $]
+            <table>
+              <tr> 
+                <th id=grid-header class="grid-header1 narrow"><input type="checkbox" onClick='checkAll(this.checked)'></th>
+                <th id=grid-header> Nickname </th>
+                <th id=grid-header> Name </th>
+                <th id=grid-header> Email </th>
+              </tr>
+              [- $i = 0; -]
+              [$ foreach $a (@addrnums) $]
+
+              [- 
+                # A few specifics
+                $nick  = $addrdata{"n$a"} || '[Blank]';
+                ($safenick = $nick) =~ s/'/\&#39;/g;
+                $email = $addrdata{"e$a"};
+                $email =~ s/<(.*?)>/$1/;
+                $full  = $addrdata{"f$a"};
+                $email =~ s!\\'!'!g;
+              -]
+
+              <tr> 
+                <input type='hidden' name='orig[+ $a +]' value='[+ $safenick +]'>
+                <td id=grid-data1 class=centered><input type="hidden" name="d" value="[+ $a +]"><input type="checkbox" name="d[+ $a +]"></td>
+                <td id=grid-data><a href='#' onclick="edit_contact([+ $i +]);return false;">[+ $nick +]</a></td>
+                <td id=grid-data>[+ $full +]</td>
+                <td id=grid-data>[+ $email +]</td>
+              </tr>
+              [- $i++; -]
+            [$ endforeach $]
+            </table>
+          [$ endif $]
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+             [$ if (@addrnums) $]
+                <input type="image" value="Delete Selected" onClick="document.addrform.submit()" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif" alt="Delete Selected" title="Delete Selected" align="left">
+                <input type="image" value="Email Selected" onClick="composeEmail(); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/emailSelectedButton.gif" alt="Email Selected" title="Email Selected" align="left">
+             [$ endif $]
+                <input type="image" value="Import/Export"  onClick="window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=address_import_export.html';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/impot-exportButton.gif" align="left">
+                <input type="image" value="Add Contact" onClick="window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addContactButton.gif" align="right" alt="Add Contact" title="Add Contact">
+                <input type="image" value="Group Manager" onClick="window.location='[+ $EMU::EMU_URL +]?folder=INBOX&passed=address_groups';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/groupManagerButton.gif" align="right" alt="Group Manager" title="Group Manager">
+             [$ if ($EMU::c{ldap_search_host}) $]
+                <input type="image" value="LDAP Search" onClick="window.location='[+ &EMU::make_url('directory') +]';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/LDAPSearchButton.gif" align="right" alt="LDAP Search" title="LDAP Search"> 
+             [$ endif $]
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

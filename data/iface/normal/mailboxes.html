@@ -1,0 +1,205 @@
+[-
+   $args = shift @param;
+
+   # Get all external folders!
+   @folders = grep { ($_ ne &EMU::get_var('inbox')) && 
+                     $EMU::userdb{"folder:$_:external"}
+                   } &EMU::get_folders();
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Mailbox Manager</title>
+<script language="JavaScript">
+
+var Mailboxes = new Array();
+var current;
+
+function Mailbox(name, email, protocol, path, password) {
+   this.name = name;
+   this.email = email;
+   this.protocol = protocol;
+   this.path = path;
+   this.password = password;
+   
+   return this;
+}
+
+function editMailbox(add) {
+   
+   if (add) {
+      current = new Mailbox('','','','','');
+      current.fresh = true;
+   } else
+   if (!current) {
+      alert('No mailbox selected!');
+      return;
+   }
+
+   document.emuform.editfolder.value = current.name;
+   
+   window.open('[+ $args->{HTMLURL} +]/mailbox_editor.html','folder_editor','scrollbars=yes,resizable=yes,width=350,height=275');
+}
+
+function setCurrent(index) {
+   current = Mailboxes[index];
+   document.emuform.folder_selected.value = current.name;
+}
+
+function getCurrent() {
+   return current;
+}
+
+function submitForm(fn) {
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+
+function saveMailbox(me) {
+   document.emuform.new_fold.value = me.name;
+   document.emuform.fold_type.value = me.protocol;
+   document.emuform.folder_selected.value = me.name;
+   document.emuform.fold_user.value = me.email;
+   document.emuform.fold_pass.value = me.password;
+   document.emuform.fold_fold.value = me.path;
+
+   submitForm('save');
+}   
+</script>
+</style>
+
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='fillme' value='42'>
+<input type='hidden' name='passed' value='process_mailboxes'>
+<input type='hidden' name='new_fold' value=''>
+<input type='hidden' name='fold_type' value=''>
+<input type='hidden' name='folder_selected' value='[+ $EMU::inbox  +]'>
+<input type='hidden' name='folddir' value='/'>
+<input type='hidden' name='fold_user' value=''>
+<input type='hidden' name='fold_fold' value=''>
+<input type='hidden' name='fold_pass' value=''>
+<input type='hidden' name='editfolder' value=''>
+
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+   
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Mailbox Manager</font></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu">
+  <td class="Menu">
+
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+[# Close Menu #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="BodyGridOutline">
+  <td><table width="100%" border="0" cellspacing="1" cellpadding="3">
+    <tr class="BodyButtonBar">
+     <td colspan="4"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr> 
+        <td>[$ if (@folders) $]<input type="button" value="Edit Selected" onclick='editMailbox(false)' class="DefaultButton">&nbsp;<input type="submit" name="delete.x" value="Delete Selected" class="DefaultButton">&nbsp;<input type="submit" name='export.x' value="Export" class="DefaultButton">[$ endif $]&nbsp;</td>
+        <td align='right'>&nbsp;<input type="button" value="Add New Mailbox" onClick='editMailbox(true)' class="DefaultButton"></td>
+       </tr>
+     </table></td>
+   </tr>
+
+[$ if (&EMU::get_status()) $]
+   <tr class="GridData">  
+    <td align="center" colspan="4"><font class="Alert">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;</font></td>
+   </tr>
+[$ endif $]
+
+[$ if (@folders) $]
+<tr class="GridHeader">
+  <td width="1%"><font class="GridHeader">&nbsp;</font></td>
+  <td width="50%"><font class="GridHeader">Mailbox &nbsp;Name</font></td>
+  <td width="30%"><font class="GridHeader">Account</font></td>
+  <td width="10%"><font class="GridHeader">Type</font></td>
+ </tr>
+[- $i = 0 -]
+[$ foreach $f (@folders) $]
+[-  ($user, $pass, $host) = &EMU::get_folder_credentials($f);
+     $path = $EMU::userdb{"folder:$f:extra_fold"};
+     $email = $EMU::userdb{"folder:$f:email"};
+     $proto = uc(&EMU::get_folder_protocol($f));
+     ($safef = $f) =~ s/'/\\'/g;
+-]
+ <tr class="GridData"> 
+<script>
+Mailboxes[ [+ $i +] ] = new Mailbox('[+ $safef +]','[+ $email +]','[+ $proto +]','[+ $path +]');
+</script>
+  <td><input type='radio' name='radio' onclick='setCurrent([+ $i++ +])'></td>
+  <td><a href="[+ $EMU::EMU_URL +]?passed=select&reload.x=19&folder=[+ &CGI::escape($f) +]" class="GridData">[+ $f +]</a>&nbsp;</td>
+  <td nowrap><font class="GridData">[+ $email +]&nbsp;</font></td>
+  <td nowrap><font class="GridData">[+ $proto +]&nbsp;</font></td>
+ </tr>
+[$ endforeach $]
+[$ else $]
+
+ <tr class="GridData">
+  <td colspan="4" height="300" align="center"><font class="Alert">&nbsp;<br>Your Mailbox list is empty.<br>&nbsp;<br><a 
+href="#" class="Default" onClick="editMailbox(true)">Add a new Mailbox</a><br>&nbsp;</font></td>
+ </tr>
+
+[$ endif $]
+ <tr class="BodyButtonBar">
+  <td colspan="4"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+     <td>[$ if (@folders) $]<input type="button" value="Edit Selected" onclick='editMailbox(false)' class="DefaultButton">&nbsp;<input type="submit" name="delete.x" value="Delete Selected" class="DefaultButton">&nbsp;<input type="submit" name='export.x' value="Export" class="DefaultButton">[$ endif $]&nbsp;</td>
+     <td align='right'>&nbsp;<input type="button" value="Add New Mailbox" onClick='editMailbox(true)' class="DefaultButton"></td>
+    </tr>
+   </table></td>
+ </tr>
+</table>
+</td></tr></table>
+
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+[# Open Post-Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close Post-Body #]
+
+[# Open Menu #]
+
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+
+[# Close Menu #]
+
+</form>
+</body>
+</html>

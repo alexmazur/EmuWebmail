@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN"
+     "http://www.wapforum.org/DTD/wml_1.1.xml">
+
+
+<wml>
+
+<card id="message_view_main">
+
+  <do type="accept" label="BACK"> <prev/> </do>
+
+  <do type="options" label="MENU">
+    <go href="#message_view_menu"/>
+  </do>
+  
+({ if ($ch == 1) })
+({ if ($folder != sent) })
+<p mode="nowrap">
+
+  FROM: <anchor title="REPLY">
+    <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="multi"/>
+      <postfield name="reply.x" value="1"/>
+      <postfield name="variable" value="$message"/>
+    </go>
+   $from
+   </anchor> <br/>
+  SUBJ: $subj <br/>
+  DATE: $date </p>
+
+({ endif })
+({ endif })
+
+
+({ if ($ch == 1) })
+({ if ($folder == sent) })
+<p mode="nowrap">
+
+  TO: $to <br/>
+  SUBJ: $subj <br/>
+  DATE: $date </p>
+({ endif })
+({ endif })
+
+
+
+
+<p mode="wrap">$the_message 
+
+({ if ($next_chunk) })
+<anchor title="MORE">
+<go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="msg"/>
+      <postfield name="folder" value="$folder"/>
+      <postfield name="variable" value="$message"/>
+      <postfield name="ch" value="$next_chunk"/>
+</go>MORE</anchor>
+({ endif })
+
+</p>
+
+</card>
+
+
+<card id="message_view_menu">
+
+<p>
+
+ <select name="choice" ivalue="1">
+
+ <option title="REPLY">
+   <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="multi"/>
+      <postfield name="reply.x" value="1"/>
+      <postfield name="variable" value="$message"/>
+      <setvar name="mymessg" value=""/>
+      <setvar name="myto" value=""/>
+      <setvar name="mysubj" value=""/>
+     </go>
+    </onevent>
+    REPLY
+ </option>   
+
+ <option title="SAVE">
+   <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="multi"/>
+      <postfield name="addto.x" value="1"/>
+      <postfield name="variable" value="$message"/>
+      <postfield name="add2folder" value="SAVED"/>
+     </go>
+    </onevent>
+    SAVE
+ </option>
+
+<option title="DELETE">
+   <onevent type="onpick">
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="multi"/>
+      <postfield name="delete.x" value="1"/>
+      <postfield name="variable" value="$message"/>
+     </go>
+    </onevent>
+    DELETE
+ </option>
+
+ <option title="WRITE">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+          <postfield name="folder" value="$folder"/>
+          <postfield name="passed" value="compose"/>
+          <setvar name="mymessg" value=""/>
+          <setvar name="myto" value=""/>
+          <setvar name="mysubj" value=""/>
+         </go>
+       </onevent>
+     WRITE
+ </option>
+
+ <option title="INDEX">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+         <postfield name="folder" value="$folder"/>
+         <postfield name="passed" value="go_index"/>
+         <postfield name="position" value="1"/>
+         <postfield name="index_jump.x" value="1"/>
+        </go>
+       </onevent>
+     INDEX
+    </option>
+
+<option title="FOLDERS">
+     <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+          <postfield name="folder" value="$folder"/>
+          <postfield name="passed" value="folders"/>
+         </go>
+       </onevent>
+     FOLDERS
+ </option>
+
+ <option title="OPTIONS">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+          <postfield name="folder" value="$folder"/>
+          <postfield name="passed" value="options"/>
+         </go>
+       </onevent>
+     OPTIONS
+ </option>
+
+ <option title="QUIT">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+         <postfield name="folder" value="$folder"/>
+         <postfield name="passed" value="logout"/>
+        </go>
+       </onevent>
+     QUIT
+ </option>
+
+ </select>
+
+</p>
+
+</card>
+
+</wml>

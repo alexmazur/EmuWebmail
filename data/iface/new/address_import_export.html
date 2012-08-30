@@ -1,0 +1,162 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<title>[+ $EMU::c{publisher_name} +] - Addressbook Import/Export</title>
+
+<script language=JavaScript>
+
+function do_import() {
+    if (document.importexportform.import_format.selectedIndex == 0) {
+        alert("Please select an import format.");
+        return;
+    }
+
+    file = document.importexportform.import_file.value.replace(/^\s+|\s+$/g, "");
+    if (file == "") {
+        alert("Please select a file to be uploaded.");
+        return;
+    }
+
+    //document.importexportform.import_file.value = file;
+
+    document.importexportform.passed.value="import_addressbook";
+    var type = document.importexportform.import_format.options[document.importexportform.import_format.selectedIndex].value;
+
+    document.importexportform.import_type.value="csv";
+
+    document.importexportform.submit();
+}
+function do_export() {
+    if (document.importexportform.export_format.selectedIndex == 0) {
+        alert("Please select an export format.");
+        return;
+    }
+
+    document.importexportform.passed.value="export_addressbook";
+    document.importexportform.submit();
+}
+</script>
+
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+        <form name='importexportform' action='[+ $EMU::EMU_URL +]' method='POST' ENCTYPE="multipart/form-data">
+          <input type=hidden name="passed" value="">
+          <input type=hidden name="import_type" value="">
+          
+          <div id=folder-title> 
+            <div id=folder-name>Addressbook Import/Export</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              <input type="image" name="back" value="Back to the Addressbook" onClick="window.location='[+ $EMU::EMU_URL +]?folder=[+ $EMU::folder +]&passed=address';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/backAddressbookButton.gif"></td>
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            <table>
+              <tr> 
+                <th colspan=3 id=grid-header class="grid-header1" align=left>Importing</th>
+              </tr>
+              <tr>
+                <td colspan=3>&nbsp;</td>
+              </tr>
+              <tr>
+                 <td align="right" nowrap>Import&nbsp;from:</td>
+                 <td>
+                   <select name="import_format" style="width:200px"><option>-- Select --</option>
+                      <option value="Outlook9798">Outlook 97/98 (.CSV)</option>
+                      <option value="Outlook2000">Outlook 2000 (.CSV)</option>
+                      <option value="Outlook2002">Outlook 2002 (.CSV)</option>
+                      <option value="Outlook2000">Outlook Express 6 (.CSV)</option>
+                      <option value="Netscape">Netscape (.CSV)</option>
+                      <option value="Yahoo">Yahoo (.CSV)</option>
+                   </select>
+                 </td>
+                 <td rowspan="3" valign="top" width="50%">
+                 You may import addressbooks from:
+                   <ol>
+                     <li>Microsoft Outlook 97/98/2000</li>
+                     <li>Microsoft Outlook Express 6</li>
+                     <li>Netscape</li>
+                     <li>Yahoo Mail</li>
+                   </ol>
+                 </td>
+              </tr>
+              <tr>
+                <td align="right">Select file:</td>
+                <td><input type="file" name="import_file" style="width:200px"></td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td><input type="image" name="import_addressbook" value="Import Contacts" onClick="do_import();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/importContactsButton.gif"><br>&nbsp;<br>&nbsp;<br>&nbsp;</td>
+              </tr>
+              <tr>
+                <th colspan=3 id=grid-header class="grid-header1" align=left>Exporting</th>
+              </tr>
+              <tr>
+                <td colspan=3>&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right">Export to:</td>
+                <td>
+                  <select name="export_format" style="width:200px">
+                    <option>-- Select --</option>
+                    <option value="Outlook9798">Outlook 97/98</option>
+                    <option value="Outlook2000">Outlook 2000</option>
+                    <option value="Netscape">Netscape</option>
+                    <option value="Yahoo">Yahoo</option>
+                  </select>
+                </td>
+                <td rowspan="2" valign="top">&nbsp;</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td><input type="image" name="export" value="Export Contacts" onClick="do_export();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/exportContactsButton.gif"></td>
+              </tr>
+              <tr>
+                <td colsapn=3>&nbsp;</td>
+              </tr>
+            </table>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+              <input type="image" name="back" value="Back to the Addressbook" onClick="window.location='[+ $EMU::EMU_URL +]?folder=[+ $EMU::folder +]&passed=address';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/backAddressbookButton.gif"></td>
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

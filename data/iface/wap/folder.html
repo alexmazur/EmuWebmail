@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN"
+     "http://www.wapforum.org/DTD/wml_1.1.xml">
+
+
+<wml>
+
+
+<card id="folder_main">
+
+<p>
+<select>
+
+   <option title="INBOX">
+      <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+         <postfield name="folder" value="INBOX"/>
+         <postfield name="passed" value="go_index"/>
+        </go>
+       </onevent>
+     INBOX
+   </option>
+
+   <option title="SAVED">
+      <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+         <postfield name="folder" value="SAVED"/>
+         <postfield name="passed" value="go_index"/>
+        </go>
+       </onevent>
+     SAVED
+   </option>
+
+   <option title="SENT">
+      <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+         <postfield name="folder" value="sent"/>
+         <postfield name="passed" value="go_index"/>
+        </go>
+       </onevent>
+     SENT
+   </option>
+
+</select>
+
+</p>
+
+</card>
+</wml>

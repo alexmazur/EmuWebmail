@@ -1,0 +1,386 @@
+[-
+$args = shift @param;
+
+@folders = @{ $args->{folders} };
+ 
+my @msginfo = &EMU::get_msg_array();
+@msgnums = @{ $msginfo[0] };
+%msgdata = %{ $msginfo[1] };
+
+$this_page = $EMU::v{$EMU::folder."_page"};
+
+$maxmsgs     = $EMU::userdb{"options.max_messages"} || $EMU::c{default_max_messages} || 15;
+$firstmsg    = $maxmsgs * ( $this_page - 1 ) + 1;
+$lastmsg     = $firstmsg + $maxmsgs - 1;
+$total_msgs  = &EMU::get_var('total_messages');
+$total_pages = &EMU::ceil($total_msgs / $maxmsgs);
+$lastmsg     = $total_msgs if $lastmsg > $total_msgs;
+
+# This is the relative href to the current folder
+$currenthref = "$EMU::EMU_URL?passed=go_index&folder=$EMU::folder";
+
+$theme = $args->{theme};
+$manual_filtering = $EMU::userdb{'options.manual_filtering'} && $EMU::c{'allow_manual_filtering'};
+
+-]
+
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Inbox</title>
+[$ if (!$EMU::v{'mailcheck_popup'}) $]
+<META HTTP-EQUIV="Refresh" CONTENT="[+ &EMU::get_var('reload') +]; URL=[+ &EMU::make_url('go_index', 'refresh') +]">
+[$ endif $]
+<script language='Javascript'>
+
+[# Don't forget! Put generic JS in a cacheable js include file! #]
+
+function submitForm(fn) {
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+
+function goto_page(val) {
+   document.emuform.position.value = val;
+   submitForm('index_jump');
+   return false;
+}
+
+function flip_page(val) {
+   goto_page([+ $this_page +] + val);
+   return false;
+}
+
+function checkAll(val) {
+   if (document.emuform.d.length) {
+      for (var i=0; i<document.emuform.d.length; i++) {
+         document.emuform.d[i].checked = val;
+      }
+   } else {
+      document.emuform.d.checked = val;
+   }
+}            
+
+function submitMove(source) {
+   if (!source.options[source.selectedIndex].value) {
+      alert('You must select a folder first!');
+      return false;
+   }
+   document.emuform.folder.value = source.options[source.selectedIndex].value;
+   submitForm('move');
+}
+
+function folderSelect(source) {
+   // The first item in the list is New Folder
+   if (source.selectedIndex == 0) {
+      var val = prompt("Enter a name for your New Folder:","");
+      if (!val) {
+         source.selectedIndex = 1;
+         return false;
+      }
+      source.options[source.options.length] = new Option(val, val);
+      source.selectedIndex = source.options.length - 1;
+      return true;
+   }
+}
+
+function addFolder() {
+   window.open('[+ $EMU::EMU_URL +]?passed=parse&variable=add_folder_popup.html','new_folder','scrollbars=yes,resizable=yes,width=350,height=275');
+}
+
+function enable() {
+   var bChecked;
+
+   var Mark1 = document.emuform.mark1;
+   var Mark2 = document.emuform.mark2;
+   var Del1 = document.emuform.delete1;
+   var Del2 = document.emuform.delete2;
+   var Select1 = document.emuform.select1;
+   var Select2 = document.emuform.select2;
+
+   if (document.emuform.d.length) {
+      for( i=0; i < document.emuform.d.length; i++)
+      {	
+         if( document.emuform.d[i].checked ) bChecked=1;
+      }
+   } else {
+      if( document.emuform.d.checked ) bChecked=1;
+   }
+
+   if( bChecked )
+   {  
+      if (Mark1) Mark1.disabled=false;
+      if (Mark2) Mark2.disabled=false;
+      if (Del1) Del1.disabled=false;
+      if (Del2) Del2.disabled=false;
+      if (Select1) Select1.disabled=false;
+      if (Select2) Select2.disabled=false;
+   }else{
+      if (Mark1) Mark1.disabled=true;
+      if (Mark2) Mark2.disabled=true;
+      if (Del1) Del1.disabled=true;
+      if (Del2) Del2.disabled=true;
+      if (Select1) Select1.disabled=true;
+      if (Select2) Select2.disabled=true;
+   }
+}
+
+</script>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='fillme' value='42'>
+<INPUT TYPE='hidden' NAME='passed' VALUE='select'>
+<INPUT TYPE='hidden' NAME='position' VALUE=''>
+<INPUT TYPE='hidden' NAME='sorttype' VALUE='[+ $sorttype +]'>
+<input type='hidden' name='folder' value=''>
+
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+   
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1"></td>
+  <td nowrap><font class="PageTitle">Current&nbsp;Folder:&nbsp;[+ $EMU::folder +]</td>
+  <td width="100%" align="right"><table cellpadding="0" cellspacing="0" border="0">
+ <tr>
+  <td><font class="PageOptions">
+[$ if (!$total_msgs) $]
+  No&nbsp;Messages
+[$ else $]
+Viewing [+ "$firstmsg-$lastmsg" +]&nbsp;of&nbsp;[+ $total_msgs +]</font></td><td><font
+class="PageOptionsSpacer">&nbsp;|&nbsp;</font></td>
+[$ if ($firstmsg != 1) $]
+     <td><font class="PageOptions">&lt;&nbsp;</font><a href='#' onclick="return flip_page(-1);" class="PageOptions">Prev&nbsp;Page</a><font class="PageOptionsSpacer">&nbsp;|&nbsp;</td>
+[$ endif $]
+[$ if ($total_pages > 1) $]
+     <td><select onchange='goto_page(this.options[this.selectedIndex].value);' class="DefaultSelect">
+[$ foreach $p (1 .. $total_pages) $]
+[- $selected = ($p eq $this_page)?'selected':''; -]
+ <option value='[+ $p +]' [+ $selected +]>Page [+ $p +] of [+ $total_pages +]
+[$ endforeach $]
+ </select><b></td>
+[$ endif $]
+[$ if ($lastmsg != $total_msgs) $]
+     <td><font class="PageOptionsSpacer">&nbsp;|&nbsp;</font><a href='#' onclick="return flip_page(1);" class="PageOptions">Next&nbsp;Page</a><font class="PageOptions">&nbsp;&gt;</font></td>
+[$ endif $]
+[$ endif $]
+     <td><font class="PageOptionsSpacer">&nbsp;&nbsp;</font></td>
+    </tr>
+   </table></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu">
+  <td valign="top">
+
+
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+[# Close Menu #]
+
+</td>
+
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="BodyGridOutline">
+  <td><table width="100%" border="0" cellspacing="1" cellpadding="3">
+    <tr class="BodyButtonBar">
+     <td align="center" colspan="7">
+[$ if (@msgnums) $]
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+  <td>
+ [$ if $manual_filtering $]
+ <input type="button" name="filter" value="Apply Filters" class="DefaultButton" onClick="submitForm('filter')">
+ [$ endif $]
+ [$ if ($EMU::folder ne 'Search Results') $]
+ <input type="button" name="delete1" value="Delete Selected" class="DefaultButton" onClick="submitForm('delete')" disabled>
+ <input type="button" name="mark1" value="Mark As Read/Unread" class="DefaultButton" onClick="submitForm('mark')" disabled>
+ [$ endif $]&nbsp;&nbsp;
+ [$ if ($EMU::folder eq $EMU::trash_folder && $EMU::trash_bin) $]
+    <input type="button" name="empty1" value="Empty Folder" class="DefaultButton" onClick="submitForm('empty')">
+ [$ endif $]
+ </td>
+  <td align="right"><input type='button' name="select1" value="Save Selected in:" onclick="submitMove(this.form.folder_top)" class="DefaultButton" disabled>&nbsp;<select name="folder_top" onchange="folderSelect(this)" class="DefaultSelect"><option value=''>Add New Folder</option>
+  <option value='' selected>----
+ [$ foreach $f (@folders) $]
+ [- ($fesc = $f) =~ s/'/\\'/g; -]
+  <option value='[+ $fesc +]'>[+ $f +]
+ [$ endforeach $]
+  </select></td>
+      </tr>
+     </table>
+[$ else $]&nbsp;[$ endif $]</td>
+   </tr>
+
+[$ if (&EMU::get_status()) $]
+   <tr class="GridData">
+    <td colspan="7" align="center"><font class="Alert">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;</font></td>
+   </tr>
+[$ endif $]
+
+[$ if (@msgnums) $]
+   <tr class="GridHeader">
+    <td align="center">&nbsp;<input type="checkbox" onClick='checkAll(this.checked); enable()'></td>
+    <td align="center" nowrap><a href="[+ $currenthref +]&sorttype=select" class="GridHeader">*</a></td>
+    <td align="center"><a href="[+ $currenthref +]&sorttype=Content-Type"><img border=0 src='[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icon_attachment.gif'></a></td>
+    <td width="40%"><a href="[+ $currenthref +]&sorttype=subject" class="GridHeader">Subject</a></td>
+[$ if (&EMU::get_var('is_sent_mail')) $]
+    <td width="40%"><a href="[+ $currenthref +]&sorttype=to" class="GridHeader">To</a></td>
+[$ else $]
+    <td width="40%"><a href="[+ $currenthref +]&sorttype=sender" class="GridHeader">From</a></td>
+[$ endif $]
+    <td width="10%"><a href="[+ $currenthref +]&sorttype=date" class="GridHeader">Date</a></td>
+    <td width="5%"><a href="[+ $currenthref +]&sorttype=size" class="GridHeader">Size</a></td>
+   </tr>
+[$ else $]
+   <tr class="GridData">
+    <td colspan="7" align="center" height="300"><font class="alert">The [+ $EMU::folder +] folder is empty.</font></td>
+   </tr>
+[$ endif $]
+[$ foreach $m (@msgnums) $]
+ [-
+  $status = $msgdata{"status$m"};
+  # If we're not dealing with a single character, its likely an image (problems in conf.emu prevent us from doing this right)
+  if (length($status) > 1) {
+  $status = "<img src='$args->{IMGURL}/skins/$args->{SKIN}/$status'>";
+  }
+
+  $status  ||= '&nbsp;';
+  if ($msgdata{"newcolumn1$m"}) {
+      $attachment = "<img src='$args->{IMGURL}/skins/$args->{SKIN}/".$msgdata{"newcolumn1$m"}."'>";
+  }
+  else {
+      $attachment = '&nbsp;';
+  }
+  $from = $msgdata{"from$m"} || '&nbsp;';
+  $to = $msgdata{"to$m"} || '&nbsp;';
+  $hash = $msgdata{"hash$m"} || '&nbsp;';
+  $href = $msgdata{"href$m"} || '&nbsp;';
+  $subject = $msgdata{"subject$m"};
+  $date = $msgdata{"day_name$m"}. ', ' . $msgdata{"day$m"}.' '.$msgdata{"month_name$m"}.' '.$msgdata{"year$m"};
+  $date .= ' ' . $msgdata{"hour$m"} . ':' . sprintf("%02d", $msgdata{"minute$m"}) . ':' . sprintf("%02d", $msgdata{"second$m"});
+  $date .= ' ' . $msgdata{"ampm$m"} if ($msgdata{"ampm$m"});
+  $date .= ' ' . $msgdata{"gmt$m"} if ($msgdata{"gmt$m"});
+  $size = $msgdata{"size$m"} || '&nbsp;';
+ -]
+   <tr class="GridData">
+    <td nowrap align="center">&nbsp;<input type="checkbox" name="d" value="[+ $hash +]" onclick="enable()"></td>
+    <td align="center">[+ $status +]</td>
+    <td align='center'>[+ $attachment +]</td>
+    <td><a href="[+ $href +]" class="GridData">[+ $subject +]</a>&nbsp;</td>
+ [$ if (&EMU::get_var('is_sent_mail')) $]
+    <td><font class="GridData">[+ $to +]&nbsp;</font></td>
+ [$ else $]
+    <td><font class="GridData">[+ $from +]&nbsp;</font></td>
+ [$ endif $]
+    <td nowrap><font class="GridData">[+ $date +]&nbsp;</font></td>
+    <td nowrap><font class="GridData">[+ $size +]&nbsp;</font></td>
+   </tr>
+ [$ endforeach $]
+   <tr class="BodyButtonBar">
+    <td colspan="7">
+[$ if (@msgnums) $]
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+       <td>
+ [$ if $manual_filtering $]
+ <input type="button" name="filter" value="Apply Filters" class="DefaultButton" onClick="submitForm('filter')">
+ [$ endif $]
+ [$ if ($EMU::folder ne 'Search Results') $]
+ <input type="button" name="delete2" value="Delete Selected" class="DefaultButton" onClick="submitForm('delete')" disabled>
+ <input type="button" name="mark2" value="Mark As Read/Unread" onClick="submitForm('mark')" class="DefaultButton" disabled>
+ [$ endif $]&nbsp;&nbsp;
+ [$ if ($EMU::folder eq $EMU::trash_folder && $EMU::trash_bin) $]
+    <input type="button" name="empty2" value="Empty Folder" onClick="submitForm('empty')" class="DefaultButton">
+ [$ endif $]
+</td>
+  <td align="right"><input type='button' name="select2" value="Save Selected in:" onclick="submitMove(this.form.folder_bottom)" class="DefaultButton" disabled>&nbsp;<select name="folder_bottom" onchange="folderSelect(this)" class="DefaultSelect"><option value=''>Add New Folder</option>
+  <option value='' selected>----
+ [$ foreach $f (@folders) $]
+ [- ($fesc = $f) =~ s/'/\\'/g; -]
+  <option value='[+ $fesc +]'>[+ $f +]
+ [$ endforeach $]
+  </select></td> 
+ </tr>
+</table>
+[$ else $]&nbsp;[$ endif $]</td>
+   </tr>
+  </table></td>
+ </tr>
+</table>
+
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td nowrap><font class="PageOptions">
+  [$ if (&EMU::get_var('allowed') > 0) $]
+    [- 
+      $percent = sprintf("%2d", ($EMU::v{quota_used}/$EMU::v{quota_allowed})*100 );
+      $allowed = sprintf("%2d", $EMU::v{quota_allowed}/1024);
+    -]
+    You&nbsp;are&nbsp;using&nbsp;[+ $percent +]%&nbsp;of your&nbsp;[+ $allowed +]&nbsp;KB&nbsp;Quota.&nbsp;&nbsp;<br>
+  [$ endif $]
+ </font></td>  
+ <td align="right" width="100%"><table cellpadding="0" cellspacing="0" border="0">
+ <tr>
+  <td><font class="PageOptions">
+[$ if (!$total_msgs) $]
+  No&nbsp;Messages
+[$ else $]
+Viewing [+ "$firstmsg-$lastmsg" +]&nbsp;of&nbsp;[+ $total_msgs +]</font></td><td><font
+class="PageOptionsSpacer">&nbsp;|&nbsp;</font></td>
+[$ if ($firstmsg != 1) $]
+     <td><font class="PageOptions">&lt;&nbsp;</font><a href='#' onclick="return flip_page(-1);" class="PageOptions">Prev&nbsp;Page</a><font class="PageOptionsSpacer">&nbsp;|&nbsp;</td>
+[$ endif $]
+[$ if ($total_pages > 1) $]
+     <td><select onchange='goto_page(this.options[this.selectedIndex].value);' class="DefaultSelect">
+[$ foreach $p (1 .. $total_pages) $]
+[- $selected = ($p eq $this_page)?'selected':''; -]
+ <option value='[+ $p +]' [+ $selected +]>Page [+ $p +] of [+ $total_pages +]
+[$ endforeach $]
+ </select><b></td>
+[$ endif $]
+[$ if ($lastmsg != $total_msgs) $]
+     <td><font class="PageOptionsSpacer">&nbsp;|&nbsp;</font><a href='#' onclick="return flip_page(1);" class="PageOptions">Next&nbsp;Page</a><font class="PageOptions">&nbsp;&gt;</font></td>
+[$ endif $]
+[$ endif $]
+     <td><font class="PageOptionsSpacer">&nbsp;&nbsp;</font></td>
+       </tr>
+   </table></td>
+ </tr>  
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>

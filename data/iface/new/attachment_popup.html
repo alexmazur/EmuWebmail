@@ -1,0 +1,98 @@
+[-
+   $args = shift @param;
+
+   $attached = &EMU::get_var('here_atts');
+   $attached_old = &EMU::get_var('attach');
+   $attached = "$attached"."$attached_old";
+   @attachments = split(/\s+/, $attached);
+-]
+
+<html>
+<head>
+<title>EMU Webmail - Attachments</title>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<script language='javascript'>
+
+function saveAttachments() {
+   if (document.emuform.tmpupload.value &&
+       !confirm("You have selected a file to attach but have not uploaded the file. Continuing will not process your upload. Are you sure you want to continue? If you would like to upload the selected file, click 'Cancel' and then click 'Upload File'.")) {
+      return false;
+   }
+   
+   var attachments = document.emuform.attached.value;   
+   parent.setAttachments(attachments);
+}
+
+var spin = new Array('|', '/', '-', '\\');
+
+function showProgress(val) {
+   val = val % spin.length;
+
+   document.emuform['attach.x'].value="Uploading  ["+spin[val]+"]";
+   
+   window.setTimeout("showProgress("+(val+1)+")", 800);
+}
+</script>
+</head>
+
+<BODY class=attachments_body onload="saveAttachments()">
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST' ENCTYPE="multipart/form-data">
+  <input type="hidden" name="passed" value="process_attachment">
+  <input type='hidden' name='attached' value='[+ $attached +]'>
+
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+<tr> 
+  <td align="center">File to attach:&nbsp;&nbsp;
+  <input type="file" name="tmpupload" size="25">&nbsp;
+<!--  <input type="image" name="attach.x" value="Upload File" onclick='showProgress(0);' title="Click &quot;upload&quot; to attach it. Note, this may take
+a while, depending on the filesize and your connection speed." src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/uploadFileButton.gif"> -->
+  <input type="submit" name="attach.x" value="Upload File" onclick='showProgress(0);' title="Click &quot;upload&quot; to attach it. Note, this may take
+a while, depending on the filesize and your connection speed.">
+  </td>
+</tr>
+ <tr> 
+  <td align=center>
+  <table border="0" cellspacing="5" cellpadding="0">
+    <tr>
+     <td><table width="300" border="0" cellspacing="1" cellpadding="4">
+[$ if (@attachments)  $] 
+       <tr> 
+        <th id=grid-header class="grid-header1 narrow">Select</th>
+        <th id=grid-header>Filename</th>
+       </tr>
+[$ endif $]
+[$ foreach $a (@attachments) $]
+[- ($name = $a) =~ s/_\d+$//; -]
+       <tr> 
+        <td id=grid-data1 class=centered><input type="checkbox" name="selected" value="[+ $a +]"></td>
+        <td id=grid-data>[+ $name +]</td>
+       </tr>
+[$ endforeach $]
+[$ if (@attachments)  $]
+       <tr> 
+        <td align="center" colspan="2"><input type="image" name="delete.x" value="Remove Selected" onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/removeSelectedButton.gif"></td>
+       </tr>
+[$ else $] 
+       <tr bgcolor="#FFFFFF"> 
+        <td colspan="2"><div class="red centered">&nbsp;<br>No attachments uploaded yet<br>&nbsp;</div></td>
+       </tr>
+[$ endif $]
+      </table></td>
+    </tr>
+   </table></td>
+ </tr>
+<!--
+ <tr> 
+  <td align="center">&nbsp;<br><input type="button" value="Save Attachments" onclick='saveAttachments()'
+class="DefaultButton">&nbsp;<input type="button" value="Cancel" onclick='window.close()' class="DefaultButton"></td>
+ </tr>
+-->
+ <tr>
+   <td>Attach one or more files on your harddrive to your message by clicking the
+&quot;browse&quot; button, selecting a file, and then clicking &quot;upload&quot;.<br>&nbsp;</td>
+ </tr>
+</table>
+</form>
+</body>
+</html>

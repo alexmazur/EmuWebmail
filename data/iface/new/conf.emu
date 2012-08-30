@@ -1,0 +1,38 @@
+## EMUmail Config file#
+#######################
+#
+# Any values in the iface/BAZ directory will override the site.emu default file
+#	Most values in this file are *interface related* (but don't have to be)
+#
+# The format of the EMUmail3.0 config file is similar to EMUmail2.7 and below, except
+# now it is easier to manage and offers less room for mistakes (no longer are quotes or
+# semicolons or care for special characters needed)
+#
+# There are 6 special values within the config file:
+#  false and true. Which are booleans, equally replaceable with 0 and 1.
+#  no and yes. (which follows suite with false and true)
+#  none. Becomes a blank entry.
+#  [SomeNameHere]. If a config entry called SomeNameHere exists then the value
+#    of that is used in substitution. 
+#
+# If you need to insert a newline into a field, use \n
+#
+# Lists are created with SPACE or , between list items.
+# Embperl support. This allows you to have embperl HTML templates
+######################
+
+
+embedded_perl = true
+
+default_signature = 
+addressbook_length = 20
+index_sender_mode = 0
+index_sender_length=35
+index_subject_length=50
+quickjump_sender_length = 11
+quickjump_subject_length = 16
+
+Status0 = icon_new.gif
+Status1 = icon_read.gif
+Status2 = icon_answered.gif
+

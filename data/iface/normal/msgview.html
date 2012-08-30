@@ -1,0 +1,364 @@
+[-
+   $args = shift @param;
+
+   @folders = @{ $args->{folders} };
+   @attachments = @{ &EMU::get_var('attachments_array') };
+   $quote = defined($EMU::userdb{'options.quoted_reply'}) ? $EMU::userdb{'options.quoted_reply'} : 1;
+
+   my @headerinfo = &EMU::get_header_array();
+   @headerorder = @{ $headerinfo[0] };
+   %headerdata = %{ $headerinfo[1] };
+
+   # We want From and To always visible (even if blank)
+   $headerdata{'From'} ||= '';
+   $headerdata{'To'}   ||= '';
+   
+   if (!&EMU::get_var('full_header')) {
+      
+      # These are the basic headers
+      @headerorder = qw/From To Cc Date Subject/;
+      my %newdata = map { $_ => undef } @headerorder;
+
+      foreach (keys %headerdata)
+      {
+         my $k = $_;
+         $k =~ s/^\s+//; $k =~ s/\s+$//;
+         $newdata{$k} = $headerdata{$_} if (exists($newdata{$k}));
+      }
+      
+      %headerdata = %newdata;
+  }
+   
+   @headerorder = grep { defined($headerdata{$_}) } @headerorder;
+
+   $message = &EMU::get_var('message');
+   @msglist = &EMU::msg_quickjump($message, $EMU::folder);
+   
+   # First, reformat our data
+   foreach my $m (@msglist) {
+      ($sender, $subject, $msgid) = $m =~ /^(.{10})(.{15})(.*)/;
+      push (@messages, { msgid => $msgid, sender => $sender, subject => $subject });
+   }
+
+   # Second, mark important data
+   for (my $i=0; $i<@messages; $i++) {
+      if ($messages[$i]->{msgid} eq $message) {
+         $messages[$i]->{selected} = 'selected';
+         $previous = $messages[$i-1]->{msgid} if ($i > 0 && ref($messages[$i-1]) && exists($messages[$i-1]->{msgid}));
+         $next = $messages[$i+1]->{msgid} if (ref($messages[$i+1]) && exists($messages[$i+1]->{msgid}));
+         last;
+      }
+   }
+   
+   # Setup MHTML parsing
+   $mhtml_bgcolor = &EMU::get_var('mhtml_bgcolor');
+   $mhtml_background = &EMU::get_var('mhtml_background');
+   $theme = $args->{theme};
+
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Read Message</title>
+<script language=javascript>
+
+function submitForm(fn) {
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+
+function do_reply(how) {
+   [$ if ($quote || !defined($quote)) $]
+      document.emuform.reply_how.value = 'q'+how;
+   [$ else $]
+      document.emuform.reply_how.value = how;
+   [$ endif $]
+   submitForm('reply');
+}
+   
+
+function msgjump(msgid) {
+   document.emuform.variable2.value=msgid;
+   submitForm('quick');
+   return false;
+}
+
+function showPrintable() {
+   document.emuform.variable2.value = 'print';
+   document.emuform.variable2.name = 'display';
+   submitForm('display');
+   return false;
+}
+
+function submitMove(source) {
+   if (!source.options[source.selectedIndex].value) {
+      alert('You must select a folder first!');
+      return false;
+   }
+   document.emuform.add2folder.value = source.options[source.selectedIndex].value;
+   submitForm('addto');
+}
+
+function folderSelect(source) {
+   // The first item in the list is New Folder
+   if (source.selectedIndex == 0) {
+      var val = prompt("Enter a name for your New Folder:","");
+      if (!val) {
+         source.selectedIndex = 1;
+         return false;
+      }
+      source.options[source.options.length] = new Option(val, val);
+      source.selectedIndex = source.options.length - 1;
+      return true;
+   }
+}
+
+function addFolder() {
+   window.open('[+ $EMU::EMU_URL +]?passed=parse&variable=add_folder_popup.html','new_folder','scrollbars=yes,resizable=yes,width=350,height=275');
+}
+
+[$ if (EMU::get_var('mdn_email')) $]
+function confirmReadReceipt()
+{
+	var RRconfirmed = confirm("User has requested a read receipt be sent when message has been read.\nDo you want to send a receipt?");
+	if (RRconfirmed)
+	{
+		document.location = '[+ $EMU::EMU_URL +]?passed=send_readreceipt&variable=[+ &CGI::escape($message) +]&folder=[+ $EMU::folder +]';
+	}
+	else
+	{
+		document.location = '[+ $EMU::EMU_URL +]?passed=send_readreceipt&option=dontsend&variable=[+ &CGI::escape($message) +]&folder=[+ $EMU::folder +]';
+	}
+}
+[$ endif $]
+</script>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'[$ if (EMU::get_var('mdn_email')) $] onload='confirmReadReceipt()'[$ endif $]>
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='reply_how' value=''>
+<input type='hidden' name='fillme' value='42'>
+<input type='hidden' name='passed' value='multi'>
+<input type='hidden' name='variable' value='[+ $message +]'>
+<input type='hidden' name='variable2' value=''>
+<input type='hidden' name='add2folder' value=''>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PReBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%" align="right"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+     <td width="100%"><font class="PageTitle">Current&nbsp;Folder:&nbsp;[+ $EMU::folder +]&nbsp;|&nbsp;Read Message</font></td>
+[$ if ($previous) $]
+     <td nowrap><font class="PageOptions">&lt;&nbsp;</font><a href='#' onclick="msgjump('[+ $previous +]'); return
+false;" class="PageOptions">Previous&nbsp;Message</a><font class="PageOptionsSpacer">&nbsp;|&nbsp;</font></td>
+[$ endif $]
+[$ if (@messages) $]
+     <td><select onchange="msgjump(this.options[this.selectedIndex].value);" class="DefaultSelect">
+[$ foreach $m (@messages) $]
+     <option value='[+ $m->{msgid} +]' [+ $m->{selected} +]>[+ $m->{sender} +]: [+ $m->{subject} +]
+[$ endforeach $]
+     </select></td>
+[$ else $]
+     <td><font class="PageOptions">&nbsp;</font></td>
+[$ endif $]
+[$ if ($next) $]
+     <td nowrap><font class="PageOptionsSpacer">&nbsp;|&nbsp;</font><a href='#' onclick="msgjump('[+ $next +]'); return false;" class="PageOptions">Next Message</a><font class="PageOptions">&nbsp;&gt;&nbsp;</font></td>
+[$ endif $]
+    </tr>
+   </table></td>
+ </tr>
+</table>
+[# Close PreBody #]
+   
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu">
+  <td valign="top">
+       
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args, \@folders) -]
+[# Close Menu #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="BodyGridOutline">
+  <td><table width="100%" border="0" cellspacing="1" cellpadding="3">
+    <tr class="BodyButtonBar">
+     <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+     <td><input type="button" name="qreply.x" onclick="do_reply('reply');" value="Reply" class="DefaultButton">&nbsp;<input type="button" name="qreply.x" onclick="do_reply('replyall');" value="Reply to All" class="DefaultButton">&nbsp;<input type="submit" name="forward.x" value="Forward" class="DefaultButton">[$ if ($EMU::folder ne 'Search Results') $]&nbsp;<input type="submit" name="delete.x" value="Delete" class="DefaultButton">
+[$ endif $]</td>
+     <td align="right"><input type="button" value="Save in:" onclick="submitMove(this.form.add2folder_top)" class="DefaultButton">&nbsp;<select name="add2folder_top" onchange="folderSelect(this)" class="DefaultSelect">
+         <option value=''>Add New Folder
+         <option value='' selected>----
+         [$ if ($fullname = &EMU::get_var('fullname')) $]
+            [- ($fn = $fullname) =~ s/'/\\'/g; -]
+            <option value='[+ $fn +]'>[+ $fullname +]
+         [$ endif $]
+         [$ foreach $f (@folders) $]
+            [$ if ($fullname && $f ne $fullname) $]
+              [- ($fesc = $f) =~ s/\'/\\'/g; -]
+              <option value='[+ $fesc +]'>[+ $f +]
+            [$ endif $]
+         [$ endforeach $]
+     </select></td>
+    </tr>
+   </table>
+
+[# Close MsgView Header #]
+
+</td>
+</tr>
+
+[$ if (&EMU::get_status()) $]
+<tr class="GridData">
+	<td align="center"><font class="Alert">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;</font></td>
+</tr>
+[$ endif $]
+
+<tr class="GridHeader" valign="top"> 
+  <td><table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+     <td><table width="100%" border="0" cellspacing="4" cellpadding="0">
+[$ foreach $h (@headerorder) $]
+[- 
+   $data = $headerdata{$h} || '&nbsp;';
+   $h =~ s/^\s+|\s+$//g;
+   if ($EMU::msg{"MSG_Header$h"}) {
+      $h = $EMU::msg{"MSG_Header$h"};
+   } else {
+      $h = "$h:";
+   }
+-]
+       <tr> 
+        <td align="right" valign="top"><font class="DefaultText">[+ $h +]&nbsp;</font></td>
+        <td valign="top"><font class="DefaultText">[+ $data +]</font></td>
+       </tr>
+[$ endforeach $]
+[$ if (@attachments) $]
+       <tr> 
+        <td width="31%" align="right"><font class="DefaultText">Attachments:&nbsp;</font></td>
+        <td><font class="DefaultText">
+        [$ foreach $a (@attachments) $]
+           [$ if ($a->{content_type} =~ /msword/i) $]
+              <a href='#' onClick="window.open('[+ $a->{url} +]','WebmailHelp','width=750,height=500,toolbar=yes,location=no,directories=no,status=yes,menubar=yes,resizable=yes,copyhistory=no,scrollbars=yes');return false;">[+ $a->{name} +]</a><br>
+           [$ else $]
+              <a href='[+ $a->{url} +]' [+ $a->{target} +]>[+ $a->{name} +]</a><br>
+           [$ endif $]
+        [$ endforeach $]
+        </font></td>
+       </tr>
+[$ endif $]
+      </table></td>
+     <td valign="top"><table border="0" cellpadding="0" cellspacing="4">
+       <tr>
+        <td><input type='checkbox' name='display' onclick="submitForm('display')" value='full_header' [+ 'checked' if &EMU::get_var('full_header') +]></td>
+        <td nowrap><font class="DefaultText">Show&nbsp;full&nbsp;message&nbsp;header</font></td>
+       </tr><tr>
+        <td></td>
+        <td><font class="DefaultText"><a href='[+ $EMU::EMU_URL +]?passed=multi&display=print&display.x=16&variable=[+ &CGI::escape($message) +]' target='_blank' class="Default">Printer-Friendly Version</td>
+       </tr>
+      </table></td>
+    </tr>
+   </table></td>
+ </tr><tr class="GridData">
+   <td valign="top" align="left"></form><table width="100%" border="0" cellspacing="5" cellpadding="0">
+     <tr>
+      <td [$ if ($mhtml_background) $]background=[+ $mhtml_background +][$ endif $][$ if ($mhtml_bgcolor) $]bgcolor=[+ $mhtml_bgcolor +][$ endif $]>
+
+[$ if (&EMU::get_var('inline_html')) $]
+[+ &EMU::get_var('inline_html_value') +]
+<br><br><HR WIDTH=80% ALIGN=CENTER><br><br>
+[$ endif $]
+<font class="MessageText"><pre>[+ &EMU::get_var('the_message') +][+ &EMU::get_var('prologue') +]</pre></font></td>
+     </tr>
+    </table>
+<form action='[+ $EMU::EMU_URL +]' method='POST'>
+</td>
+  </tr><tr class="BodyButtonBar">
+   <td>
+
+<!-- Open MSGVIEW header -->
+     
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+     <td><input type="button" name="qreply.x" onclick="do_reply('reply');" value="Reply" class="DefaultButton">&nbsp;<input type="button" name="qreply.x" onclick="do_reply('replyall');" value="Reply to All" class="DefaultButton">&nbsp;<input type="button" name="forward.x" value="Forward" onclick="submitForm('forward')" class="DefaultButton">[$ if ($EMU::folder ne 'Search Results') $]&nbsp;<input type="button" name="delete.x" value="Delete" onclick="submitForm('delete')" class="DefaultButton">
+        [$ endif $]</td>
+     <td align="right"><input type="button" value="Save in:" onclick="submitMove(this.form.add2folder_bottom)" class="DefaultButton">&nbsp;<select name="add2folder_bottom" onchange="folderSelect(this)" class="DefaultSelect">
+         <option value=''>Add New Folder
+         <option value='' selected>----
+         [$ if ($fullname = &EMU::get_var('fullname')) $]
+            [- ($fn = $fullname) =~ s/'/\\'/g; -]
+            <option value='[+ $fn +]'>[+ $fullname +]
+         [$ endif $]
+         [$ foreach $f (@folders) $]
+            [$ if ($fullname && $f ne $fullname) $]
+              [- ($fesc = $f) =~ s/\'/\\'/g; -]
+              <option value='[+ $fesc +]'>[+ $f +]
+            [$ endif $]
+         [$ endforeach $]
+     </select></td>
+    </tr>
+   </table>
+  </td>
+ </tr>
+</tr>
+</table>
+</td></tr></table>
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="2" alt=""></td>
+  <td width="100%" align="right"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+     <td width="100%"><font class="pagetitle">&nbsp;</font></td>
+[$ if ($previous) $]
+     <td nowrap><font class="PageOptions">&lt;&nbsp;</font><a href='#' onclick="msgjump('[+ $previous +]'); return false;" class="PageOptions">Previous&nbsp;Message</a><font class="PageOptionsSpacer">&nbsp;|&nbsp;</font></td>
+[$ endif $]
+[$ if (@messages) $]
+     <td><select onchange="msgjump(this.options[this.selectedIndex].value);" class="DefaultSelect">
+[$ foreach $m (@messages) $]
+     <option value='[+ $m->{msgid} +]' [+ $m->{selected} +]>[+ $m->{sender} +]: [+ $m->{subject} +]
+[$ endforeach $]   
+     </select></td>
+[$ else $]
+     <td><font class="PageOptions">&nbsp;</font></td>
+[$ endif $]
+[$ if ($next) $]
+     <td nowrap><font class="PageOptionsSpacer">&nbsp;|&nbsp;</font><a href='#' onclick="msgjump('[+ $next +]'); return
+false;" class="PageOptions">Next&nbsp;Message</a><font class="PageOptions">&nbsp;&gt;&nbsp;</font></td>
+[$ endif $]
+    </tr>  
+   </table></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+
+</form>
+</body>
+</html>

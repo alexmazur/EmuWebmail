@@ -1,0 +1,96 @@
+[-
+   $args = shift @param;
+
+   $attached = &EMU::get_var('here_atts');
+   $attached_old = &EMU::get_var('attach');
+   $attached = "$attached"."$attached_old";
+   @attachments = split(/\s+/, $attached);
+-]
+
+<html>
+<head>
+<title>EMU Webmail - Attachments</title>
+<script language='javascript'>
+
+function saveAttachments() {
+   if (document.emuform.tmpupload.value &&
+       !confirm("You have selected a file to attach but have not uploaded the file. Continuing will not process your upload. Are you sure you want to continue? If you would like to upload the selected file, click 'Cancel' and then click 'Upload File'.")) {
+      return false;
+   }
+   
+   var attachments = document.emuform.attached.value;   
+   parent.setAttachments(attachments);
+}
+
+var spin = new Array('|', '/', '-', '\\');
+
+function showProgress(val) {
+   val = val % spin.length;
+
+   document.emuform['attach.x'].value="Uploading  ["+spin[val]+"]";
+   
+   window.setTimeout("showProgress("+(val+1)+")", 800);
+}
+</script>
+<link rel="stylesheet" type="text/css" href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css">
+</head>
+
+<body class="popup" onload="saveAttachments()">
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST' ENCTYPE="multipart/form-data">
+<input type="hidden" name="passed" value="process_attachment">
+<input type='hidden' name='attached' value='[+ $attached +]'>
+
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+<tr> 
+  <td align="center">
+  <font class="PopupDefault">File to attach:&nbsp;</font>&nbsp;
+  <input type="file" name="tmpupload" size="25" class="DefaultFile">&nbsp;
+  <input type="submit" name="attach.x" value="Upload File" onclick='showProgress(0);' class="DefaultButton" title="Click &quot;upload&quot; to attach it. Note, this may take
+a while, depending on the filesize and your connection speed."></td>
+</tr>
+ <tr> 
+  <td align=center>
+  <table border="0" cellspacing="5" cellpadding="0">
+    <tr class="BodyGridOutline">
+     <td><table width="300" border="0" cellspacing="1" cellpadding="4">
+[$ if (@attachments)  $] 
+       <tr class="GridHeader"> 
+        <td align="center"><font class="GridHeader">Select</font></td>
+        <td width="90%"><font class="GridHeader">Filename</font></td>
+       </tr>
+[$ endif $]
+[$ foreach $a (@attachments) $]
+[- ($name = $a) =~ s/_\d+$//; -]
+       <tr class="GridData"> 
+        <td align="center"><input type="checkbox" name="selected" value="[+ $a +]"></td>
+        <td>[+ $name +]</td>
+       </tr>
+[$ endforeach $]
+[$ if (@attachments)  $]
+       <tr bgcolor="#FFFFFF"> 
+        <td align="center" colspan="2"><input type="submit" name="delete.x" value="Remove Selected" class="DefaultButton"></td>
+       </tr>
+[$ else $] 
+       <tr bgcolor="#FFFFFF"> 
+        <td align="center" colspan="2"><font class="Alert">&nbsp;<br>No attachments uploaded yet<br>&nbsp;</font></td>
+       </tr>
+[$ endif $]
+      </table></td>
+    </tr>
+   </table></td>
+ </tr>
+<!--
+ <tr> 
+  <td align="center">&nbsp;<br><input type="button" value="Save Attachments" onclick='saveAttachments()'
+class="DefaultButton">&nbsp;<input type="button" value="Cancel" onclick='window.close()' class="DefaultButton"></td>
+ </tr>
+-->
+ <tr>
+   <td><font class="PopupDefault">Attach one or more files on your harddrive to your message by clicking the
+&quot;browse&quot; button, selecting a file, and then clicking &quot;upload&quot;.<br>&nbsp;</font></td>
+ </tr>
+</table>
+</form>
+</body>
+</html>

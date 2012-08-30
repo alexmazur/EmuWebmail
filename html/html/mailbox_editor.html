@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>Mailbox Editor</title>
+<script Language='Javascript'>
+
+var me;
+
+function Load() {
+   me = window.opener.getCurrent();
+
+   document.popup.name.value = me.name;
+   document.popup.email.value = me.email;
+   document.popup.path.value = me.path;
+   
+   var protocol = document.popup.protocol;
+
+   for (var i=0; i<protocol.options.length; i++) {
+      if (protocol.options[i].value == me.protocol) {
+         protocol.selectedIndex = i;
+         break;
+      }
+   }
+}
+
+function saveChanges() {
+   me.name = document.popup.name.value;
+   me.email = document.popup.email.value;
+   me.path = document.popup.path.value;
+   me.password = document.popup.password.value;
+   me.protocol = document.popup.protocol.options[document.popup.protocol.selectedIndex].value;
+
+   window.opener.saveMailbox(me);
+   window.close();
+}
+
+</script>
+</head>
+
+<script>
+   document.write("<link id='css_link' rel='stylesheet' type='text/css' href='css/skin_webmail_"+window.opener.GetSkin()+".css'>");
+</script>
+
+<body class="Popup" onload='Load()'>
+<form name='popup'>
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+ <tr> 
+  <td align="right"><font class="DefaultText">Mailbox Type:&nbsp;</font></td>
+  <td><select name="protocol" class="DefaultSelect"><option selected value="">-- Select --</option><option value='POP3'>POP3</option><option value='IMAP'>IMAP</option></select></td>
+ </tr><tr>
+  <td align="right"><font class="DefaultText">Mailbox Name:&nbsp;</font></td>
+  <td><input type="text" name="name" class="DefaultTextbox"></td>
+ </tr><tr> 
+  <td align="right"><font class="DefaultText">Email Address:&nbsp;</font></td>
+  <td><input type="text" name="email" class="DefaultTextbox"></td>
+ </tr><tr> 
+  <td align="right"><font class="DefaultText">IMAP Folder:&nbsp;</font></td>
+  <td><input type="text" name="path" class="DefaultTextbox"></td>
+ </tr><tr> 
+  <td align="right"><font class="DefaultText">Password:&nbsp;</font></td>
+  <td><input type="password" name="password" class="DefaultTextbox"></td>
+ </tr><tr> 
+  <td colspan="2">&nbsp;</td>
+ </tr><tr> 
+  <td colspan="2" align="center"><input type="button" value="Save Changes" onClick="saveChanges()" class="DefaultButton"><input type="button" value="Cancel" onClick="window.close()" class="DefaultButton"></td>
+ </tr>
+</table>
+</form>
+</body>
+</html>

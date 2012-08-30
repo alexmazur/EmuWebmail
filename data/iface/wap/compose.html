@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN"
+     "http://www.wapforum.org/DTD/wml_1.1.xml">
+
+
+<wml>
+
+<card id="compose_to">
+
+  <do type="accept" label="NEXT">
+   <go href="#compose_subj"/>
+  </do>
+
+  <p> 
+  TO:
+  <input name="myto" value="$to"/>
+  </p>
+
+</card>
+
+<card id="compose_subj">
+
+  <do type="accept" label="NEXT">
+   <go href="#compose_msg"/>
+  </do>
+
+  <p>
+  SUBJ:
+  <input name="mysubj" value="$subj"/>
+  </p>
+
+</card>
+
+<card id="compose_msg">
+
+  <do type="accept" label="NEXT">
+    <go href="#compose_menu">
+          <setvar name="sg" value = "$sigwap"/>
+          <setvar name="ms" value = "Cancelled."/>
+     </go>
+  </do>
+
+  <p>
+  MSG:
+  <input name="mymessg" value="$message"/>
+  </p>
+
+</card>
+
+
+<card id="compose_menu">
+
+<p>
+
+  <select name="choice" ivalue="1">
+
+     <option title="SEND"> 
+        <onevent type="onpick">
+         <go href="$url?$cache_bust" method="post">
+  	  <postfield name="message" value ="$(mymessg)$(sg)"/>
+          <postfield name="to" value ="$(myto)"/>
+          <postfield name="subject" value ="$(mysubj)"/>
+          <postfield name="passed" value ="compose_parse"/>
+          <postfield name="from" value ="$from"/>
+         </go> 
+        </onevent>
+     SEND 
+      </option>
+
+    <option title="EDIT" onpick="#compose_to"> EDIT </option>
+
+    <option title="CANCEL">
+       <onevent type="onpick">
+        <go href="$url?$cache_bust" method="post" >
+         <postfield name="folder" value="$folder"/>
+         <postfield name="passed" value="go_index"/>
+         <postfield name="m" value="Cancelled."/>
+        </go>
+       </onevent>
+     CANCEL
+    </option>
+
+
+  </select>
+
+</p>
+
+</card>
+
+
+</wml>
+
+
+

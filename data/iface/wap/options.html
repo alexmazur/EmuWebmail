@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.1//EN"
+     "http://www.wapforum.org/DTD/wml_1.1.xml">
+
+
+<wml>
+
+
+<card id="options_main">
+
+<onevent type="onenterforward">
+ <refresh>
+   <setvar name="yourname" value="$real_name"/>
+   <setvar name="yourmail" value="$email"/>   
+   <setvar name="sig" value="$sigwap"/>
+   <setvar name="mmax_m" value="$max_messages"/>
+ </refresh>
+</onevent>
+
+<do type="options" label="INDEX">
+     <go href="$url?$cache_bust" method="post">
+        <postfield name="folder" value="$folder"/>
+        <postfield name="passed" value="go_index"/>
+     </go>
+</do>
+
+<p>
+
+ $sv 
+
+ <select>
+
+ <option title="NAME" onpick="#options_name">
+ EDIT NAME
+ </option>
+
+ <option title="EMAIL" onpick="#options_email">
+ EDIT EMAIL
+ </option>
+
+ <option title="SIG" onpick="#options_sig">
+ EDIT SIG
+ </option>
+
+ <!--option title="MAXM" onpick="#options_max_m">
+ EDIT MAXM
+ </option-->
+
+ <option title="SAVE">
+   <onevent type="onpick">    
+     <go href="$url?$cache_bust" method="post">
+      <postfield name="passed" value="options_parse"/>
+      <!--postfield name="max_messages" value="$(mmax_m)"/-->
+      <postfield name="yourname" value="$(yourname)"/>
+      <postfield name="yourmail" value="$(yourmail)"/>
+      <postfield name="signature" value="$(sig)"/>
+      <postfield name="sv" value="Saved."/>
+     </go>
+   </onevent>
+
+ SAVE OPTIONS
+ </option>
+
+
+ </select>
+
+</p>
+
+
+</card>
+
+
+<!--card id="options_max_m">
+
+  <p>MAX MSGS:
+     <input name="mmax_m"/>
+  </p>
+ 
+</card-->
+
+
+<card id="options_name">
+
+  <p>NAME:
+     <input type="text" name="yourname" format="*m"/>
+  </p>
+
+</card>
+
+<card id="options_email">
+
+  <p>EMAIL:
+     <input type="text" name="yourmail" format="*m"/>
+  </p>
+
+</card>
+
+
+<card id="options_sig">
+
+  <p>SIGNATURE:
+     <input type="text" name="sig" format="*m" />
+  </p>
+
+</card>
+
+
+</wml>

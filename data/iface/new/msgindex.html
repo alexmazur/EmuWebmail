@@ -1,0 +1,367 @@
+[-
+$args = shift @param;
+
+@folders = @{ $args->{folders} };
+ 
+my @msginfo = &EMU::get_msg_array();
+@msgnums = @{ $msginfo[0] };
+%msgdata = %{ $msginfo[1] };
+
+$this_page = $EMU::v{$EMU::folder."_page"};
+
+$maxmsgs     = $EMU::userdb{"options.max_messages"} || $EMU::c{default_max_messages} || 15;
+$firstmsg    = $maxmsgs * ( $this_page - 1 ) + 1;
+$lastmsg     = $firstmsg + $maxmsgs - 1;
+$total_msgs  = &EMU::get_var('total_messages');
+$total_pages = &EMU::ceil($total_msgs / $maxmsgs);
+$lastmsg     = $total_msgs if $lastmsg > $total_msgs;
+
+# This is the relative href to the current folder
+$currenthref = "$EMU::EMU_URL?passed=go_index&folder=$EMU::folder";
+
+$theme = $args->{theme};
+$manual_filtering = $EMU::userdb{'options.manual_filtering'} && $EMU::c{'allow_manual_filtering'};
+
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - [+ $EMU::folder +] [+ &EMU::folder_stats() +]</title>
+
+[$ if (!$EMU::v{'mailcheck_popup'}) $]
+<META HTTP-EQUIV="Refresh" CONTENT="[+ &EMU::get_var('reload') +]; URL=[+ &EMU::make_url('go_index', 'refresh') +]">
+[$ endif $]
+<script language='Javascript'>
+
+[# Don't forget! Put generic JS in a cacheable js include file! #]
+
+function submitForm(fn) {
+	 
+	 var count = 0;
+	 if (document.emuform.d.length) {
+	 
+		 for(var i=0; i<document.emuform.d.length; i++) {
+	         if (document.emuform.d[i].checked) {
+	         		count++;
+	         }
+	   }
+	 } else {
+	   	count = (document.emuform.d.checked) ? 1 : '';
+	 }
+	 
+	 var message = (count > 1) ? 'these emails' : 'this email';
+	 	 
+	 if (count > 0){	
+			 if ( fn === 'delete' && !confirm("Are you certain you wish to delete "+ message+"?")) {
+			 		return false;
+			 }else{
+		   		document.emuform.fillme.name = fn+".x";
+		   		document.emuform.submit();
+		   }
+		} else {
+					document.emuform.fillme.name = fn+".x";
+		   		document.emuform.submit();
+		}
+}
+
+function goto_page(val) {
+   document.emuform.position.value = val;
+   submitForm('index_jump');
+   return false;
+}
+
+function flip_page(val) {
+   goto_page([+ $this_page +] + val);
+   return false;
+}
+
+function checkAll(val) {
+   if (document.emuform.d.length) {
+      for (var i=0; i<document.emuform.d.length; i++) {
+         document.emuform.d[i].checked = val;
+      }
+   } else {
+      document.emuform.d.checked = val;
+   }
+}            
+
+function submitMove(source) {
+var bChecked;
+
+   if (!source.options || !source.options[source.selectedIndex].value) {
+      alert('You must select a folder first!');
+      return false;
+   }
+   document.emuform.folder.value = source.options[source.selectedIndex].value;
+
+   if (document.emuform.d.length) {
+      for( i=0; i < document.emuform.d.length; i++)
+      {	
+         if( document.emuform.d[i].checked ) bChecked=1;
+      }
+   } else {
+      if( document.emuform.d.checked ) bChecked=1;
+   }
+   
+   if( bChecked )
+   {       
+   submitForm('move');
+   }else{
+   	alert('You must select a message first!');
+   	return false;
+   }
+   return false;
+}
+
+function folderSelect(source) {
+   // The first item in the list is New Folder
+   if (source.selectedIndex == 0) {
+      var val = prompt("Enter a name for your New Folder:","");
+      if (!val) {
+         source.selectedIndex = 1;
+         return false;
+      }
+      source.options[source.options.length] = new Option(val, val);
+      source.selectedIndex = source.options.length - 1;
+      return true;
+   }
+}
+
+function addFolder() {
+   window.open('[+ $EMU::EMU_URL +]?passed=parse&variable=add_folder_popup.html','new_folder','scrollbars=yes,resizable=yes,width=350,height=275');
+}
+
+function enable() {
+   var bChecked;
+
+   var Mark1 = document.emuform.mark1;
+   var Mark2 = document.emuform.mark2;
+   var Del1 = document.emuform.delete1;
+   var Del2 = document.emuform.delete2;
+   var Select1 = document.emuform.select1;
+   var Select2 = document.emuform.select2;
+
+   if (document.emuform.d.length) {
+      for( i=0; i < document.emuform.d.length; i++)
+      {	
+         if( document.emuform.d[i].checked ) bChecked=1;
+      }
+   } else {
+      if( document.emuform.d.checked ) bChecked=1;
+   }
+
+   if( bChecked )
+   {  
+      if (Mark1) Mark1.disabled=false;
+      if (Mark2) Mark2.disabled=false;
+      if (Del1) Del1.disabled=false;
+      if (Del2) Del2.disabled=false;
+      if (Select1) Select1.disabled=false;
+      if (Select2) Select2.disabled=false;
+   } else {
+      if (Mark1) Mark1.disabled=true;
+      if (Mark2) Mark2.disabled=true;
+      if (Del1) Del1.disabled=true;
+      if (Del2) Del2.disabled=true;
+      if (Select1) Select1.disabled=true;
+      if (Select2) Select2.disabled=true;
+   }
+}
+</script>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+</HEAD>
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+        <form name="emuform" action="[+ $EMU::EMU_URL +]" method="POST">
+          <input type='hidden' name='fillme' value='42'>
+          <INPUT TYPE='hidden' NAME='passed' VALUE='select'>
+          <INPUT TYPE='hidden' NAME='position' VALUE=''>
+          <INPUT TYPE='hidden' NAME='sorttype' VALUE='[+ $sorttype +]'>
+          <input type='hidden' name='folder' value=''>
+          <div id=folder-title> 
+            <div id=folder-name>Current folder: [+ $EMU::folder +]</div>
+            <div id=folder-option>
+              [$ if (!$total_msgs) $]
+                No Messages
+              [$ else $]
+                Viewing [+ "$firstmsg-$lastmsg" +] of [+ $total_msgs +]
+                [$ if ($firstmsg != 1) $]
+                 | &lt;&nbsp;<a href='#' onclick="flip_page(-1);">Prev&nbsp;Page</a>&nbsp;|&nbsp;
+                [$ endif $]
+                [$ if ($total_pages > 1) $]
+                  <select onchange='goto_page(this.options[this.selectedIndex].value);'>
+                  [$ foreach $p (1 .. $total_pages) $]
+                    [- $selected = ($p eq $this_page)?'selected':''; -]
+                    <option value='[+ $p +]' [+ $selected +]>Page [+ $p +] of [+ $total_pages +]
+                  [$ endforeach $]
+                  </select>
+                [$ endif $]
+                [$ if ($lastmsg != $total_msgs) $]
+                &nbsp;|&nbsp;<a href='#' onclick="flip_page(1); return false;">Next&nbsp;Page</a>&nbsp;&gt;
+                [$ endif $]
+              [$ endif $]
+            </div>
+          </div>
+          
+          [$ if (@msgnums) $]
+          <div id="action-buttons"> 
+            <table>
+              <tr> 
+             [$ if ($EMU::folder eq $EMU::trash_folder && $EMU::trash_bin) $]
+                <td><input type="image" name="empty1" value="Empty Folder" onClick="submitForm('empty'); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/emptyButton.gif" alt="Empty Folder" title="Empty Folder" align="absmiddle"></td>
+             [$ endif $]
+             [$ if ($EMU::folder ne 'Search Results') $]
+                <td><input type="image" name="delete1" value="Delete Selected" onClick="submitForm('delete'); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif" alt="Delete Selected" title="Delete Selected" align="absmiddle"></td>
+                <td><input type="image" name="mark1" value="Mark As Read/Unread" onClick="submitForm('mark'); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/markButton.gif" alt="Mark as READ/UNREAD" title="Mark as READ/UNREAD" align="absmiddle"></td>
+             [$ endif $]
+                <td width="90%">&nbsp;</td>
+                <td><input type='image' name="select1" value="Save Selected in:" onclick="return submitMove(this.form.folders1);" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveButton.gif" alt="Save Selected in" title="Save Selected in" align="absmiddle"></td>
+                <td><select name="folders1" onChange="folderSelect(this)">
+                    <option value=''>Add New Folder</option>
+                    <option value='' selected>---- </option>
+                  [$ foreach $f (@folders) $]
+                    [- ($fesc = $f) =~ s/'/\\'/g; -]
+                    <option value='[+ $fesc +]'>[+ $f +]</option>
+                  [$ endforeach $]
+                  </select>
+                </td>
+              </tr>
+            </table>
+          </div>
+          [$ else $]
+            <div class="mediumText red centered">The [+ $EMU::folder +] folder is empty.</div>
+          [$ endif $]
+          
+          [$ if (@msgnums) $]
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+            <table>
+              <tr> 
+                <th id=grid-header class="grid-header1 narrow"><input type="checkbox" onClick="checkAll(this.checked); enable()"></th>
+                <th id=grid-header class=narrow><a href="[+ $currenthref +]&sorttype=select"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/16x16/emailstatus.gif" width="7" height="14" border="0"></a></th>
+                <th id=grid-header class=narrow><a href="[+ $currenthref +]&sorttype=Content-Type"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/16x16/attachment.gif" width="7" height="14" border="0"></a></th>
+                <th id=grid-header><a href="[+ $currenthref +]&sorttype=subject">Subject</a></th>
+
+                [$ if (&EMU::get_var('is_sent_mail')) $]
+                <th id=grid-header><a href="[+ $currenthref +]&sorttype=to">To</a></th>
+                [$ else $]
+                <th id=grid-header><a href="[+ $currenthref +]&sorttype=sender">From</a></th>
+                [$ endif $]
+                
+                <th id=grid-header><a href="[+ $currenthref +]&sorttype=date">Date</a></th>
+                <th id=grid-header class=narrow><a href="[+ $currenthref +]&sorttype=size">Size</a></th>
+              </tr>
+           [$ foreach $m (@msgnums) $]
+            [-
+             $status = $msgdata{"status$m"};
+             # If we're not dealing with a single character, its likely an image (problems in conf.emu prevent us from doing this right)
+             
+             $style = ($status eq 'icon_new.gif') ? "selected" : "";
+
+             if (length($status) > 1) {
+             $status = "<img src='$args->{IMGURL}/skins/$args->{SKIN}/icons/16x16/$status'>";
+             }
+           
+             $status  ||= '&nbsp;';
+             if ($msgdata{"newcolumn1$m"}) {
+                 $attachment = "<img src='$args->{IMGURL}/skins/$args->{SKIN}/icons/16x16/".$msgdata{"newcolumn1$m"}."'>";
+             }
+             else {
+                 $attachment = '&nbsp;';
+             }
+             $from = $msgdata{"from$m"} || '&nbsp;';
+             $to = $msgdata{"to$m"} || '&nbsp;';
+             $hash = $msgdata{"hash$m"} || '&nbsp;';
+             $href = $msgdata{"href$m"} || '&nbsp;';
+             $subject = $msgdata{"subject$m"};
+             $date = $msgdata{"day_name$m"}. ', ' . $msgdata{"day$m"}.' '.$msgdata{"month_name$m"}.' '.$msgdata{"year$m"};
+             $date .= ' ' . $msgdata{"hour$m"} . ':' . sprintf("%02d", $msgdata{"minute$m"}) . ':' . sprintf("%02d", $msgdata{"second$m"});
+             $date .= ' ' . $msgdata{"ampm$m"} if ($msgdata{"ampm$m"});
+             $date .= ' ' . $msgdata{"gmt$m"} if ($msgdata{"gmt$m"});
+             $size = $msgdata{"size$m"} || '&nbsp;';
+            -]
+
+              <tr onMouseOver="this.bgColor='#D6EEF2';" onMouseOut="this.bgColor='#FFFFFF';" style="cursor:hand; cursor:pointer"> 
+                <td id=grid-data1 class=centered><input type="checkbox" name="d" value="[+ $hash +]" onClick="enable();"></td>
+                <td id=grid-data class=centered onClick=window.open('[+ $href +]','_self')>[+ $status +]</td>
+                <td id=grid-data class=centered onClick=window.open('[+ $href +]','_self')>[+ $attachment +]</td>
+                <td id=grid-data class="[+ $style +]" onClick=window.open('[+ $href +]','_self')><a href="[+ $href +]">[+ $subject +]</a></td>
+              [$ if (&EMU::get_var('is_sent_mail')) $]
+                <td id=grid-data class="[+ $style +]" onClick=window.open('[+ $href +]','_self')>[+ $to +]</td>
+              [$ else $]
+                <td id=grid-data class="[+ $style +]" onClick=window.open('[+ $href +]','_self')>[+ $from +]</td>
+              [$ endif $]
+                <td id=grid-data class="[+ $style +]" onClick=window.open('[+ $href +]','_self')>[+ $date +]</td>
+                <td id=grid-data class="[+ $style +]" onClick=window.open('[+ $href +]','_self')>[+ $size +]</td>
+              </tr>
+           [$ endforeach $]
+
+            </table>
+          </div>
+          [$ endif $]
+
+          [$ if (@msgnums) $]
+          <div id="action-buttons"> 
+            <table>
+              <tr> 
+             [$ if ($EMU::folder eq $EMU::trash_folder && $EMU::trash_bin) $]
+                <td><input type="image" name="empty2" value="Empty Folder" onClick="submitForm('empty'); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/emptyButton.gif" alt="Empty Folder" title="Empty Folder" align="absmiddle"></td>
+             [$ endif $]
+             [$ if ($EMU::folder ne 'Search Results') $]
+                <td><input type="image" name="delete2" value="Delete Selected" onClick="submitForm('delete'); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/deleteButton.gif" alt="Delete Selected" title="Delete Selected" align="absmiddle"></td>
+                <td><input type="image" name="mark2" value="Mark As Read/Unread" onClick="submitForm('mark'); return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/markButton.gif" alt="Mark as READ/UNREAD" title="Mark as READ/UNREAD" align="absmiddle"></td>
+             [$ endif $]
+                <td width="90%">&nbsp;</td>
+                <td><input type='image' name="select2" value="Save Selected in:" onclick="return submitMove(this.form.folders2);" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveButton.gif" alt="Save Selected in" title="Save Selected in" align="absmiddle"></td>
+                <td><select name="folders2" onChange="folderSelect(this)">
+                    <option value=''>Add New Folder</option>
+                    <option value='' selected>---- </option>
+                  [$ foreach $f (@folders) $]
+                    [- ($fesc = $f) =~ s/'/\\'/g; -]
+                    <option value='[+ $fesc +]'>[+ $f +]</option>
+                  [$ endforeach $]
+                  </select>
+                </td>
+              </tr>
+            </table>
+          </div>
+          [$ endif $]
+
+        </form>
+              [$ if (&EMU::get_var('allowed') > 0) $]
+    						[- 
+      					$percent = sprintf("%2d", ($EMU::v{quota_used}/$EMU::v{quota_allowed})*100 );
+      					$allowed = sprintf("%2d", $EMU::v{quota_allowed}/1024);
+    						-]
+    						<div class="vnesh" style="width: 40%;" align="absmiddle"><div class="vnutr" style="width: [+ $percent +]%;" align="absmiddle">&nbsp;</div> <b>You&nbsp;are&nbsp;using&nbsp;[+ $percent +]%&nbsp;of your&nbsp;[+ $allowed +]&nbsp;KB&nbsp;Quota.&nbsp;&nbsp;</b></div>
+								<div class="vnesh2" style="width: 40%;" align="absmiddle"><div class="vnutr2" style="width: 100%;" align="absmiddle"></div></div>
+  	      [$ endif $]
+    </DIV>      
+      <DIV class=clear></DIV>
+    </DIV>
+
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

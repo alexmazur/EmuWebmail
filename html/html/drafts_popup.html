@@ -1,0 +1,92 @@
+<html>
+<head>
+<title>Draft Messages</title>
+<script language='javascript'>
+function getDraft(msgid) {
+   window.opener.loadDraft(msgid);
+   
+   window.close();
+}
+
+function setSelected(ix,msgid) {
+   document.drafts.selected_file.value=msgid;
+   document.drafts.draft_index.value=ix;
+}
+   
+function doSubmit() {
+   if (document.drafts.selected_file.value == '0') return ;
+   document.drafts.action = window.opener.getURI();
+   ix=document.drafts.draft_index.value;
+   window.opener.removeDraft(ix);
+   document.drafts.passed.value = "options_parse";
+   document.drafts.submit();
+}
+
+</script>
+</head>
+
+<script>
+   document.write("<link id='css_link' rel='stylesheet' type='text/css' href='css/skin_webmail_"+window.opener.GetSkin()+".css'>");
+</script>
+
+<body class="popup">
+ <table width="100%" border="0" cellspacing="2" cellpadding="0">
+  <tr> 
+   <td><font class="DefaultText">Continue a previously saved Draft by clicking on the appropriate message.<br>&nbsp;</font></td>
+  </tr>
+  <tr align="center"> 
+   <td><table border="0" cellspacing="5" cellpadding="0" width="100%">
+     <tr class="BodyGridOutline">
+      <td> 
+<script language='Javascript'>
+   var Drafts = window.opener.getDrafts();
+   
+   var total = 0;
+   var html_text = "";
+   for (var i = 0; i<Drafts.length; i++) {
+      var m = Drafts[i];
+      if (m == null) continue;
+      total++;
+      html_text += "<tr class='GridData'>";
+      html_text += "<td width='10%'><input type=radio name='file' onClick=\"setSelected('"+i+"','"+m.msgid+"')\"></td>";
+      html_text += "<td width='60%'><a href='#' class='GridData' onclick=\"getDraft('"+m.msgid+"')\">"+m.subject+"</a></td>";
+      html_text += "<td width='30%'>"+m.date+"</td>";
+   }
+
+   if (total == 0) {
+      document.writeln("</td> </tr> </table>");
+
+      document.writeln("<p><center>");
+      document.writeln("<font class='Alert'>There are no saved Drafts at this time.</font>");
+      document.writeln("</center></p>");
+   }
+   else {
+      document.writeln("<form name='drafts' method='POST' >");
+      document.writeln("<INPUT TYPE='HIDDEN' NAME='passed' value='compose'>");
+      document.writeln("<INPUT TYPE='HIDDEN' NAME='selected_file' value='0'>");
+      document.writeln("<INPUT TYPE='HIDDEN' NAME='delete.x' value='1'>");
+      document.writeln("<INPUT TYPE='HIDDEN' NAME='draft_index' >");
+      document.writeln("<INPUT TYPE='HIDDEN' NAME='close_window' value='1' >");
+
+      document.writeln("<table border='0' cellspacing='1' cellpadding='3' width='100%'>");
+      document.writeln("<tr class='GridHeader'><td width='10%'><font class='GridHeader'>&nbsp;</font></td>");
+      document.writeln("<td width='60%'><font class='GridHeader'>Subject&nbsp;</font></td>");
+      document.writeln("<td width='30%' no wrap><font class='GridHeader'>Draft&nbsp;Date</font></td></tr>");
+      document.writeln(html_text);
+      document.writeln("</tr>");
+      document.writeln("</table>");
+      document.writeln("</td> </tr> </table>");
+
+      document.writeln("<p><center>");
+      document.writeln("<input type=button value='Delete Selected Draft' name='delete' class='DefaultButton' onClick=\"doSubmit()\">");
+      document.writeln("</center></p>");
+   }
+
+   document.writeln("</form>");
+</script>
+   </td>
+  </tr>
+ </table>
+</body>
+</html>
+

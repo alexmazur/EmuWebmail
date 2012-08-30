@@ -1,0 +1,68 @@
+<html>
+<head>
+<title>Customize Header</title>
+<script language='Javascript'>
+
+function getHeaderValues() {
+   var Headers = window.opener.get_headers();
+
+   for (var i=0; i < Headers.length; i++) {
+      if (document.popup.elements[Headers[i]])
+         document.popup.elements[Headers[i]].checked = true;
+   }
+}
+
+function saveChanges() {
+   var newheaders = new Array();
+   
+   for (var i=0; i < document.popup.elements.length; i++) {
+      if (document.popup.elements[i].checked) {
+         newheaders[i] = document.popup.elements[i].name;
+      }
+   }
+
+   window.opener.store_headers(newheaders);
+   window.close();
+}
+
+</script>
+</head>
+
+<script>
+   document.write("<link id='css_link' rel='stylesheet' type='text/css' href='css/skin_webmail_"+window.opener.GetSkin()+".css'>");
+</script>
+
+<body onload="getHeaderValues();" class="Popup">
+<form name='popup'>
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+ <tr>
+  <td colspan="2"><font class="DefaultText">Select which fields you would like to appear in the header when composing a message.<br>&nbsp;</font></td>
+ </tr><tr> 
+  <td align="right"><input type="checkbox" name="cc"></td>
+  <td width="75%"><font class="DefaultText">CC</font></td>
+ </tr><tr> 
+  <td align="right"><input type="checkbox" name="bcc"></td>
+  <td><font class="DefaultText">BCC</font></td>
+ </tr><tr> 
+  <td align="right"><input type="checkbox" name="from"></td>
+  <td><font class="DefaultText">From</font></td>
+ </tr><tr> 
+  <td align="right"><input type="checkbox" name="replyto"></td>
+  <td><font class="DefaultText">Reply to</font></td>
+ </tr><tr> 
+  <td align="right"><input type="checkbox" name="priority"></td>
+  <td><font class="DefaultText">Priority</font></td>
+ </tr><tr> 
+  <td align="right"><input type="checkbox" name="org"></td>
+  <td><font class="DefaultText">Organization</font></td>
+ </tr><tr> 
+  <td colspan="2">&nbsp;</td>
+ </tr><tr> 
+  <td colspan="2">&nbsp;</td>
+ </tr><tr align="center"> 
+  <td colspan="2"><input type="button" value="Save Changes" onclick="saveChanges()" class="DefaultButton">&nbsp;<input type="button" value="Cancel" onclick="window.close()" class="DefaultButton"></td>
+ </tr>
+</table>
+</form>
+</body>
+</html>

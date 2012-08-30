@@ -1,0 +1,112 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   @suggestions = split(/:+/, &EMU::get_var('suggestions'));
+
+   $current_word = &EMU::get_var('bad_word');
+   $the_message = &EMU::get_var('the_message');
+   $the_message =~ s/\n//g;
+   $the_message =~ s/<.*?>//g
+-]
+<html>
+<head>
+  <title>[+ $EMU::c{publisher_name} +] - Spell Check</title>
+  <link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='passed' value='spelling_parse'>
+          <input type="hidden" name="selected_msg" value="[+ &EMU::get_var('digest') +]">
+          <input type="hidden" name='start_pos' value="[+ &EMU::get_var('start_pos') +]">
+          <input type="hidden" name='end_pos' value="[+ &EMU::get_var('end_pos') +]">
+          <input type="hidden" name='word_num' value="[+ &EMU::get_var('word_num') +]">
+
+          <div id=folder-title> 
+            <div id=folder-name>Spell Check</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+                <input type="image" name="continue" value="Finish Spell Check" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/finishSpellCheckButton.gif" align="left">
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+            <table width="100%" border="0" cellspacing="5" cellpadding="3">
+              <tr>
+                <td colspan="2">Select a word from the Suggestion List or type your own word in the space
+                provided, then press "Replace."</font><font size="1"><br>&nbsp;
+                </td>
+              </tr>
+              <tr> 
+                <td width="31%" align="right">&nbsp;Unknown Word:&nbsp;&nbsp;</td>
+                <td>[+ $current_word +]&nbsp;</td>
+              </tr>
+              <tr> 
+                <td width="31%" align="right" nowrap>Suggested&nbsp;Replacements:&nbsp;&nbsp;</td>
+                <td><select onchange="if (selectedIndex >= 0) this.form.replacement.value=this.options[this.selectedIndex].text" style="width: 250px">
+                  <option value=''>Make a Selection
+                  [$ foreach $s (@suggestions) $]
+                    <option>[+ $s +]
+                  [$ endforeach $]
+                  </select>
+                </td>
+              </tr>
+              <tr> 
+                <td width="31%" align="right">Edit Replacement:&nbsp;&nbsp;</td>
+                <td><input type="text" name="replacement" value='[+ $current_word +]' style="width: 250px">
+                    <input type="hidden" name="unknown_word" value='[+ $current_word +]'>
+                </td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td>
+                  <input type="image" name="replace" value="Replace" onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/replaceButton.gif">&nbsp;
+                  <input type="image" name="skip" value="Skip" onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/skipButton.gif">&nbsp;
+                  <input type="image" name="lookup" value="Dictionary" onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/dictionaryButton.gif">&nbsp;
+                </td>
+             </tr>
+              <tr>
+                <td colspan="2">&nbsp;<br><pre>[+ $the_message +]</pre></td>
+             </tr>
+           </table>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+                <input type="image" name="continue" value="Finish Spell Check" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/finishSpellCheckButton.gif" align="left">
+            </div>
+          </div>
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

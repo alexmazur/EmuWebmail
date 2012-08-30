@@ -1,0 +1,31 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   $passed = &EMU::get_var("passed");
+-]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="3"></td>
+ </tr><tr class="RibbonBot">
+  <td background="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/ribbon.gif"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="6"></td>
+ </tr><tr>
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="5"></td>
+ </tr>
+</table>
+[$ if ($EMU::userdb{'options.mailcheck_popup'} and $EMU::c{'disabled_popup_pages'} !~ /$passed/) $]
+ <div style="visibility: hidden">
+ <table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+  <td>
+  <iframe height="0" width="0" src="[+ $EMU::EMU_URL +]?passed=mailcheck"></iframe>
+  </td>
+ </tr>
+ </table>
+ </div>
+ [$ endif $]
+</table><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+  <td align="center"><a href="http://www.emumail.com" target="_blank" class="Copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</a></td>
+ </tr>
+</table>

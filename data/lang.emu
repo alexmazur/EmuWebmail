@@ -1,0 +1,503 @@
+# EMUWebmail Language Configuration File: lang.emu
+# -------------------------------------------------
+#  
+# This file contains the phrases that EMU Webmail uses to communicate
+# error, warning, and other messages to the user.  You may wish to 
+# modify some of these phrases according to your users' preferences
+# and needs.
+#
+# The lang.emu file located at the same level as the site.emu file
+# will be the default for all interfaces.  A lang.emu file can also be
+# present in each interface, allowing different messages for each
+# interface--for example Spanish messages for the Spanish interface and
+# English messages for the English interface.  A lang.emu file in 
+# an interface directory will override the default lang.emu file.
+#
+# The format for an entry in this file is:
+#
+# NAME=VALUE
+#
+# where NAME is the name of an option, and VALUE is the value
+# to assign it.
+#
+# If an entry spans multiple lines, a "\" must be placed at the end of
+# each line that continues.  To insert a newline into a value, use "\n."
+# To specify a list, use either a space or a comma between list items.
+#
+# If an option is left blank or is commented by placing the "#" character
+# in front, the option will assume its internal default value.
+#
+
+
+MSG_SelectHost = ---- Select Mail Server ----
+
+MSG_Spam_Folder_Name = SPAM
+
+MSG_Spam_Detected = Spam detected, message moved to SPAM folder.
+
+MSG_AddressMissing = Nickname and email address required
+
+MSG_AddressSaved = Addressbook changes saved
+MSG_AddressAdded = Addressbook entry %1, %2 added
+MSG_GroupAdded = Group %1 has been added
+
+MSG_GroupRenamed = Group %1 has been renamed to %2
+
+MSG_AddressEmpty = Empty Addressbook
+
+MSG_MDNSent = Read Receipt has been sent!
+ERR_MDNSent = Read Receipt has not been sent!
+# %1 - Date of original letter, %2 - it's Subject, %3 - it's author and his email
+MSG_MDNHumanReadable = There was read receipt confirmation request from your address.\nWe inform you, that your email from %1 about '%2' was read by user %3.\n\n
+# %1 - Original subject (optional)
+MSG_MDNSubject = Reading Confirmation Receipt for %1
+# %1 - EMUmail version
+MSG_MDNTagline = This is automatically created response by EMUmail %1 (http://www.emumail.com)\n
+
+nohttps_title = Cannot use HTTPS protocol
+
+nohttps_body = <CENTER><h2>Sorry, cannot process request.</h2></CENTER> Sorry, the <B>ADVERT</B> version of EMUmail cannot be used with an HTTPS server.<BR>Please contact sales\@emumail.com for information on how to purchase a full version of EMUmail which does not have this restriction.
+
+ERR_MissingPage_T = Fatal EMU Error
+# %1 is the name of the missing page. %2 is the value of ($!, $@ once) at the time
+ERR_MissingPage_B = We have encountered a fatal EMU Error while<BR>locating the page '%1'<br>(%2)
+MSG_Filtered_Num = %1 message(s) filtered
+MSG_Filtered_Trash = Message with subject &quot%1&quot; moved to Trash folder
+MSG_Filtered_Deleted = Message with subject &quot;%1&quot; deleted
+MSG_Filtered_Moved = Message with subject &quot;%1&quot; moved to folder %2
+MSG_Filtered_TooMany = Too many messages filtered. Skipping further results...
+ERR_SessionExpired_S = Session expired, please login again.  Please check to see if cookies are enabled in your web browser.
+ERR_SessionExpired_T = Session Error
+ERR_SessionExpired_B = [ERR_SessionExpired_S]
+
+ERR_CheckDirs_T = EMUmail Configuration Error
+ERR_CheckDirs_B = Cannot create directory '<font color=red><b>%1</b></font>' (UID: %2)<BR>\n
+MSG_InvalidSelection = Ooof! Invalid jump!
+MSG_FolderSelected = Selected folder %1
+ERR_FolderSelected = Unable to select folder %1
+ERR_FolderEmpty = All messages in folder %1 deleted
+ERR_PopError_T = POP Server Error
+ERR_PopLoginError = Can't login to POP server
+
+ERR_MSGNotInServer = Message not found or no longer exists!
+
+MSG_NoMessages = <td colspan=6><table width=100% cellpadding=20 cellspacing=12><td align=center valign=middle><font face="Arial,Helvetica" size=3><b>Sorry, you have no messages!</b></font></td></table></tr>
+
+MSG_DeletedSpamMessages = Deleted %1 SPAM message(s)
+MSG_MovedSpamMessages = Moved %1 SPAM message(s) to folder %2
+
+MSG_FilteredMessages_S = Filters:<BR>
+# %1 = num of messages.  %2 = folder filtered to
+MSG_FilteredMessages = %1 message(s) to %2<br>\n
+
+V_FilterMoveto = move to
+V_FilterTrash = GARBAGE
+V_FilterContains = contains
+V_FilterNoContains = doesn't contain
+V_FilterNameTo = To:
+V_FilterNameOff = off
+V_FilterNameFrom = From:
+V_FilterNameSubject = Subject:
+V_FilterNameBody = Body:
+V_FilterNameAny = any
+V_FilterNameHeader = Header
+V_FilterDefaultAction = junk-mail
+V_FilterDefaultType = [V_FilterNameOff]
+
+# %1 = current quota. %2 = $help_url %3 = amount over quota
+ERR_QuotaExceeded_T = <CENTER><B>Message quota of %1 bytes exceeded.  Delete messages to clear some space.</B> </FONT></CENTER>\n
+ERR_QuotaExceeded_Move = Can't move message to folder '%1'. Message quota exceeded. Delete messages to clear some space.
+ERR_FailedGetMessage = Error Retrieving messages. Login again.
+
+ERR_Jump_T = Jump Error
+
+ERR_Jump_B = <h1>Jump Error</h1>
+
+# %1 = term searched for
+MSG_Searched_S = Searched for %1.
+
+MSG_SearchNoResult = Search for %1 returned no messages.
+
+ERR_NoMoveMessage = No message selected for move
+
+ERR_NoMovetoInbox = Messages can't be moved to INBOX!
+
+# %1 = folder messages has been moved to
+MSG_MoveMessage = 1 message moved to %1
+
+# %1 = number of messages. %2 = folder moved to
+MSG_MoveMessageMult = %1 messages moved to %2
+
+ERR_AddtoFolder = No folder to move message to!
+
+MSG_AddtoFolder = Message saved in folder %1
+
+MSG_DelMessage = 1 Message deleted
+
+MSG_DelMessageMult = %1 Messages deleted
+
+ERR_MimeHeadParse = MIME Error parsing Header
+
+MSG_DownloadFileType = This is a <B>%1</B> file.</font><P>
+
+MSG_DownloadFile = Download this file now!
+
+ERR_Detach_T = Error Detaching Document
+
+# %1 = the url from econfig
+ERR_Detach_B = Press the back button to return to the previous page,<br> or click <a href="http://%1">here</a> to return to your mail index.
+
+# %1 = date.  %2 = who wrote it.
+MSG_QReplyTop = ==============Original message text===============\nOn %1 %2 wrote:
+
+MSG_Reply = Re:
+
+# %1 = the subject
+MSG_ReplySubject = [MSG_Reply] %1
+
+#No subject in message
+MSG_NoSubject = (No subject)
+
+#Unknown From line
+MSG_NoFrom = Unknown
+
+ERR_NoFromField = Error: Unable to find a From field in message.
+
+ERR_FormatNoMessage = No message to format
+
+ERR_VrmlNoMessage = No message to view in 3d
+
+ERR_ForwardNoReturnEmail = Can't find return address!
+
+MSG_ForwardFormat = ==============Original message text===============\nFrom: %1\nDate: %2\nSubject: %3\n\n
+
+MSG_ForwardFormat_End = ===========End of original message text===========\n
+
+ERR_MissingModule_T = Module error: %1
+
+ERR_MissingModule_B = Required module %1 not found.<P>Contact your EMUmail administrator
+
+ERR_DictConnect = Could not connect to dictionary server
+
+MSG_DictNoWord = Word not found.
+
+MSG_DictSource = <P>Dictionary source:<BR>%1
+
+MSG_DictNoMoreErrors = No more errors detected.
+
+ERR_SCheckSecurity_S = Whatchu talkin' 'bout Willis?
+
+ERR_SCheckSecurity_T = Spellcheck Security Error
+
+ERR_SCheckSecurity_B = What what what do you mean?
+
+MSG_SCheckClean = No spelling errors detected.
+
+ERR_UploadNoSelect = No attachment selected!
+
+ERR_UploadEmpty = File %1 is empty. Not attached.
+# %1 = filename. %2 = error message
+ERR_UploadFailed = Couldn't attach %1: %2
+
+MSG_Postpone_S = Message Postponed
+
+MSG_NoneSelected = No message selected
+MSG_NoMessage = No such message: %1
+
+MSG_ContNoneSelected = [MSG_NoneSelected]
+MSG_ContNoSuchMessage = [MSG_NoMessage]
+
+MSG_ContNoPostponed = Can't find postponed message.
+
+# %1 = list of files
+ERR_ContAttachFailed = Unable to reattach the files: %1
+# %1 = date
+MSG_Continue_S = Continuing from %1
+
+ERR_DelePostNoSuchMessage = [MSG_NoMessage]
+ERR_DelePostMissingMessage = Can't find message!
+MSG_DelePost_S = Deleted Postponed Message
+
+ERR_MissingToAddress = No <u>TO</u> address for message!
+
+ERR_TooManyRecipients = Too Many Message Recipients! Outgoing messages may not have more than %1 recipients.
+
+#MSG_Tagline = This message powered by EMUMAIL. -- http://www.EMUMAIL.com
+
+ERR_FailedAttachSendAgain = Unable to attach the file(s): %1<BR><BR>\nHit send again to send without the attachments.
+
+ERR_FailedAttach = Unable to attach %1<BR>\n
+
+ERR_SmtpServConnect_S = SMTP Server Unreachable
+ERR_SmtpServConnect_T = [ERR_SmtpServConnect_S]
+ERR_SmtpServConnect_B = Sorry, but we couldn't connect to your SMTP host.<P>Please press the back button and send again.<P>If you're still having problems, postpone<BR>your message and try to send it later.
+
+ERR_EmailAddrInvalid_S = The E-mail address %1 is invalid.
+ERR_EmailAddrInvalidMult_S = The E-mail addresses %1 are invalid.
+
+ERR_FailedMessageSend_S = &nbsp;&nbsp;Unable to send Message
+
+MSG_SentMessage = Message Sent
+MSG_SentMessageSaved = and saved to folder %1
+MSG_SentMessageNotSaved = but not saved to %1 (%2)
+MSG_SentMessageNotSavedQuota = account over quota
+MSG_SentMessageNotSavedLarge = message too large
+
+MSG_DomainDeniedAccess = <CENTER><MENU><B><H2>Your domain <TT>%1</TT> is denied access.</H2></FONT></B></MENU></CENTER>\n
+
+# %1 = username. %2 = first part of domain. %3 = 2nd part of domain. %4 = 3rd part of domain (hostname?)
+ERR_FailedLogin = <font color=red><CENTER><MENU><H2>Server hostname is incorrect. Please try again!</H2></FONT></MENU></CENTER><P> \
+	<CENTER> \
+	You may be using an incorrect POP or IMAP server.  Consult with your system \
+	&nbsp;administrator for the correct server address. \
+	<P> \
+	Possible suggestions are:  \
+	<BR> \
+	<MENU> \
+	 <LI>%1@mail.%3.%2 \
+	 <LI>%1@pop.%3.%2 \
+	 <LI>%1@%3.%2 \
+	</MENU> \
+	</CENTER> \
+	<P> \
+
+
+# %1 = error message received from pop server
+MSG_LoginError = <CENTER>\n<MENU><font face="Arial,Helvetica" size=+1 color=red><b>Username, hostname or password is incorrect. Please try again!<BR>Server said: %1</b></FONT></MENU></CENTER><P>
+
+
+MSG_RebuildComplete_S = Rebuild Complete
+MSG_RebuildComplete_T = [MSG_RebuildComplete_S]
+MSG_RebuildComplete_B = Your home directory has been cleaned.
+
+MSG_FlushComplete_S = Message Flush Complete
+MSG_FlushComplete_T = [MSG_FlushComplete_S]
+MSG_FlushComplete_B = Your Messages Directory has been synchronized with your folders.
+
+MSG_CacheCheck_S = Message Cache Check Complete
+MSG_CacheCheck_T = [MSG_CacheCheck_S]
+MSG_CacheCheck_B = Your folders have been syncronized with your with your messages directory.
+
+MSG_OptionsSaved_S = Options Saved
+MSG_OptionsReset = Options reset to default
+
+ERR_DeleteInbox = Cannot delete INBOX!
+MSG_NoEditInbox = Cannot edit INBOX!
+# %1 = name of folder
+MSG_FolderDelete_S = Folder %1 deleted
+
+ERR_FolderEmptyName_S = Must enter a folder name!
+ERR_FolderIllegalName_S = Illegal folder name! Do not use chars " : % $ { } or any leading .'s
+# %1 = folder name
+ERR_FolderFailedCreate_S = Error creating folder %1
+
+# %1 = folder name
+MSG_FolderCreated = Folder %1 created
+MSG_FolderEdited = Folder %1 changed
+MSG_FolderExists_S = Folder %1 already exists!
+MSG_DirCreated = IMAP Directory %1 created
+
+MSG_MBoxNoPassword_S = Please enter a password!
+MSG_MBoxNoName_S = Please enter a mailbox nickname.
+ERR_MissingEmail=An E-mail address is missing or in an incorrect format (use: user@host.com)
+ERR_FailedSelect=Unable to select that IMAP folder (%1)
+ERR_FailedCreateFolder=Failed creating folder %1
+ERR_FailedAddToFolder = Error in adding message to folder %1
+MSG_MBoxNoEmail_S = Please enter a mailbox: user@pophost
+ERR_MBoxIllegalName_S = Illegal Mailbox name!
+# %1 = mailbox name
+ERR_MBoxCreate_S = Error creating mailbox %1
+MSG_MBoxCreate_S = Mailbox %1 created
+MSG_MBoxExists_S = Mailbox %1 already exists!
+MSG_MBoxBadProtocol = Please select a protocol for this mailbox.
+MSG_MBoxNone = None
+ERR_MBoxNoExist = No such mailbox!
+
+# %1 = folder name
+ERR_FolderMissing_S = Can't find folder %1
+ERR_FolderEmpty_S = That folder is empty
+
+# %1 = status
+MSG_StatusFormatBlank = %1
+
+# %1 = publisher name.  %2 = status
+MSG_StatusFormat = %1 %2
+MSG_StatusFormatOverQuota = %1 %2
+
+ERR_SessionStartUsername_T = Illegal Instruction
+ERR_SessionStartUsername_B = [ERR_StartWithoutUsername_T]
+
+ERR_SessionStart_T = Session Error
+ERR_SessionStart_B = Error starting session!
+
+ERR_SessionCheckExpired_S = Session expired, please login again.
+ERR_SessionCheckNoFile_S = Session Error: Can't open session file
+
+# %1 = num of seconds inactive
+ERR_SessionActivity = Activity timeout, please login again. (%1)
+
+# %1 = filename
+MSG_AttachmentDeleted = Attachment %1 deleted
+ERR_AttachmentMissing = No such attachment %1!
+
+MSG_MessageDeleted_S = Message Deleted
+
+ERR_MissingCallback = ERROR: No callback when viewing EMUfile
+MSG_InvalidSession=No valid session found!
+MSG_SelectFailed=SELECT failed: Can't open mailbox %1: no such folder
+ERR_EmufileInvalid = That is not a file
+ERR_EmufileIllegal = Illegal!
+
+# %1 = filename
+ERR_SysfileMissing = No such system file %1
+
+
+ERR_WordConvert = File for Word conversion doesn't exist.
+ERR_EmufileDelete = %1 cannot be deleted
+ERR_EmufileMissing = File %1 doesn't exist!
+
+MSG_EmufileDelete = Deleted %1
+ERR_EmufileDelete = Error deleting %1
+
+ERR_EmufileUploadSelected = No file selected for upload
+ERR_EmufileUploadEmpty = File %1 is empty. Not uploaded.
+
+MSG_EmufileUploaded = Uploaded file %1
+
+
+# printed out on the msgindex.html page
+V_IndexTop_To = To
+V_IndexTop_From = Sender
+
+# fixed (rather than formatted) sent-mail folder name. If you want to
+# have a fixed system-wide outbox folder name, configure and uncomment
+# the line below. Default is to use the formatted name below.
+#V_Outbox_Name = Sent
+
+# Formatted sent-mail folder name. Use the configuration below for
+# variable (usually month-based) folder names. If you want a single, fixed
+# name folder, use the config above.
+V_SentmailFolderPretext = sent-mail
+# %1 = pretext name, %2 = month name, %3 = year
+V_SentmailFolderFormat = %1-%2-%3
+
+MSG_FailedParse = <Severe>: Unable to parse message!
+
+MSG_Ihelp_To = Type the E-mail address (or select a name from the list at right) of the person you wish to send this message to.
+MSG_Ihelp_Subject = Type a topic for this message.
+MSG_Ihelp_From = Type the E-mail address of the actual sender of this message.
+MSG_Ihelp_Replyto = Type the E-mail address that recipients should respond to (if other than From:).
+MSG_Ihelp_Sender = Type your name or E-mail address if you are sending this message for someone else.
+MSG_Ihelp_Organization = Type the company or group name which you are representing.
+MSG_Ihelp_Cc = Carbon copy; Type or select the names of additional recipients of this E-mail message.
+MSG_Ihelp_Bcc = Blind carbon copy; Same as Cc:,  these E-mail addresses will be concealed fro mthe rest of the message's recipients.
+MSG_Ihelp_Priority = Select the level of importance of this message.
+MSG_Ihelp_Attach = 1. Click "Browse".<BR>2. Choose the desired file from your hard drive.<BR><LI> For single attachments, continue with the message.<LI> For multiple attachments, click "Attach More Files", repeating the attachment process (steps 1 & 2).
+MSG_Ihelp_Emufiles = EMUfiles is your own server-based file storage area, where graphic, sound, HTML and other files can be kept on the EMUmail server. Select files from the storage area to attach them to this E-mail message.
+
+ERR_OpenFolder = Error opening folder.
+
+MSG_NicknameExists = The nickname %1 already exists!
+
+MSG_GroupExists = The Group %1 already exists!
+
+# %1 = foldername, %2 = folder type, %3 = username, %4 = host, %5 = server errmsg
+ERR_ServerLogin = Unable to login to %4 as %3.<BR>Server said: <i>%5</i>
+
+ERR_ImproperLogin = Improper Login sequence. Please refresh your login page and log in again.
+ERR_NoSessionID = Session ID Error. Please contact your site administrator, login page missing Session ID.
+
+MSG_SystemFiles = <System Files>
+
+# 3.1 MOD.
+# Header to display for inline HTML Attachment
+Inline-Attach-Header = \n</PRE><center><hr width=30%></center><p><font size=2 color=blue face="Helvetica,Arial"><b>[ %1 ]<u> %2 </u> <font color=black>(type: %3)</font></b></font><p>
+
+# Jumping to pages.
+Next-Page-Title = Page
+Next-Page-OF = of
+
+# Functions on Index Page.
+FUNC_GoToFolder = Go To Selected Folder
+FUNC_MoveToFolder = Move Sel. Messages to Folder
+FUNC_DeleteMsgs = Delete Selected Messages
+FUNC_ExportMsgs = Export Selected Messages
+FUNC_Filters = Apply Filtering Rules
+FUNC_FwdMsgs = Forward Selected Messages
+FUNC_ReplyMsg = Reply-To Selected Message
+
+# This is the name for the folder that holds search results.
+FOLD_Search_Results = Search Results
+
+ERR_DeleteSearch = Please do not delete the Search Folder, it will force deletion of messages.
+ERR_DeleteSearchMsg = Please do not delete from the Search Folder, the message will be deleted from its original folder as well.
+
+# Waitscreen progress messages.
+WAIT_DBLock = <div align="center"><font face="Verdana" size=1><b>Accessing account database...</b><br></font></div>
+WAIT_CheckQuota = <div align="center"><font face="Verdana" size=1><b>Checking Quota...</b><br></font></div>
+WAIT_CheckHeaders = <div align="center"><font face="Verdana" size=1><b>Checking headers from server...</b><br></font></div>
+WAIT_ProcessedMsgs = <div align="center"><font face="Verdana" size=1><b>Processed %1 messages...</b><br></font></div>
+WAIT_DeleteMsgs = <div align="center"><font face="Verdana" size=1><b>Deleting %1 messages...</b><br></font></div>
+WAIT_Deleted = <div align="center"><font face="Verdana" size=1><b> %1 messages deleted</b><br></font></div>
+WAIT_FilterMsgs = <div align="center"><font face="Verdana" size=1><b>Filtering messages...</b><br></font></div>
+WAIT_NumToFilter = <div align="center"><font face="Verdana" size=1><b>%1 Messages will be processed for filtering...</b><br></font></div>
+WAIT_FilterTotal = <div align="center"><font face="Verdana" size=1><b>There are %1 filtering rules to be applied to each message...</b><br></font></div>
+WAIT_FilteredNum = <div align="center"><font face="Verdana" size=1><b>Filtered %1 messages...</b><br></font></div>
+WAIT_FilterAction = <div align="center"><font face="Verdana" size=1><b>Filtering %1 messages to %2</b><br></font></div>
+WAIT_MoveAction = <div align="center"><font face="Verdana" size=1><b>Moved %1 messages to %2</b><br></font></div>
+WAIT_SearchFor = <div align="center"><font face="Verdana" size=1><b>Searching for %1...</b><br></font></div>
+WAIT_TotalMsgs = <div align="center"><font face="Verdana" size=1><b>Found %1 messages in server...</b><br></font></div>
+
+# Links for LDAP search results
+DIR_COMPOSE_NAME = Compose Mail
+DIR_ADDRESSBOOK_NAME = Save in Addressbook
+
+# Error generated when verify_nfs_presence is used and an error is 
+# detected.
+ERR_Fail_NFS_Presence = An NFS error in the system has been encountered, please contact the system administrator, %1 (%2)
+
+# Message priorities.
+MSG_Priority_Highest = Highest
+MSG_Priority_High = High
+MSG_Priority_Normal = Normal
+MSG_Priority_Low = Low
+MSG_Priority_Lowest  = Lowest
+
+# Months and Weekdays
+Month_Names = Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+Day_Names = Mon Tue Wed Thu Fri Sat Sun
+
+# What appears in compose.html for attachments.
+MSG_ATTFileNone = None
+MSG_ATTSelDel = Select to Delete
+
+# What to display on messages for in-lined Attachment.
+Inline-Attach = Attachment:
+
+# Name for TRASH folder (if implemented).
+TRASH_Fold_Name = TRASH
+
+# Name that appears as title of RFC822 attachments (message attachments)
+MSG_RFC822_TITLE = Attached Message
+
+# Text that appears when a message is of type message/rfc822 (rather
+# than having a message/rfc822 *attachment*)
+MSG_ViewRFC822 = This message contains another embedded message. Please click here to view that message.
+
+# Error in using a particular protocol (imap/pop) on a particular server
+ERR_InvalidProtocol = Error: %1 is an invalid protocol for server/domain %2
+
+# Message Header fields translations
+MSG_HeaderFrom=From:
+MSG_HeaderTo=To:
+MSG_HeaderDate=Date:
+MSG_HeaderSubject=Subject:
+MSG_HeaderCc=Cc:
+MSG_HeaderAttachments=Attachments:
+
+# Generic permission denied error
+ERR_PermissionDenied = Permission Denied! Contact the administrator to obtain access to this resource.
+MSG_FileSaved = File Saved!
+
+MSG_MarkedMessage = 1 Message marked
+MSG_MarkedMessageMulti = %1 Messages marked

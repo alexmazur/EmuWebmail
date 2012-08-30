@@ -1,0 +1,27 @@
+[-
+
+$args = shift @param;
+
+-]
+    <DIV id="toolbar"> 
+      <div id="toolbar-content"> 
+        <table>
+          <tr> 
+            <td><a href="[+ &EMU::make_url('go_index','refresh') +]"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/52x52/new-mail.gif" border="0"></a></td>
+            <td><a href="[+ &EMU::make_url('compose') +]"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/52x52/compose.gif" border="0"></a></td>
+            <td><a href="[+ &EMU::make_url('folders') +]"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/52x52/folder-manager.gif" border="0"></a></td>
+            <td><a href="[+ &EMU::make_url('address') +]"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/52x52/address-book.gif" border="0"></a></td>
+            <td><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=search.html"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/52x52/search.gif" border="0"></a></td>
+            <td><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=options_list.html"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/52x52/options.gif" border="0"></a></td>
+          </tr>
+          <tr> 
+            <td><a href="[+ &EMU::make_url('go_index','refresh') +]">Get New Mail</a></td>
+            <td><a href="[+ &EMU::make_url('compose') +]">Compose Message</a></td>
+            <td><a href="[+ &EMU::make_url('folders') +]">Folder Manager</a></td>
+            <td><a href="[+ &EMU::make_url('address') +]">Address Book</a></td>
+            <td><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=search.html">Search</a></td>
+            <td><a href="[+ $EMU::EMU_URL +]?passed=parse&variable=options_list.html">Options</a></td>
+          </tr>
+        </table>
+      </div>
+    </DIV>

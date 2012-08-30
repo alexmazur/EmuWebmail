@@ -1,0 +1,84 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Remote Dictionary Check</title>
+
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='spelling_parse'>  
+<input type="hidden" name="selected_msg" value="[+ &EMU::get_var('digest') +]">
+
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+   
+[# Open Pre-Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Remote Dictionary Check</font></td>
+ </tr>
+</table>
+[# Close Pre-Body #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu"> 
+  <td valign="top">
+
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+[# Close Menu #]
+
+[# Open Body #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+    <tr>
+     <td colspan="4" align="center"><font class="Alert">[+ &EMU::get_status() +]</font>
+<input type='submit' name='back.x' value='Return to Spell Check'><br>&nbsp;<br><font class="DefaultText">Word Dictionary
+Lookup:<input name=replacement value="[+ &EMU::get_var('replacement') +]"><br>&nbsp;<br>
+<input type=submit name="replace.x" value="Replace">
+<input type=submit name="skip.x" value="Skip">
+<input type=submit name="lookup.x" value="Dictionary">
+<br>&nbsp;<br><div align="left">The dictionary lookup function returned the following information. Please review it if you'd like. To
+replace or skip, click on the appropriate button; to get back to the spell check without committing any action, please click on the
+browser Back button.</div><font class="DefaultText"><pre>[+ &EMU::get_var('def') +]</pre></font></td>
+ </tr>
+</table>
+
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+[# Open Post-Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close Post-Body #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>
+

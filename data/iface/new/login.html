@@ -1,0 +1,139 @@
+[-
+   $args = shift @param;
+
+   @interfaces = split(/[\s,]+/, $EMU::c{'ifaces'});
+   $default_interface = &EMU::get_var('type') || &EMU::get_var('emu_type') || $EMU::emu_cookies{'emu_type'} || $EMU::c{"default_interface"};
+
+   @mailhosts = split(/[\s,]+/, $EMU::c{'mail_hosts'});
+   $default_host = &EMU::get_var('hostname') || $emu_cookies{'host'};
+
+   if (&EMU::get_var('user_name') && $default_host) {
+      $email = &EMU::get_var('user_name')."\@$default_host";
+   }
+   $theme = $args->{theme};
+
+# This is a browser check to identify if the user's browser is one known to have poor CSS implementation
+   if ($ENV{HTTP_USER_AGENT} =~ /^Mozilla\/4/ && $ENV{HTTP_USER_AGENT} !~ /MSIE|Opera/i) {
+      $args->{BADCSS} = 1;
+   } else {
+      $args->{BADCSS} = 0;
+   }
+-]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Login</title>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<script language="javascript" type="text/javascript">
+
+function setupSession () {
+//   document.emuform.submit.disabled = true;
+   document.emuform.password.value = document.emuform.pass_tmp.value;
+   document.emuform.pass_tmp.value = "";
+   
+   document.cookie="emu_session=; expires=Sun, 01-Jan-1995 01:00:00 GMT;";
+   today = new Date();
+   document.emuform.sessionID.value = today.getTime();
+   
+}
+
+function GetSkin() {
+   return "[+ $args->{SKIN} +]";
+}
+</script>
+</HEAD>
+<BODY class="login-body">
+<!-- <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'> -->
+<div id="login-header"> 
+  <div id="login-header-inner-wrap"> 
+    <div id="emu-logo"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/webmail_logo.gif" alt="EMUWebmail" width="297" height="49"></div>
+  </div>
+</div>
+<div id="login-box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="login-box-inner-wrap"> 
+    <DIV id=colwrapper> 
+      <div id=login-navcol-fill>&nbsp;</div>
+      <DIV id=login-navcol> 
+        <div id=side-content> <br>
+          <br>
+          <br>
+          Checking your email from anywhere is easy with EMU Webmail [+ $EMU::Version +]<br>
+          <ol>
+            <li>Enter&nbsp;your&nbsp;email&nbsp;address<br>
+              Ex:&nbsp;yohan@company.com</li>
+            <li>Enter your password</li>
+            <li>Click "Login"</li>
+          </ol>
+          <br>
+          <br>
+          <br>
+        </div>
+      </DIV>
+      <DIV id=login-main>
+      <form action="[+ $EMU::EMU_URL +]" method="POST" name=emuform onsubmit="setupSession();">
+        <input type='hidden' name='passed' value='login_parse'>
+        <input type='hidden' name='first' value='1'>
+        <input type='hidden' name='sessionID' value=''>
+        <input type='hidden' name='password' value=''>
+        [$ if (!&EMU::get_var('multi_interfaces') || !@interfaces) $]
+          <input type='hidden' name='type' value='[+ $default_interface +]'>
+        [$ elsif (@interfaces == 1) $]
+          <input type='hidden' name='type' value='[+ $interfaces[0] +]'>
+        [$ endif $]
+          <table border="0" align="center" cellpadding="3" cellspacing="3">
+            <tr> 
+              <td align="center" class="smallText red" colspan="2">[+ &EMU::get_var('login_error') +]</td>
+            </tr>
+            <tr> 
+              <td align="right" class="smallText">Email address:</td>
+              <td align="right"><input type="text" name="user_name" value='[+ $email +]'></td>
+            </tr>
+       [$ if (@mailhosts) $]
+            <tr> 
+              <td align="right" class="smallText">POP/IMAP Host:</td>
+              <td align="right">
+                <select name='hostname'>
+                 <option value=''>[+ $EMU::msg{'MSG_SelectHost'} +]
+                 [$ foreach $h (@mailhosts) $]
+                   [- $selected = ($h eq $default_host)?'selected':''; -]
+                   <option [+ $selected +]>[+ $h +]
+                 [$ endforeach $]
+               </select>
+              </td>
+            </tr>
+        [$ endif $]
+            <tr> 
+              <td align="right" class="smallText">Password:</td>
+              <td align="right"><input type="password" name="pass_tmp"></td>
+            </tr>
+        [$ if (&EMU::get_var('multi_interfaces') && (@interfaces > 1)) $]
+            <tr> 
+              <td align="right" class="smallText">Interface:</td>
+              <td><select name="type">
+                  [$ foreach $i (@interfaces) $]
+                    [- $selected =  ($i eq $default_interface)?'selected':''; -]
+                    <option [+ $selected +]>[+ $i +]
+                  [$ endforeach $]
+                </select>
+              </td>
+            </tr>
+        [$ endif $]
+            <tr> 
+              <td>&nbsp;</td>
+              <td align="right">
+                <input type="image" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/login.gif" style="width:140px;height:22px;border:0px;" value="submit" alt="Login" name="submit" title="Login" onmouseover="this.src='[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/login.gif'" onmouseout="this.src='[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/login.gif'"> 
+<!--                <a href="#" onClick="setupSession();document.emuform.submit();return false;"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/login.gif" alt="Login" title="Login" border=0></a> -->
+              </td>
+            </tr>
+          </table>
+      </form>
+
+      </DIV>
+      <DIV class=clear>&nbsp;</DIV>
+    </DIV> 
+  </div>
+  <div id="login-footer-corner">&nbsp;</div>
+</div>
+<div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+</BODY></HTML>

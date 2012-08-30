@@ -1,0 +1,490 @@
+[-
+   $args = shift @param;
+   $message = &EMU::get_var('data') || $EMU::query->param('message');
+
+   @headers = qw/cc bcc from replyto priority org attach/;
+   @headers = grep (&EMU::get_var("$_.show"), @headers);
+
+   $base_URI = $ENV{REQUEST_URI};
+   $base_URI = substr($base_URI, 0, index($base_URI,"?")) if (index($base_URI,"?")); 
+   @data = &EMU::get_priority_data();
+   @parray = @{ $data[0] };
+   %phash  = %{ $data[1] };
+   $priority = &EMU::get_var('priority') || $parray[2];
+
+   @drafts = &EMU::get_postponed_msgs();      
+   
+   $attachments = &EMU::get_var('here_atts');
+   $theme = $args->{theme};
+
+   $load_editor = ($EMU::c{'reditor'} ne '0' && ($ENV{HTTP_USER_AGENT} =~ /MSIE/i || $ENV{HTTP_USER_AGENT} =~ /Gecko/i));
+   
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Compose Message</title>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<script language="JavaScript">
+<!--
+_editor_url = "./html/editor/";
+_editor_lang = "en";
+var editor = null;
+
+var win_ie_ver = parseFloat(navigator.appVersion.split("MSIE")[1]);
+var is_gecko  = (navigator.product == "Gecko");
+
+var LoadingEditor = true;
+
+if (is_gecko && (navigator.productSub >= 20021201 || navigator.productSub >= 20030210)) {win_ie_ver = 5.5}
+
+if (navigator.userAgent.indexOf('Mac')        >= 0) { win_ie_ver = 0; }
+if (navigator.userAgent.indexOf('Windows CE') >= 0) { win_ie_ver = 0; }
+if (navigator.userAgent.indexOf('Opera')      >= 0) { win_ie_ver = 0; }
+
+if (win_ie_ver >= 5.5) {
+  document.write('<scr' + 'ipt src="' +_editor_url+ 'htmlarea.js"');
+  document.write(' language="Javascript1.2"></scr' + 'ipt>');
+} else { document.write('<scr'+'ipt>function initEditor() { return false; }</scr'+'ipt>'); }
+
+function submitForm(fn) {
+
+[$ if ($EMU::userdb{"options.richeditor"}) $]
+   var msg;
+    
+   if (fn == 'richeditor') {
+       // get message from HTMLArea 
+       msg = editor.getInnerHTML();
+
+       // replace p and br
+       msg = msg.replace(/<\/p>/gi,'\r\n').replace(/<br>/gi,'\r\n');
+   
+       //delete all HTML tags
+       msg = msg.replace(/<[A-Za-z ][^>]*>/gi,'').replace(/<\/[A-Za-z ][^>]*>/gi,'');
+   }
+   else {
+       // get message from HTMLArea 
+       msg = editor.getHTML();
+   }
+   document.emuform.message.value = msg;
+[$ else $]
+   if (fn == 'richeditor') {
+       var msg = document.emuform.message.value;
+       msg = msg.replace(/\r\n/gi,'<br>').replace(/\r|\n/gi,'<br>');
+       document.emuform.message.value = msg;
+   }
+[$ endif $]
+
+   document.emuform.fillme.name = fn+".x";
+   document.emuform.submit();
+   return false;
+}
+
+function header_popup() {
+   window.open('[+ $args->{HTMLURL} +]/header_popup.html','Headers','scrollbars=yes,resizable=yes,width=250,height=375');
+}
+         
+function drafts_popup() {
+   window.open('[+ $args->{HTMLURL} +]/drafts_popup.html','Drafts','scrollbars=yes,resizable=yes,width=350,height=250');
+}
+         
+function setAttachments(attachments) {
+   document.emuform.attached.value = attachments;
+}
+
+var Headers = new Array( [+ join(', ', map { "'$_'" } @headers) +] );
+
+function get_headers() {
+   return Headers;
+}
+
+function store_headers(newheaders) {
+   Headers = newheaders;
+   for (var i=0; i < document.emuform.options.length; i++) {
+      if (Headers[i]) {
+         document.emuform.options[i].value = Headers[i];
+      } else {
+         document.emuform.options[i].value = '';
+      }
+   }
+   
+   submitForm('properties');
+}
+
+var Drafts = new Array([+ scalar(@drafts) +]);
+[$ foreach $m (@drafts) $]
+Drafts[ [+ $i++ +] ] = new Msg([+ join(',', map { s/'/\\'/g; "'$_'" } @$m) +]);
+[$ endforeach $]
+
+
+function Msg(msgid, date, subject) {
+   this.msgid = msgid;
+   this.date = date;
+   this.subject = subject;
+   
+   return this;
+}
+
+function getDrafts() {
+   return Drafts;
+}
+
+function loadDraft(msgid) {
+   document.emuform.selected_msg.value=msgid;
+   
+   submitForm('continue');
+}
+
+function removeDraft(ix) {
+   Drafts[ix] = null;
+}
+
+function address_popup() {
+   var to  = escape(document.emuform.to.value);
+   var cc  = escape(document.emuform.cc.value);
+   var bcc = escape(document.emuform.bcc.value);
+   var query_string = 'passed=address_select&to='+to+'&cc='+cc+'&bcc='+bcc;
+   window.open('[+ $EMU::EMU_URL +]?'+query_string,'Addresses','scrollbars=yes,resizable=yes,width=450,height=300');
+}
+
+function address(nick, email) {
+   this.nick = nick;
+   this.email = email;
+   return this;
+}
+
+function setRecipients(to, cc, bcc) {
+   var refresh = false;
+
+   document.emuform.to.value  = to;
+   document.emuform.cc.value  = cc;
+   document.emuform.bcc.value = bcc;
+
+[$ if (!grep(/cc/, @headers)) $]
+   if (cc != '') {
+      Headers[Headers.length] = 'cc';
+      refresh = true;
+   }
+[$ endif $]
+[$ if (!grep(/bcc/, @headers)) $]
+   if (bcc != '') {
+      Headers[Headers.length] = 'bcc';
+      refresh = true;
+    }
+[$ endif $]
+   if (refresh) {
+      store_headers(Headers);
+   }
+}
+
+function getURI() {
+   return "[+ $base_URI +]";
+}
+
+function getAction() {
+   return document.emuform.action;
+}
+
+function setSelected(item, val) {
+   document.emuform.elements[item].value = (val?1:0);
+}
+
+
+  [$ if (!$attachments) $]
+		var attachments_widget_state = 1;
+	[$ else $]
+		var attachments_widget_state = 0;	
+	[$ endif $]
+	
+function operate_attachments_widget()
+{
+   var wid_style = (attachments_widget_state) ? 'none' : 'block';
+
+   var butmsg = (attachments_widget_state) ? "[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/attachmentsButton.gif" : "[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/hideAttachmentsButton.gif";
+   attachments_widget_state = 1 - attachments_widget_state;
+
+   document.getElementById('attachments_widget').style.display = wid_style;
+
+   document.getElementById('attachments_anchor').focus();
+
+    
+   document.getElementById('attachments_button').src = butmsg;
+
+   return false;
+}
+
+
+//-->
+</script>
+</head>
+
+[$ if ($load_editor && $EMU::userdb{"options.richeditor"}) $]
+<body onload="initEditor(); operate_attachments_widget();">
+[$ else $]
+<body onload="operate_attachments_widget();">
+[$ endif $]
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <INPUT TYPE="hidden" NAME="fillme" value="42">
+          <INPUT TYPE="hidden" NAME="passed" value="compose_parse">
+          <INPUT TYPE="hidden" NAME="msg_continued" value="[+ &EMU::get_var('msg_continued') +]">
+          <input type='hidden' name='selected_msg' value=''>
+          <input type='hidden' name='attached' value='[+ $attachments +]'>
+          <input type='hidden' name='outbox' value='[+ $EMU::userdb{'options.save_outbox'} +]'>
+          
+          [# For Compose Headers #]
+          <input type='hidden' name='options' value='[+ $headers{cc} +]'>
+          <input type='hidden' name='options' value='[+ $headers{bcc} +]'>
+          <input type='hidden' name='options' value='[+ $headers{from} +]'>
+          <input type='hidden' name='options' value='[+ $headers{replyto} +]'>
+          <input type='hidden' name='options' value='[+ $headers{priority} +]'>
+          <input type='hidden' name='options' value='[+ $headers{org} +]'>
+          <input type='hidden' name='options' value='[+ $headers{attach} +]'>
+
+          <div id=folder-title> 
+            <div id=folder-name>[$ if ($message) $]Current&nbsp;Folder:&nbsp;[+ $EMU::folder +]&nbsp;|&nbsp;[$ endif $]Compose Message</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+                <input type="image" onClick="submitForm('send'); return false;" value="Send Message" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/sendMsgButton.gif" align="left">
+                <input type="image" onClick="submitForm('spelling')" value="Spell Check" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/spellCheckButton.gif" align="left">
+                <input type="image" onClick="submitForm('postpone')" value="Save Draft" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveDraftButton.gif" align="left">
+                [$ if (@drafts) $]
+                <input type="image" value="Open Draft" onclick="drafts_popup();return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/openDraftButton.gif" align="left">
+                [$ endif $]
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+            <table border="0" cellspacing="1" cellpadding="2">
+              <tr>
+                <td colspan="3"></td>
+                <td rowspan="[+ @headers + 3 +]">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td nowrap rowspan="[+ @headers + 3 +]" valign="top">
+                  <table width="100" border="0" cellspacing="2" cellpadding="2">
+                    <tr>
+                      <td align="left" valign="top" colspan="2"><input type='image' value='Customize Header' onclick='header_popup();return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/customizeHeaderButton.gif"><font size="1"></td>
+                    </tr>
+                    <tr> 
+                      <td align="right" valign="top"><input type="checkbox" onclick="setSelected('outbox', this.checked)" [+ 'checked' if ($EMU::userdb{'options.save_outbox'} == 1) +]></td>
+                      <td>Save&nbsp;a&nbsp;copy&nbsp;of&nbsp;this&nbsp;message in my &quot;Sent&quot; folder</td>
+                    </tr>
+                    <tr> 
+                      <td align="right" valign="top"><input type="checkbox" name="returnreceipt" value=1 [+ 'checked' if ($EMU::userdb{'options.dsn'} == 1) +]></td>
+                      <td>Request a delivery receipt for this message&nbsp;[&nbsp;<a href="#" onclick="window.open('[+ &EMU::get_var('help_url') +]/webmail_compose.html#options','WebmailHelp','width=750,height=300,toolbar=yes,location=no,directories=no,status=yes,menubar=yes,resizable=yes,copyhistory=no,scrollbars=yes');return false;">?</a>&nbsp;]</td>
+                    </tr>
+                    <tr> 
+                      <td align="right" valign="top"><input type="checkbox" name="readreceipt" value=1 [+ 'checked' if ($EMU::userdb{'options.mdn'} == 1) +]></td>
+                      <td>Request a read receipt for this message&nbsp;[&nbsp;<a href="#" onclick="window.open('[+ &EMU::get_var('help_url') +]/webmail_compose.html#options','WebmailHelp','width=750,height=300,toolbar=yes,location=no,directories=no,status=yes,menubar=yes,resizable=yes,copyhistory=no,scrollbars=yes');return false;">?</a>&nbsp;]</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              [$ if (&EMU::get_var('from.show')) $]
+              <tr> 
+                <td align="right">From:&nbsp;</td>
+                <td><input type="text" name="from" value="[+ &EMU::get_var('from') +]" size="30" style="width:200"></td>
+                <td></td>
+              </tr>
+              [$ endif $]
+              <tr> 
+                <td align="right">To:&nbsp;</td>
+                <td nowrap><input type="text" name="to" value="[+ &EMU::get_var('to') +]" size="30" style="width:200"></td>
+                <td><input type='image' value='Address Book' onclick='address_popup();return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addressBookButton.gif"></td>
+              </tr>
+              [$ if (&EMU::get_var('cc.show')) $]
+              <tr>
+                <td align="right">Cc:&nbsp;</td>
+                <td nowrap><input type="text" name="cc" value="[+ &EMU::get_var('cc') +]" size="30" style="width:200"></td>
+                <td><input type='image' value='Address Book' onclick='address_popup();return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addressBookButton.gif"></td>
+              </tr>
+              [$ else $]
+                <input type='hidden' name='cc' value=''>
+              [$ endif $]
+              [$ if (&EMU::get_var('bcc.show')) $]
+              <tr>
+                <td align="right">Bcc:&nbsp;</td>
+                <td><input type="text" name="bcc" value="[+ &EMU::get_var('bcc') +]" size="30" style="width:200"></td>
+                <td><input type='image' value='Address Book' onclick='address_popup();return false;' src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/addressBookButton.gif"></td>
+              </tr>
+              [$ else $]
+               <input type='hidden' name='bcc' value=''>
+              [$ endif $]
+              [$ if (&EMU::get_var('replyto.show')) $]
+              <tr>
+                <td align="right">Reply-To:&nbsp;</td>
+                <td><input type="text" name="replyto" value="[+ &EMU::get_var('replyto') +]" size="30" style="width:200"></td>
+                <td></td>
+              </tr>
+              [$ endif $]
+              [$ if (&EMU::get_var('priority.show')) $]
+              <tr> 
+                <td align="right">Priority:&nbsp;</td>
+                <td><select name='priority' style="width:200">
+                [$ foreach $p (@parray) $]
+                  [$ if ($p eq $priority) $]
+                  <option value='[+ $p +]' selected>[+ $phash{$p} +]
+                  [$ else $]
+                  <option value='[+ $p +]'>[+ $phash{$p} +]
+                  [$ endif $]
+                [$ endforeach $]
+                  </select>
+                </td>
+                <td></td>
+              </tr>
+              [$ endif $]
+              [$ if (&EMU::get_var('org.show')) $]
+              <tr> 
+                <td align="right">Organization:&nbsp;</td>
+                <td><input type="text" name="org" value="[+ &EMU::get_var('org') +]" size="30" style="width:200"></td>
+                <td></td>
+              </tr>
+             [$ endif $]
+             <tr> 
+               <td align="right">Subject:&nbsp;</td>
+               <td><input type="text" name="subject" value="[+ &EMU::get_var('subj') +]" size="30" style="width:200"></td>
+             </tr>
+             <tr>
+               <td colspan='2'>
+               <input type="image" id="attachments_button" name="attachments_button" onclick="operate_attachments_widget(); return false">
+               <!--<img id="attachments_button" onclick="operate_attachments_widget(); return false">-->
+               </td>
+             </tr>
+           </table>
+           <div id='LoadingMessage'></div>
+           [$ if ($load_editor) $]
+	   [- $message =~ s/\n/<br>/g if ($load_editor && $EMU::userdb{"options.richeditor"}) -]
+           <!-- Editor Code -->
+           <!-- htmlArea editor is Copyright (c) 2002, interactivetools.com, inc. -->
+           <!-- See webmail/html/html/editor.js for full license and source -->
+
+           <table style="width: 550px" border="0" cellspacing="0" cellpadding="0">
+	         <tr>
+	           <td>
+                 <div align="right"><input type='checkbox' onclick="submitForm('richeditor');" name='message_ct' value='text/html' [+ "checked" if $EMU::userdb{"options.richeditor"} +]>
+                 Rich-Text Editor</div>
+                 <textarea id='MessageEditor' name="message" style="width: 550px;" rows="20" wrap="physical">[+ $message +]</textarea>
+                 <br clear=all><br>
+	           </td>
+	         </tr>
+           </table>
+
+           <script language="javascript1.2">
+             var cfg = new HTMLArea.Config();
+             cfg.toolbar = [
+		                     [ "fontname", "space",
+		                       "fontsize", "space",
+		                       "formatblock", "space",
+		                       "bold", "italic", "underline", "strikethrough", "separator",
+		                       "subscript", "superscript", "separator"],
+
+		                     [ "justifyleft", "justifycenter", "justifyright", "justifyfull", "separator",
+                               "insertorderedlist", "insertunorderedlist", "outdent", "indent", "separator",
+		                       "forecolor", "hilitecolor", "separator",
+		                       "inserthorizontalrule", "createlink", "inserttable", "separator" ]
+                           ];
+             cfg.width = "550px";
+             cfg.height = "250px";
+             if (is_gecko) {
+  	           cfg.pageStyle = 'body {padding: 0; background-color: white; font-family: Verdana; font-size: small;}';
+             }
+             else {
+  	           cfg.pageStyle = 'body {padding: 0; background-color: white; font-family: Verdana; font-size: x-small; formatblock: normal; border: solid 1px; border-color: threedlightshadow threeddarkshadow threeddarkshadow threedlightshadow;}';
+             }
+  
+             cfg.fontnames = {
+               "Arial":           "arial, helvetica, sans-serif",
+               "Courier New":     "courier new, courier, mono",
+               "Georgia":         "Georgia, Times New Roman, Times, Serif",
+               "Tahoma":          "Tahoma, Arial, Helvetica, sans-serif",
+               "Times New Roman": "times new roman, times, serif",
+               "Verdana":         "Verdana, Arial, Helvetica, sans-serif",
+               "impact":          "impact",
+               "WingDings":       "WingDings"
+             };
+
+             cfg.fontsizes = {
+               "1 (8 pt)":  "1",
+               "2 (10 pt)": "2",
+               "3 (12 pt)": "3",
+               "4 (14 pt)": "4",
+               "5 (18 pt)": "5",
+               "6 (24 pt)": "6",
+               "7 (36 pt)": "7"
+             };
+
+             //cfg.statusBar = false;
+ 
+             function initEditor() {
+               editor = new HTMLArea("MessageEditor", cfg);
+               editor.generate();
+   
+               if (document.readyState == 'complete' && LoadingEditor) {
+                 LoadingEditor = false;
+                 document.getElementById('LoadingMessage').style.visibility='hidden';
+               }
+               return false;
+             }
+
+             [# Webmail specific #]
+             [$ if ($EMU::userdb{"options.richeditor"}) $]
+             document.getElementById('LoadingMessage').style.visibility='visible';
+             document.getElementById('LoadingMessage').innerText = "One moment while the editor loads...";
+             document.getElementById('MessageEditor').style.visibility='hidden';
+             [$ endif $]
+
+           </script>
+           <!-- Editor End Code -->
+           [$ else $]
+           <br>
+           <textarea name="message" style="width: 550px" rows="30" wrap="physical">[+ $message +]</textarea>
+           [$ endif $]
+           <iframe name="attachments_widget" id="attachments_widget" width="550" frameborder=0 src="[+ $EMU::EMU_URL +]?passed=parse&attach=[+ &CGI::escape($attachments) +]&variable=attachment_popup.html">Sorry! Your browser doesn't support &lt;IFRAME&gt; tag.</iframe>
+           <a id='attachments_anchor'>&nbsp;</a>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+                <input type="image" onClick="submitForm('send'); return false;" value="Send Message" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/sendMsgButton.gif" align="left">
+                <input type="image" onClick="submitForm('spelling')" value="Spell Check" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/spellCheckButton.gif" align="left">
+                <input type="image" onClick="submitForm('postpone')" value="Save Draft" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveDraftButton.gif" align="left">
+                [$ if (@drafts) $]
+                <input type="image" value="Open Draft" onclick="drafts_popup();return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/openDraftButton.gif" align="left">
+                [$ endif $]
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>
+
+

@@ -1,0 +1,43 @@
+[-
+
+$args = shift @param;
+
+# This is a browser check to identify if the user's browser is one known to have poor CSS implementation
+if ($ENV{HTTP_USER_AGENT} =~ /^Mozilla\/4/ && $ENV{HTTP_USER_AGENT} !~ /MSIE|Opera/i) {
+   $args->{BADCSS} = 1;
+} else {
+   $args->{BADCSS} = 0;
+}
+
+-]
+
+<script>
+   function GetSkin() {
+      return "[+ $args->{SKIN} +]";
+   }
+</script>
+
+<link rel="stylesheet" type="text/css" href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+  <td class="LogoWindow"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/webmail_logo.gif"></td>
+  <td width="75%" align="center">[+ &EMU::show_ad() +]</td>
+ </tr>
+ [$ if ($EMU::Edition) $]
+ <tr>
+  <td><font class='EditionTag'>&nbsp;&nbsp;&nbsp;&nbsp;[+ uc($EMU::Edition) +] EDITION</font></td>
+  <td>&nbsp;</td>
+ </tr>
+ [$ endif $]
+</table>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="3"></td>
+ </tr><tr class="RibbonTop">
+  <td background="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/ribbon.gif"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="6"></td>
+ </tr><tr>
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="3"></td>
+ </tr>
+</table>

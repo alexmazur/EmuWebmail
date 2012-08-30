@@ -1,0 +1,157 @@
+[-
+
+  $args = $param[0];
+  $data = &EMU::get_var('data');
+
+-]
+
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Questionaire</title>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+                
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Questionaire</font></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+ <tr class="Body">
+  <td align="center"><table width="90%" border="0" cellspacing="0" cellpadding="15">
+    <tr> 
+     <td><font class="DefaultText"><form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'><input type='hidden'
+name='passed' value='questionaire_parse'>
+<font class="Alert">[+ &EMU::get_status() +]</font><br>
+<font class="DefaultText">In an effort to better understand the background and needs of our
+customers, we ask that you take a moment and complete the questionaire below, as well as review the End User License
+Agreement.<br>&nbsp;</td>
+    </tr>
+   </table><table width="100%" border="0" cellspacing="0" cellpadding="3">
+
+[# Start required fields with a '!' #]
+
+    <tr>
+     <td align="right" width="40%"><font class="DefaultText">Age:</font></td>
+     <td width="60%"><select name="age" style="width:250px">
+[$ foreach $age ('Under 18','18-25','26-35','36-45','46-55','56-65','66+') $]
+[- $selected = ($age eq $passedinval)?'selected':'' -]
+<option [+ $selected +]>[+ $age +]
+[$ endforeach $]
+</select></td>
+    </tr><tr>
+     <td align="right"><font class="DefaulText">Sex:</font></td>
+     <td><select name="sex" style="width:250px">
+[$ foreach $sex ('Male','Female','Undisclosed') $]
+[- $selected = ($sex eq $passedinval)?'selected':'' -]   
+<option [+ $selected +]>[+ $sex +]   
+[$ endforeach $]
+</select></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">Occupation:</font></td>
+     <td><input type='text' name='occupation' value='[+ $data->{'occupation'} +]' style="width:250px"></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">Zip Code:</font></td>
+     <td><input type='text' name='zip' value='[+ $data->{zip} +]' style="width:250px"></td>
+    </tr><tr>
+     <td align="right"><font class="DefaultText">Language:</font></td>
+     <td><select name="language" style="width:250px"> 
+[$ foreach $lang ('English','Chinese','Czech','Danish','Dutch','Estonian','Finnish','French','German','Greek','Hebrew','Hungarian','Icelandic','Italian','Japanese','Korean','Latvian','Lithuanian','Norwegian','Polish','Portuguese','Romanian','Russian','Spanish','Swedish')
+$]                              
+[- $selected = ($lang eq $passedinval)?'selected':'' -]
+<option [+ $selected +]>[+ $lang +]
+[$ endforeach $]
+</select></td>
+    </tr><tr>
+     <td align="right"><input type="checkbox" name="opt"</td>
+     <td><font class="DefaultText">Don't send me information via Email</font></td>
+    </tr><tr>
+     <td colspan="2" align="center"><font face="Verdana" size="2">&nbsp;<br>End User License Agreement<br></font><textarea
+rows="8" cols="60">
+1.	Terms of Service for Use of the EMUMAIL
+	1.1.	Definitions. "EMUMAIL" is the online e-mail service operated by EMUMAIL, Inc. "You" or "User" means each person who uses the EMUMAIL service.
+	1.2.	Agree to Comply. The User is required to read and agree to this Agreement the first time the User accesses EMUMAIL. Other than the first access to EMUMAIL for the purpose of reading this Agreement, by using EMUMAIL, the User agrees to comply with all the terms and conditions set forth in this Agreement. The right to use EMUmail is personal to the User and may not be transferred to any other person or entity. The User is responsible for all of their use and for ensuring that anyone who uses this service along with the User fully complies with the terms and conditions of this Agreement. 
+	1.3.	Future Changes. EMUMAIL shall have the right to modify or stop providing its service, or any of its features at any time. This right to modify or stop providing service shall be completely unlimited. EMUMAIL shall not be obligated to provide any advance notice of its intention to modify or stop providing its service. 
+	1.4.	Modification of this Agreement. At any time, EMUMAIL shall have the right to change, modify, add to, or delete from this Agreement, or any part of this Agreement, or to impose new conditions including, but not limited to, adding fees or charges for use. At EMUMAIL's option, any changes, modifications, additions, or deletions to this Agreement may be effective immediately. EMUMAIL may provide notice of such changes, modifications, additions, or deletions by any means in its sole and absolute discretion. These may include, but are not limited to, posting on the EMUMAIL web site, e-mail or by any other means by which the User gets notice of such changes. If the User uses EMUMAIL after such notice of a change to this Agreement, that use shall be deemed an acceptance by the User of such changes, modifications, additions or deletions.  
+
+2. 	Lawful Purposes.
+	2.1.	The User agrees to use EMUMAIL for lawful purposes only.
+	2.2.	The User shall not use EMUMAIL to transmit any material which:
+		2.2.1.	Violates the rights of others;
+		2.2.2.	Infringes the intellectual property rights of others;
+		2.2.3.	Is threatening, abusive, vulgar, obscene, or profane;
+		2.2.4.	Is libelous, slanderous, or otherwise defamatory; or
+		2.2.5.	Violates the right of privacy or publicity of others.
+	2.3. 	The User shall not use EMUMAIL to violate any contractual provision with the User's e-mail service provider.
+	2.4.	The User shall not use EMUMAIL to violate any contractual provision of the online service provider from which the User is using EMUMAIL to access the User's e-mail.
+	2.5.	The User shall not use EMUMAIL in a way which encourages others to commit a criminal offense or gives rise to civil liability or otherwise violates any law.
+	2.6.	The User shall not use EMUMAIL to send unsolicited advertising with respect to products, services, or other commercial purposes.
+
+3. 	No Warranties.
+	3.1.	THE USER EXPRESSLY AGREES THAT THE USER'S USE OF EMUMAIL IS AT THE USER'S SOLE RISK. THE USER UNDERSTANDS AND EXPRESSLY AGREES THAT EMUMAIL DOES NOT WARRANT THAT EMUMAIL'S SERVICE WILL BE UNINTERRUPTED OR ERROR FREE.
+	3.2.	EMUMAIL is provided on an "As Is" basis without warranties of any kind or nature, either expressed or implied. EMUMAIL EXPRESSLY DISCLAIMS ANY WARRANTIES OF TITLE OR IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. This disclaimer does not apply if applicable law makes such a disclaimer improper.
+
+4. 	Limitation of Liability. 
+	4.1.	Under absolutely no circumstances of any kind or nature shall EMUMAIL its directors, shareholders, employees, officers, or assigns be responsible for any damages or injuries caused by any failure of performance, error, omission, interruption, deletion, defect, delay in operation or transmission, computer virus, communication line failure, theft or destruction or unauthorized access to, alteration of, or use of information, whether for breach of contract, tortious behavior, negligence, or under any other cause of action.
+	4.2.	EMUMAIL shall not be responsible for any damages including, but not limited to, direct, indirect, incidental, special, consequential or punitive damages arising out of the use of, or inability to use, EMUMAIL. 
+
+5. 	Indemnification. The User agrees to defend, indemnify, and hold harmless EMUMAIL, its affiliates and their respective directors, officers, employees and agents from and against all claims and expenses including attorney's fees arising out of the use of EMUMAIL by the User.
+
+6.	Miscellaneous.
+	6.1.	Entire Agreement. This Agreement contains the sole and entire agreement between the parties with respect to the subject matter of this Agreement and supersedes any and all other prior written or oral agreements between them. 
+	6.2.	Binding Effect. This Agreement shall be binding upon and inure to the benefit of the parties and their respective heirs, legal representatives, administrators, successors, and assigns.
+	6.3.	No Waiver. Nothing contained in this Agreement shall cause the failure of EMUmail to insist upon strict compliance with any covenant, obligation, condition or agreement contained in this Agreement to operate as a waiver of, or estoppel with respect to, any such covenant, obligation, condition or agreement. Waiver by EMUmail of any breach of any provision of this Agreement shall not be considered as nor constitute a continuing waiver or waiver of any other breach of any provision of this Agreement.
+	6.4.	Attorney's Fees. In the event of litigation between the parties to enforce the provisions of or with respect to this Agreement, the prevailing party shall be entitled to reimbursement for reasonable attorney's fees and costs at trial and on appeal.
+	6.5.	Captions. Captions contained in this Agreement are inserted only as a matter of convenience or for reference and in no way define, limit, extend, or describe the scope of this Agreement or the intent of any provision of this Agreement.
+	6.6.	Construction. In the construction of this Agreement, whether or not so expressed, words used in the singular or in the plural, respectively, include both the plural and the singular and the masculine gender includes the feminine and neuter genders.
+	6.7.	Governing Law. This Agreement and the interpretation of its terms shall be governed by the laws of the State of Massachusetts, without regard to its conflicts of laws rules.
+	6.8.	Jurisdiction and Venue. The parties consent to the exclusive jurisdiction of the Massachusetts state courts and agree that exclusive venue shall lie in Suffolk County, Massachusetts.
+	6.9.	Enforceability. If any provision of this Agreement shall be held invalid or unenforceable by any court of competent jurisdiction or as a result of future legislative action, such holding or action shall be strictly construed and shall not affect the validity or effect of any other provision of this Agreement.
+</textarea></td>
+    </tr>
+[# End Questions #]
+      <tr>
+       <td colspan="2">&nbsp;</td>
+      </tr><tr>
+       <td colspan="2" align="center"><input type='submit' value='I Agree with these Terms and Conditions' class="DefaultButton"></td>
+      </tr><tr>
+       <td colspan="2">&nbsp;</td>
+      </tr>
+     </table></td>  
+   </tr>
+  </table></td>
+ </tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</body>
+</html>

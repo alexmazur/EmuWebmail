@@ -1,0 +1,58 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   $now = &EMU::get_date(undef,undef,undef,1);
+-]
+<html>
+<head>
+  <title>[+ $EMU::c{publisher_name} +] - Logout</title>
+  <link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY class="login-body">
+<div id="login-header"> 
+  <div id="login-header-inner-wrap"> 
+    <div id="emu-logo"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/webmail_logo.gif" alt="EMUWebmail" width="297" height="49"></div>
+  </div>
+</div>
+<div id="login-box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="login-box-inner-wrap"> 
+    <DIV id=colwrapper> 
+      <div id=login-navcol-fill>&nbsp;</div>
+      <DIV id=login-navcol> 
+        <div id=side-content> <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+          <br>
+        </div>
+      </DIV>
+      <DIV id=login-main> 
+          <table border="0" align="center" cellpadding="3" cellspacing="3">
+            <tr> 
+              <td><div class="mediumText red centered">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;
+                <br>[+ &EMU::get_var('email') +] has successfully logged out.</div></td>
+            </tr>
+            <tr> 
+              <td class="blue centered"><br><a href="[+ $EMU::EMU_URL +]">Click here to Login again</a></td>
+            </tr>
+          </table>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+<div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+</BODY>
+</html>

@@ -1,0 +1,88 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<title>[+ $EMU::c{publisher_name} +] - Remote Dictionary Check</title>
+
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type='hidden' name='passed' value='spelling_parse'>  
+          <input type="hidden" name="selected_msg" value="[+ &EMU::get_var('digest') +]">
+
+          <div id=folder-title> 
+            <div id=folder-name>Remote Dictionary Check</div>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+                <input type="image" name='back.x' value='Return to Spell Check' onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/returnSpCheckButton.gif" align="left">
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+
+            <table width="100%" border="0" cellspacing="1" cellpadding="3">
+              <tr>
+                <td align="center">
+                  <br>Word Dictionary Lookup:
+                  <input name=replacement value="[+ &EMU::get_var('replacement') +]"><br>&nbsp;<br>
+                  <input type="image" name="replace.x" value="Replace" onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/replaceButton.gif">&nbsp;
+                  <input type="image" name="skip.x" value="Skip" onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/skipButton.gif">&nbsp;
+                  <input type="image" name="lookup.x" value="Dictionary" onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/dictionaryButton.gif">&nbsp;
+                  <br>&nbsp;<br><div align="left">The dictionary lookup function returned 
+                     the following information. Please review it if you'd like. To
+                     replace or skip, click on the appropriate button; to get back to the spell 
+                     heck without committing any action, please click on the
+                     browser Back button.</div>
+                  <pre>[+ &EMU::get_var('def') +]</pre>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap">
+                <input type="image" name='back.x' value='Return to Spell Check' onclick="document.emuform.submit();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/returnSpCheckButton.gif" align="left">
+            </div>
+          </div>
+
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>
+
+

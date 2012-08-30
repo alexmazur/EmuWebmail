@@ -1,0 +1,256 @@
+[-
+   $args = shift @param;
+
+   &EMU::debug("contact editor");
+   $nick = $EMU::query->param('orig');
+
+   foreach $d (split(':', $EMU::userdb{"addresses.$nick"})) {
+      $d =~ s/\"/\&quot;/g;
+      push(@data, $d);
+   }
+
+   foreach $n (grep {/^addresses\./} keys %EMU::userdb) {
+      $n =~ s/^addresses\.//;
+      push(@nicknames, lc($n));
+   }
+
+   $orig = $nick;
+   $orig =~ s/'/\\'/g;
+
+   # the first 2 entries are fullname and email, so the addrbook_* entries
+   # really start at $data[2], so when accessing it, we must add 1
+-]
+
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Contact</title>    
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+
+<script language=JavaScript>
+
+var Nicknames = new Array();
+var original = '[+ lc($orig) +]';
+
+[- $i = 0; -]
+[$ foreach $n (@nicknames) $]
+   [- $n =~ s/'/\\'/g; -]
+   Nicknames[ [+ $i +] ] = '[+ $n +]';
+   [- $i++; -]
+[$ endforeach $]
+
+function verifyDuplicate(nick) {
+    if (original != "" && original == nick.toLowerCase()) return 0;
+
+    for (i=0; i<Nicknames.length; i++) {
+        if (Nicknames[i] == nick.toLowerCase()) return 1;
+    }
+    return 0;
+}
+
+function saveChanges() {
+    // remove all blank space prior to checking
+    document.emuform.nick.value = document.emuform.nick.value.replace(/^\s+|\s+$/g, "");
+    document.emuform.email.value = document.emuform.email.value.replace(/^\s+|\s+$/g, "");
+    if (document.emuform.nick.value == "") {
+        alert("Error: a Nickname entry is required.");
+        return false;
+    }
+    else if (document.emuform.email.value == "") {
+        alert("Error: an Email entry is required.");
+        return false;
+    }
+    else if (document.emuform.full.value == "") {
+        alert("Error: a Full Name entry is required.");
+        return false;
+    }
+    else if (verifyDuplicate(document.emuform.nick.value)) {
+        alert("Error: duplicate nickname "+document.emuform.nick.value);
+        return false;
+    }
+
+    document.emuform.passed.value="address_parse";
+    document.emuform.orig.value="[+ $orig +]";
+    document.emuform.submit();
+}
+
+function composeEmail(email) {
+    document.emuform.passed.value="compose";
+    document.emuform.to.value=email;
+    document.emuform.submit();
+}
+
+</script>
+</head>  
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <form name="emuform" action='[+ $EMU::EMU_URL +]' method='POST'>
+          <input type=hidden name="orig">
+          <input type=hidden name="passed">
+          <input type=hidden name="to">
+
+          <div id=folder-title> 
+         [$ if ($nick) $]
+            <div id=folder-name>Editing Contact</div>
+         [$ else $]
+            <div id=folder-name>Adding New Contact</div>
+         [$ endif $]
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap" class="centered">
+              <input type="image" value="Save Changes" onclick="return saveChanges();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveChangesButton.gif" width="80" height="22">
+              <input type="image" value="Cancel" onclick="window.location='[+ $EMU::EMU_URL +]?passed=address';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/cancelButton.gif" width="80" height="22">
+            </div>
+          </div>
+
+          <div id="folder-content"> 
+            [$ if (&EMU::get_status()) $]
+            <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+            [$ endif $]
+            <table>
+              <tr> 
+                <th id=grid-header class="grid-header1 left" colspan=4>&nbsp;General 
+                  Information</th>
+              </tr>
+              <tr> 
+                <td width="25%" id=contact-grid class="right red">Full Name:</td>
+                <td width="25%" id=contact-grid> <input tabindex=1 type="text" name="full" value="[+ $data[1] +]"> 
+                  <script> document.emuform.full.focus(); </script> </td>
+                <td width="25%" id=contact-grid class="right">Home Phone:</td>
+                <td width="25%" id=contact-grid><input tabindex=6 type="text" name="addrbook_02" value="[+ $data[3] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class="right red">Nickname:</td>
+                [- ($safenick = $nick) =~ s/'/\&#39;/g; -]
+                <td id=contact-grid><input tabindex=2 type="text" name="nick" value='[+ $safenick +]'></td>
+                <td id=contact-grid class=right>Business Phone:</td>
+                <td id=contact-grid><input tabindex=7 type="text" name="addrbook_06" value="[+ $data[7] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>**&nbsp;<span class="red">Email 
+                  Address 1:</span></td>
+                <td id=contact-grid><input tabindex=3 type="text" name="email" value="[+ $data[0] +]"> 
+                  <a href="#"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/16x16/icon_new.gif" border=0 alt="Send an email to this address" [- $data[0] =~ s/'/\\'/g; -] onClick="composeEmail('[+ $data[0] +]');"></a></td>
+                <td id=contact-grid class=right>Cell Phone:</td>
+                <td id=contact-grid><input tabindex=8 type="text" name="addrbook_07" value="[+ $data[8] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Email 2:</td>
+                <td id=contact-grid><input tabindex=4 type="text" name="addrbook_04" value="[+ $data[5] +]"> 
+                  <a href="#"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/16x16/icon_new.gif" border=0 alt="Send an email to this address" onClick="composeEmail('[+ $data[5] +]');"></a></td>
+                <td id=contact-grid class=right>Fax:</td>
+                <td id=contact-grid><input tabindex=9 type="text" name="addrbook_08" value="[+ $data[9] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Email 3:</td>
+                <td id=contact-grid><input tabindex=5 type="text" name="addrbook_05" value="[+ $data[6] +]"> 
+                  <a href="#"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/icons/16x16/icon_new.gif" border=0 alt="Send an email to this address" onClick="composeEmail('[+ $data[6] +]');"></a></td>
+                <td id=contact-grid class=right>Website:</td>
+                <td id=contact-grid><input tabindex=10 type="text" name="addrbook_03" value="[+ $data[4] +]"></td>
+              </tr>
+              <tr> 
+                <th colspan=2 id=grid-header class="grid-header1 left">&nbsp;Business 
+                  Address</th>
+                <th colspan=2 id=grid-header class="grid-header left">&nbsp;Home 
+                  Address</th>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Company:</td>
+                <td id=contact-grid> <input tabindex=11 type="text" name="addrbook_01" value="[+ $data[2] +]"> 
+                </td>
+                <td id=contact-grid class=right>Street Address 1:</td>
+                <td id=contact-grid><input tabindex=19 type="text" name="addrbook_16" value="[+ $data[17] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Job Title:</td>
+                <td id=contact-grid> <input tabindex=12 type="text" name="addrbook_09" value="[+ $data[10] +]"> 
+                </td>
+                <td id=contact-grid class=right>Street Address 2:</td>
+                <td id=contact-grid><input tabindex=20 type="text" name="addrbook_17" value="[+ $data[18] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Street Address 1:</td>
+                <td id=contact-grid> <input tabindex=13 type="text" name="addrbook_10" value="[+ $data[11] +]"> 
+                </td>
+                <td id=contact-grid class=right>City:</td>
+                <td id=contact-grid><input tabindex=21 type="text" name="addrbook_18" value="[+ $data[19] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Street Address 2:</td>
+                <td id=contact-grid> <input tabindex=14 type="text" name="addrbook_11" value="[+ $data[12] +]"> 
+                </td>
+                <td id=contact-grid class=right>State / Province:</td>
+                <td id=contact-grid><input tabindex=22 type="text" name="addrbook_19" value="[+ $data[20] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>City:</td>
+                <td id=contact-grid> <input tabindex=15 type="text" name="addrbook_12" value="[+ $data[13] +]"> 
+                </td>
+                <td id=contact-grid class=right>Postal Code:</td>
+                <td id=contact-grid><input tabindex=23 type="text" name="addrbook_20" value="[+ $data[21] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>State / Province:</td>
+                <td id=contact-grid> <input tabindex=16 type="text" name="addrbook_13" value="[+ $data[14] +]"> 
+                </td>
+                <td id=contact-grid class=right>Country:</td>
+                <td id=contact-grid><input tabindex=24 type="text" name="addrbook_21" value="[+ $data[22] +]"></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Postal Code:</td>
+                <td id=contact-grid> <input tabindex=17 type="text" name="addrbook_14" value="[+ $data[15] +]"> 
+                </td>
+                <td colspan="2" rowspan="2" id=contact-grid>** This is the default 
+                  email address referenced when the contact "nickname" is used 
+                  on the Compose page. 
+                  <div class="red">Red labels denote required fields.</div></td>
+              </tr>
+              <tr> 
+                <td id=contact-grid class=right>Country:</td>
+                <td id=contact-grid> <input tabindex=18 type="text" name="addrbook_15" value="[+ $data[16] +]"> 
+                </td>
+              </tr>
+              <tr>
+                <td id=contact-grid class=right>Notes:</td>
+                <td colspan=3><textarea tabindex=25 name="addrbook_22" cols="70" style="width: 550px" rows="4">[+ $data[23] +]</textarea></td>
+              </tr>
+            </table>
+          </div>
+
+          <div id="action-buttons"> 
+            <div id="action-buttons-wrap" class="centered">
+              <input type="image" value="Save Changes" onclick="return saveChanges();" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/saveChangesButton.gif" width="80" height="22">
+              <input type="image" value="Cancel" onclick="window.location='[+ $EMU::EMU_URL +]?passed=address';return false;" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/cancelButton.gif" width="80" height="22">
+            </div>
+          </div>
+        </form>
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>
+

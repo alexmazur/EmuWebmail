@@ -1,0 +1,159 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Addressbook Import/Export</title>
+
+<script language=JavaScript>
+
+function do_import() {
+    if (document.importexportform.import_format.selectedIndex == 0) {
+        alert("Please select an import format.");
+        return;
+    }
+
+    file = document.importexportform.import_file.value.replace(/^\s+|\s+$/g, "");
+    if (file == "") {
+        alert("Please select a file to be uploaded.");
+        return;
+    }
+
+    //document.importexportform.import_file.value = file;
+
+    document.importexportform.passed.value="import_addressbook";
+    var type = document.importexportform.import_format.options[document.importexportform.import_format.selectedIndex].value;
+
+    document.importexportform.import_type.value="csv";
+
+    document.importexportform.submit();
+}
+function do_export() {
+    if (document.importexportform.export_format.selectedIndex == 0) {
+        alert("Please select an export format.");
+        return;
+    }
+
+    document.importexportform.passed.value="export_addressbook";
+    document.importexportform.submit();
+}
+</script>
+
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open Pre-Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="pagetitle">&nbsp;&nbsp;Addressbook Import/Export</font></td>
+ </tr>
+</table>
+[# Close Pre-Body #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu"> 
+  <td valign="top">
+  
+[# Open Menu #]   
+[- &Execute("$args->{DOCROOT}/menu.html", $args, \@folders) -]
+[# Close Menu #]
+
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>  
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+ <tr class="Body">
+  <td><form name='importexportform' action='[+ $EMU::EMU_URL +]' method='POST' ENCTYPE="multipart/form-data">
+<input type=hidden name="passed" value="">
+<input type=hidden name="import_type" value="">
+
+<table width="100%" border="0" cellspacing="1" cellpadding="3">
+ <tr>
+  <td colspan="3"></td>
+ </tr><tr class="SubHeaderBar">
+  <td colspan="3"><font class="GridHeader">Importing</font></td>
+ </tr><tr>
+  <td colspan="3"><img src="[+ $args->{IMGURL} +]/point.gif" width="5" height="5" alt=""></td>
+ </tr><tr>
+  <td align="right" nowrap><font class="DefaultText">Import&nbsp;from:</font></td>
+  <td><select name="import_format" class="DefaultSelect" style="width:200px"><option>-- Select --</option>
+    <option value="Outlook9798">Outlook 97/98 (.CSV)</option>
+    <option value="Outlook2000">Outlook 2000 (.CSV)</option>
+    <option value="Outlook2002">Outlook 2002 (.CSV)</option>
+    <option value="Outlook2000">Outlook Express 6 (.CSV)</option>
+    <option value="Netscape">Netscape (.CSV)</option>
+    <option value="Yahoo">Yahoo (.CSV)</option>
+   </select></td>
+  <td rowspan="3" valign="top" width="50%"><font class="DefaultText">You may import addressbooks
+from:<ol><li>Microsoft Outlook 97/98/2000</li><li>Microsoft Outlook Express 6</li><li>Netscape</li><li>Yahoo Mail</li></ol></font></td>
+ </tr><tr>
+  <td align="right"><font class="DefaultText">Select file:</font></td>
+  <td><input type="file" name="import_file" style="width:200px" class="DefaultTextbox"></td>
+ </tr><tr>
+  <td>&nbsp;</td>
+  <td><input type="button" name="import_addressbook" value="Import Contacts" class="DefaultButton" onClick="do_import();"><br>&nbsp;<br>&nbsp;<br>&nbsp;</td>
+ </tr><tr class="SubHeaderBar">
+  <td colspan="3"><font class="GridHeader">Exporting</font></td>
+ </tr><tr>
+  <td colspan="3"><img src="[+ $args->{IMGURL} +]/point.gif" width="5" height="5" alt=""></td>
+ </tr><tr>
+  <td align="right"><font class="DefaultText">Export to:</font></td>
+  <td><select name="export_format" class="DefaultSelect" style="width:200px"><option>-- Select --</option>
+    <option value="Outlook9798">Outlook 97/98</option>
+    <option value="Outlook2000">Outlook 2000</option>
+    <option value="Netscape">Netscape</option>
+    <option value="Yahoo">Yahoo</option>
+   </select></td>
+  <td rowspan="2" valign="top">&nbsp;</td>
+ </tr><tr>
+  <td>&nbsp;</td>
+  <td><input type="button" name="export" value="Export Contacts" class="DefaultButton" onClick="do_export();"></td>
+  <td></td>
+ </tr><tr>
+  <td>&nbsp;</td>
+  <td>&nbsp;<br>&nbsp;<br><input type="button" name="back" value="Back to the Addressbook" class="DefaultButton" onClick=window.location='[+ $EMU::EMU_URL +]?folder=[+ $EMU::folder +]&passed=address'></td>
+  <td>&nbsp;</td>
+ </tr>
+</table>
+
+</td>
+ </tr>
+</table>
+[# Close Body #]
+
+
+</td>
+ </tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="pagetitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>
+

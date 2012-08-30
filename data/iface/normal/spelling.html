@@ -1,0 +1,132 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   @suggestions = split(/:+/, &EMU::get_var('suggestions'));
+
+   $current_word = &EMU::get_var('bad_word');
+   $the_message = &EMU::get_var('the_message');
+#   $the_message =~ s/\n/<br>/g;
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Spell Check</title>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='spelling_parse'>
+<input type="hidden" name="selected_msg" value="[+ &EMU::get_var('digest') +]">
+<input type="hidden" name='start_pos' value="[+ &EMU::get_var('start_pos') +]">
+<input type="hidden" name='end_pos' value="[+ &EMU::get_var('end_pos') +]">
+<input type="hidden" name='word_num' value="[+ &EMU::get_var('word_num') +]">
+
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Spell Check</font></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu"> 
+  <td valign="top">
+  
+[# Open Menu #]   
+[- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+[# Close Menu #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="BodyGridOuline">
+  <td><table width="100%" border="0" cellspacing="0" cellpadding="4">
+    <tr class="BodyButtonBar">
+     <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr>
+        <td align="center"><input type="submit" name="continue.x" value="Finish Spell Check" class="DefaultButton"></td>
+       </tr>
+      </table></td>
+    </tr><tr class="GridData"> 
+     <td valign="top"><table width="100%" border="0" cellspacing="5" cellpadding="0">
+[$ if (&EMU::get_status()) $]
+   <tr class="GridData">  
+    <td align="center" colspan="2"><font class="Alert">&nbsp;<br>[+ &EMU::get_status() +]<br>&nbsp;</font></td>
+   </tr>
+[$ endif $]
+    <tr>
+     <td colspan="2"><font class="DefaultText">Select a word from the Suggestion List or type your own word in the space
+provided, then press "Replace."</font><font size="1"><br>&nbsp;</font></td>
+    </tr><tr> 
+     <td width="31%" align="right">&nbsp;<font class="DefaultText">Unknown Word:&nbsp;&nbsp;</font></td>
+     <td><font class="DefaultText">[+ $current_word +]</font>&nbsp;</td>
+    </tr><tr> 
+     <td width="31%" align="right" nowrap><font class="DefaultText">Suggested&nbsp;Replacements:&nbsp;&nbsp;</font></td>
+     <td><select onchange="if (selectedIndex >=
+0) this.form.replacement.value=this.options[this.selectedIndex].text" class="DefaultSelect" style="width: 250px"><option
+value=''>Make a Selection
+[$ foreach $s (@suggestions) $]
+<option>[+ $s +]
+[$ endforeach $]
+</select></td>
+    </tr><tr> 
+     <td width="31%" align="right"><font class="DefaultText">Edit Replacement:&nbsp;&nbsp;</font></td>
+     <td><input type="text" name="replacement" value='[+ $current_word +]' class="DefaultTextbox" style="width: 250px"><input
+type="hidden" name="unknown_word" value='[+ $current_word +]'></td>
+    </tr><tr align="center">
+     <td colspan="2"><font size="1">&nbsp;<br></font><input
+type="submit" name="replace.x" value="Replace" class="DefaultButton">&nbsp;<input
+type="submit" name="skip.x" value="Skip" class="DefaultButton">&nbsp;<input
+type="submit" name="lookup.x" value="Dictionary" class="DefaultButton"></td>
+    </tr>
+   </table></td>
+ </tr><tr class="GridData"> 
+  <td valign="top"><font class="MessageText"><pre>[+ $the_message +]</pre></font></td>
+ </tr><tr class="BodyButtonBar"> 
+  <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr> 
+     <td align="center"><input type="submit" name="continue.x" value="Finish Spell Check" class="DefaultButton"></td>
+    </tr>
+   </table></td>
+ </tr>
+</table>
+[# Close Body #]
+
+</td>
+   </tr>
+  </table></td>
+ </tr>
+</table>
+
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>
+

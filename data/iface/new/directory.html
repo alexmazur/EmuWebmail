@@ -1,0 +1,173 @@
+[-
+   $args = shift @param;
+
+   @hosts = &EMU::get_ldap_hosts();
+
+   my @data = &EMU::get_directory();
+   @directory_array = @{ $data[0] };
+   %directory_data = %{ $data[1] };
+   $theme = $args->{theme};
+
+-]
+<html>
+<head>
+<link href="[+ $args->{HTMLURL} +]/css/skin_webmail_[+ $args->{SKIN} +].css" rel="stylesheet" type="text/css">
+<title>[+ $EMU::c{publisher_name} +] - Addressbook - Internet Search</title>
+</head>
+
+<BODY>
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<div id="box-wrap"> 
+  <div id="top-corner">&nbsp;</div>
+  <div id="box-inner-wrap"> 
+    [# Open Toolbar #]
+    [- &Execute("$args->{DOCROOT}/toolbar.html", $args) -]
+    [# Close Toolbar #]
+
+    <DIV id=colwrapper> 
+      <DIV id=navcol> 
+      [# Open Menu #]
+      [- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+      [# Close Menu #]
+      </DIV>
+      <DIV id=main> 
+
+        <div id=folder-title> 
+          <div id=folder-name>Internet Search</div>
+        </div>
+
+        <div id="action-buttons">&nbsp;</div>
+
+        <div id="folder-content"> 
+          [$ if (&EMU::get_status()) $]
+          <div class="mediumText red centered">[+ &EMU::get_status() +]<br>&nbsp;</div>
+          [$ endif $]
+
+          <form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+            <INPUT TYPE='hidden' NAME='passed' VALUE='directory'>
+            <input type=hidden name=showentries value=1>
+            <input type=hidden name="ldap_position" value="0">
+            <input type=hidden value="cn|realname|o|mail|c|givenname|ou|facsimiletelephoneNumber|telephoneNumber|title" name="ldap_search_fields">
+
+            <div class="mediumText">Search for a friend or family member with Webmail's Address Search! Enter the
+                 first or last name of the person below, then submit your search.<br>&nbsp;</div>
+                 
+            <table width="100%" cellspacing="1" cellpadding="3" border="0">
+              <tr>
+                <td align="right">Look for names containing:</td>
+                <td><input type='text' name='search_sn' value="[+ &EMU::get_var('search_sn') +]"></td>
+              </tr>
+              [$ if (@hosts <= 1) $]
+               <input type='hidden' name='ldap_search_host' value='[+ $hosts[0] +]'>
+              [$ else $]
+              <tr>
+                <td align="right">Select a directory server:</td>
+                <td><select name='ldap_search_host'>
+                [$ foreach $h (@hosts) $]
+                  <option value='[+ $h +]'>[+ $h +]
+                [$ endforeach $]
+                </select>
+                </td>
+              </tr>
+              [$ endif $]
+              <tr>
+                <td></td>
+                <td><input name='search.x' value="Start Search" type="image" src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/buttons/startSearchButton.gif"><br>&nbsp;</td>
+              </tr>
+            </table>
+            [$ if (&EMU::get_var('searched_for')) $]
+            <table width="100%" cellspacing="1" cellpadding="3" border="0">
+              <tr>
+                <th colspan="2" id=grid-header class="grid-header1 narrow">Search Results</th>
+              </tr>
+              <tr>
+                <td colspan=2>You searched for <b><u>[+ &EMU::get_var('searched_for') +]</u></b>. 
+                  [$ if (&EMU::get_var('ldap_entries')) $]
+                    Found [+ &EMU::get_var('ldap_entries') +] matches in 
+                    [+ &EMU::get_var('total_ldap_pages') +] pages. 
+                    Displaying entries [+ &EMU::get_var('start') +] 
+                    through [+ &EMU::get_var('end') +]
+                  [$ endif $]
+                </td>
+              </tr>
+            </table>
+            [$ endif $]
+
+            <table border="0" cellpadding="0" cellspacing="3" width="100%">
+
+            [$ foreach $a (@directory_array) $]
+            [-
+                $name = $directory_data{"_name$a"};
+                $fullname = $directory_data{"_fullname$a"};
+                $email = $directory_data{"_email_link$a"};
+                $org = $directory_data{"_org$a"};
+            -]
+              <tr>
+                <td colspan="2"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="7" alt=""></td>
+             </tr>
+             <tr>
+               <td colspan="2" class="MenuLine"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="1" alt=""></td>
+             </tr>
+             <tr>
+                <td colspan="2"><img src="[+ $args->{IMGURL} +]/point.gif" width="1" height="7" alt=""></td>
+             </tr>
+             <tr>
+               <td align="right">Given Name:</td>
+               <td width="80%">[+ $name +]</td>
+             </tr>
+             <tr>
+               <td align="right">Full Name:</td>
+               <td>[+ $fullname +]</td>
+             </tr>
+             <tr>
+               <td align="right">E-mail:</td>
+               <td>[+ $email +]</td>
+             </tr>
+             <tr>
+               <td align="right">Organization:</td>
+               <td>[+ $org +]</td>
+             </tr>
+            [$ endforeach $]
+            </table>
+          </form>
+ 
+          [$ if (&EMU::get_var('more_ldap')) $]
+          <form method="POST" action="[+ $EMU::EMU_URL +]">
+            <input type="hidden" NAME="passed" VALUE="directory">
+            <input type="hidden" value="cn|realname|o|mail|c|givenname|mailquota|ou|facsimiletelephoneNumber|telephoneNumber|title" name="ldap_search_fields">
+            <input type=hidden name=search_sn value="[+ &EMU::get_var('search_sn') +]">
+            <input type=hidden name=search_ou value="[+ &EMU::get_var('search_ou') +]">
+            
+            <table border="0" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="center"><INPUT TYPE="SUBMIT" NAME="ldap_jump.x" value="Go to">&nbsp;<select name="ldap_position" class="DefaultSelect">
+                [- 
+                   $next = &EMU::get_var('next_ldap_page');
+                   $last = &EMU::get_var('total_ldap_pages');
+                -]
+                [$ foreach $i (1..$last) $]
+                  [- $selected =  ($next == $i)?'selected':'' -]
+                  <option value='[+ $i +]' [+ $selected +]>Page [+ $i +] of [+ $last +]
+                [$ endforeach $]
+                </select></td>
+              </tr>
+            </table>
+          </form>
+          [$ endif $]
+        </div>
+
+        <div id="action-buttons">&nbsp;</div>
+
+      </DIV>
+      <DIV class=clear></DIV>
+    </DIV>
+    <DIV id=foot> 
+      <div id="copyright">Powered by EMU Webmail [+ $EMU::Version +] - &copy; 1995-[+ (localtime)[5]+1900 +] EMUMAIL</div>
+    </DIV>
+  </div>
+  <div id="footer-corner">&nbsp;</div>
+</div>
+</BODY></HTML>

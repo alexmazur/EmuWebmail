@@ -1,0 +1,195 @@
+[-
+   $args = shift @param;
+
+   $theme = $args->{theme};
+   $log = &EMU::get_var('log');;
+   $addr = &EMU::get_var('data');
+   $addr =~s/addresses\.//g;
+   @addr = split(/\|\|/, $addr);
+   @used=();
+-]
+
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Address Group Editor</title>
+<script language="JavaScript">
+
+function deleteOption(object,index) {
+    object.options[index] = null;
+}
+
+function addOption(object,text,value) {
+    var defaultSelected = true;
+    var selected = true;
+    var optionName = new Option(text, value, defaultSelected, selected)
+    object.options[object.length] = optionName;
+}
+
+function copySelected(fromObject,toObject) {
+    for (var i=0, l=fromObject.options.length;i<l;i++) {
+        if (fromObject.options[i].selected)
+            addOption(toObject,fromObject.options[i].text,fromObject.options[i].value);
+    }
+    for (var i=fromObject.options.length-1;i>-1;i--) {
+        if (fromObject.options[i].selected)
+            deleteOption(fromObject,i);
+    }
+}
+
+function copyAll(fromObject,toObject) {
+    for (var i=0, l=fromObject.options.length;i<l;i++) {
+        addOption(toObject,fromObject.options[i].text,fromObject.options[i].value);
+    }
+    for (var i=fromObject.options.length-1;i>-1;i--) {
+        deleteOption(fromObject,i);
+    }
+}
+
+function saveChanges() {
+
+    for(ii=0;ii<document.emuform.select2.options.length;ii++){
+         document.emuform.select2.options[ii].selected=true;
+    }
+    document.emuform.submit();
+}
+</script>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+<form name="emuform" action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='edit_address_group'>
+<input type='hidden' name='folder_selected' value='[+ $EMU::inbox  +]'>
+<input type='hidden' name='select_group' value='[+ $log +]'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="2" alt=""></td>
+[$ if ($log) $]
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Modify Group "[+ $log +]"</td>
+[$ else $]
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Modify Group Settings</td>
+[$ endif $]
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu">
+  <td valign="top">
+
+
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args, \@folders) -]
+[# Close Menu #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="3">
+ <tr class="BodyButtonBar">
+  <td align="center"><input type="button" value="Save Changes" onclick="saveChanges()" class="DefaultButton">&nbsp;<input type="button" value="Cancel" onclick="window.location='[+ $EMU::EMU_URL +]?passed=address_groups'" class="DefaultButton">&nbsp;&nbsp;</td>
+ </tr>
+</table>
+
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+<tr>
+  <td align="right"><font class="DefaultText">Address Group Name:&nbsp;</font></td>
+  <td><font class="GridHeader"><input type="text" name="groupname" size="25" class="DefaultTextbox" value="[+ $log +]"></td>
+ </tr><tr>
+  <td align="right"><font class="DefaultText">Select Address Name:&nbsp;</font></td>
+  [$ if (@addr) $]
+  <td>
+<table><tr><td>
+<fieldset>
+<legend align="bottom"><font class="DefaultText">Users Not Affiliated</font></legend>
+<select name="select1" multiple size="12" style="width:240px" class="DefaultSelect">
+  [$ foreach $name (@addr) $]
+  [-
+  $email = $EMU::userdb{"addresses.$name"};
+  $email =~ s/^(.*?):(.*?)(:*?)$/$1/g;
+  $nick = $2;
+  -]
+  [$ if ($EMU::userdb{"addressgroup.$log"}=~m/\'$nick\'\|\|$email/g) $]
+  [- push(@used, "$nick:$email") -]
+  [$ else $]
+<option value="'[+ $nick +]'||[+ $email +]" title="[+ $email +]">[+ $nick +] < [+ $email +] ></option>
+  [$endif $]
+  [$ endforeach $]
+</select>
+</fieldset>
+</td><td align="right">
+
+<input type="button" value=" > " onClick="if (document.images) copySelected(this.form.select1,this.form.select2)" class="DefaultButton">
+<p>
+<input type="button" value=" < " onClick="if (document.images) copySelected(this.form.select2,this.form.select1)" class="DefaultButton">
+<p>
+<input type="button" value=">>" onClick="if (document.images) copyAll(this.form.select1,this.form.select2)" class="DefaultButton">
+<p>
+<input type="button" value="<<" onClick="if (document.images) copyAll(this.form.select2,this.form.select1)" class="DefaultButton">
+
+</td><td>
+<fieldset>
+<legend align="bottom"><font class="DefaultText">Users Affiliated</font></legend>
+<select name="select2" multiple size="12" style="width:240px" class="DefaultSelect">
+
+   [$ if (@addr) $]
+   [$ foreach $name_ex (@used) $]
+   [- ($name, $maile) = split(/:/, $name_ex) -]
+<option value="'[+ $name +]'||[+ $maile +]" title="[+ $maile +]">[+ $name +] < [+ $maile +] ></option>
+   [$ endforeach $]
+   [$ endif $]
+
+</select>
+</fieldset>
+</td></tr></table>
+  </td>
+  [$ else $]
+</td></tr>
+<tr>
+<td height="300" align="center"><font class="alert">&nbsp;<br>Your Addressbook is empty.<br>&nbsp;<br><a
+href="#" class="Default" onClick=window.location='[+ $EMU::EMU_URL +]?passed=parse&variable=contact_editor.html' class="DefaultButton">
+Add Contact</a><br>&nbsp;</font></td>
+
+ </tr>
+ </table>
+ </td>
+  [$ endif $]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="3" valign="bottom">
+ <tr class="BodyButtonBar">
+  <td align="center"><input type="button" value="Save Changes" onclick="saveChanges()" class="DefaultButton">&nbsp;<input type="button" value="Cancel" onclick="window.location='[+ $EMU::EMU_URL +]?passed=address_groups'" class="DefaultButton">&nbsp;&nbsp;</td>
+ </tr>
+</table>
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+
+</form>
+</body>
+</html>
+</form>

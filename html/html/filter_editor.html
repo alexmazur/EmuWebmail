@@ -1,0 +1,163 @@
+<html>
+<head>
+<title>Filter Editor</title>
+<script language='Javascript'>
+
+var me;
+var folders;
+
+function Load() {
+   me = window.opener.getCurrent();
+
+   document.popup.name.value = me.name;
+   document.popup.data.value = me.data;
+   document.popup.active.checked = (me.active == 1);
+   
+   var keys = document.popup.key.options;
+
+   for (var i=0; i<keys.length; i++) {
+      if (keys[i].value == me.key) {
+         document.popup.key.selectedIndex = i;
+         break;
+      }
+   }
+
+   var operators = document.popup.operator.options;
+
+   for (var i=0; i<operators.length; i++) {
+      if (operators[i].value == me.operator) {
+         document.popup.operator.selectedIndex = i;
+         break;
+      }
+   }
+
+   var targets = document.popup.target.options;
+
+   if (me.target) {
+      for (var i=0; i<targets.length; i++) {
+         if (targets[i].value == me.target) {
+            document.popup.target.selectedIndex = i;
+            break;
+         }
+      }
+   }
+}
+
+function folderSelect(source) {
+
+   if (source.selectedIndex != 0)
+      return false;
+      
+   var val = prompt("Enter a name for your New Folder:","");
+   if (!val) {
+      source.selectedIndex = 1;
+      return false;
+   }
+   source.options[source.options.length] = new Option("move to folder \""+val+"\"", val);
+   source.selectedIndex = source.options.length - 1;
+   return true;
+}
+
+function verifyData() {
+   document.popup.name.value = document.popup.name.value.replace("/^\s+|\s+$/", "");
+
+   if (document.popup.name.value == "") {
+      alert("Error: Filter must have a name.");
+      return 0;
+   }
+
+   if (document.popup.data.value == "") {
+      alert("Error: Missing data for filtering.");
+      return 0;
+   }
+
+   if (document.popup.target.value == "") {
+      alert("Error: Must choose action taken for filter.");
+      return 0;
+   }
+
+   return 1;
+}
+
+function saveChanges() {
+   if (!verifyData()) return;
+
+   me.name = document.popup.name.value;
+   me.data = document.popup.data.value;
+   me.active = document.popup.active.checked?1:0;
+   me.key = document.popup.key.options[document.popup.key.selectedIndex].value;
+   me.operator = document.popup.operator.options[document.popup.operator.selectedIndex].value;
+   me.target = document.popup.target.options[document.popup.target.selectedIndex].value;
+
+   // Hardcoded for now
+   me.action = 'move';
+   window.opener.saveFilter(me);
+   window.close();
+}
+
+</script>
+</head>
+
+<script>
+   document.write("<link id='css_link' rel='stylesheet' type='text/css' href='css/skin_webmail_"+window.opener.GetSkin()+".css'>");
+</script>
+
+<body class="Popup" onLoad='Load()'>
+<form name='popup'>
+  <table width="100%" border="0" cellspacing="2" cellpadding="0">
+    <tr> 
+      <td align="right"><font class="DefaultText">Filter name:&nbsp;</font></td>
+      <td><input type="text" name="name" class="DefaultTextbox"></td>
+    </tr><tr> 
+      <td align="right"><input type="checkbox" name="active"></td>
+      <td><font class="DefaultText">Active / On</font></td>
+    </tr><tr> 
+      <td colspan="2">&nbsp;</td>
+    </tr><tr align="center"> 
+      <td colspan="2"><font class="DefaultText">If the message's
+          <select name="key" class="DefaultSelect">
+            <option value='from'>sender</option>
+            <option value='to'>recipient</option>
+            <option value='subject'>subject</option>
+            <option value='body'>body</option>
+            <option value='headers'>headers</option>
+            <option value='all'>headers and body</option>
+<!--
+            <option>CC</option>
+            <option>date</option>
+            <option>age in days</option>
+-->
+          </select>
+
+          <select name="operator" class="DefaultSelect">
+            <option value='contains'>contains</option>
+            <option value='nocontains'>doesn't contain</option>
+<!--
+            <option>equals</option>
+            <option>does not equal</option>
+            <option>begins with</option>
+            <option>ends with</option>
+-->
+          </select>
+          <input type="text" name="data" style="width: 100px" class="DefaultTextbox">, then <select
+name="target" onchange='folderSelect(this)' class="DefaultSelect">
+<script language='Javascript'>
+   folders = window.opener.getFolders();
+   
+   document.writeln("<option value=''>Add New Folder</option>");
+   document.writeln("<option value='' selected>----</option>");
+   for (var i=0; i < folders.length; i++) {
+      document.writeln("<option value='"+folders[i]+"'>move to folder &quot;"+folders[i]+"&quot;</option>");
+   }
+</script>
+</select></font></td>
+    </tr><tr> 
+      <td colspan="2">&nbsp;</td>
+    </tr><tr> 
+      <td colspan="2" align="center"><input type="button" value="Save Changes" onClick="saveChanges()" class="DefaultButton">
+        <input type="button" value="Cancel" onClick="window.close()" class="DefaultButton"></td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

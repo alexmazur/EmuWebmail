@@ -1,0 +1,158 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+   
+   $file = &EMU::get_var('file');
+   $type = &EMU::get_var('filetype');
+   $content = &EMU::get_var('content');
+   $message = &EMU::get_var('message');
+   
+   @conf_files = @{ &EMU::get_var('config_files') };
+   @tmpl_files = @{ &EMU::get_var('tmpl_files') };
+   @html_files = @{ &EMU::get_var('html_files') };
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Administrator File Editor</title>
+<script>
+
+function OpenFile(select, type) {
+   var file = select.options[select.selectedIndex].text;
+   document.emuform.file.value = file;
+   document.emuform.filetype.value = type;
+
+   document.emuform.submit();
+}
+</script>
+
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='editor'>
+<input type='hidden' name='file' value='[+ $file +]'>
+<input type='hidden' name='filetype' value='[+ $type +]'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="2" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Administrator File Editor</td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu">
+  <td valign="top">
+
+
+[# Open Menu #]
+[- &Execute("$args->{DOCROOT}/menu.html", $args, \@folders) -]
+[# Close Menu #]
+
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>  
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="3">
+ <tr class="BodyButtonBar">
+  <td align="center"><input type='submit' name='save.x' value='Save' class="DefaultButton">&nbsp;<input type='reset' value='Reset' class="DefaultButton"></td>
+ </tr>  
+</table><table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Body">
+  <td><table width="100%" border="0" cellspacing="0" cellpadding="15">
+    <tr>
+     <td><font class="DefaultText"><b>Important Note: This tool allows the modification of
+Webmail configuration files, html, stylesheets, and more. When you save your modifications, the changes to your
+installation of Webmail are immediate. Please use this tool carefully! For the specifics on modifying
+your files, review any documentation bundled with this product or check for an updated product manual at
+ <a href="http://www.emumail.com/support/" target="_blank">http://www.emumail/support/</a></b></font></td>
+ </tr>
+</table><table width="100%" border="0" cellspacing="8" cellpadding="0">
+ <tr class="Body">
+  <td><table width="100%" border="0" cellspacing="1" cellpadding="3">
+ [$ if ($message) $]
+   <tr><td colspan=2><font class="Alert">&nbsp;<br>[+ $message +]<br>&nbsp;</font></td></tr>
+ [$ endif $]
+ <tr class="Body">
+  <td align="right"><font class="DefaultText">Config Files:</font></td>
+  <td><select name='config_file' class="DefaultSelect" style="width: 300px">
+   <option value=''>-- Select File --</option>
+   [$ foreach $f (@conf_files) $]
+    <option>[+ $f +]</option>
+   [$ endforeach $]
+   </select>&nbsp;<input type='button' value='Open' onClick="OpenFile(this.form.config_file, 'config')" class="DefaultButton"></td>
+ </tr><tr class="Body">
+  <td align="right"><font class="DefaultText">Template Files:</font></td>
+  <td><select name='tmpl_file' class="DefaultSelect" style="width: 300px">
+   <option value=''>-- Select File --</option>
+   [$ foreach $f (@tmpl_files) $]
+    <option>[+ $f +]</option>
+   [$ endforeach $]
+   </select>&nbsp;<input type='button' value='Open' onClick="OpenFile(this.form.tmpl_file, 'tmpl')" class="DefaultButton"></td>
+ </tr><tr>
+  <td align="right"><font class="DefaultText">HTML Files:</font></td>
+  <td><select name='html_file' class="DefaultSelect" style="width: 300px">
+   <option value=''>-- Select File --</option>
+   [$ foreach $f (@html_files) $]
+    <option>[+ $f +]</option>
+   [$ endforeach $]
+   </select>&nbsp;<input type='button' value='Open' onClick="OpenFile(this.form.html_file, 'html')" class="DefaultButton"></td>
+ </tr><tr class="Body">
+  <td colspan="2"><font class="DefaultText">&nbsp;</font></td>
+ </tr><tr class="Body">
+  <td align="right"><font class="DefaultText">Editing:</font></td>
+  <td><font class="DefaultText"><b>[+ $file || '[None]' +]</b></font></td>
+ </tr><tr class="Body">
+  <td align="center" colspan="2"><textarea name="content" cols="70" style="width: 550px" rows="30" wrap="virtual" class="Default">[+
+CGI::escapeHTML($content) +]</textarea></td>
+ </tr><tr class="Body">
+  <td colspan="2">
+ </tr>
+</table></td></tr></table></td>
+    </tr>
+   </table><table width="100%" border="0" cellspacing="0" cellpadding="3">
+ <tr class="BodyButtonBar">
+  <td align="center"><input type='submit' name='save.x' value='Save' class="DefaultButton">&nbsp;<input type='reset' value='Reset' class="DefaultButton"></td>
+ </tr>  
+</table></td>
+ </tr>
+</table>
+ 
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+
+</form>   
+</body>
+</html>
+  
+  
+</form>
+ 
+  
+  

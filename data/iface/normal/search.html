@@ -1,0 +1,137 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Search</title>
+<script language="JavaScript" src="./html/datepicker/popcalendar.js"></script>
+<script language=javascript>
+addHoliday(25,12,0,"Christmas Day");
+addHoliday(4,7,0,"Independence day");
+addHoliday(1,1,0,"New Year's Day");
+addHoliday(11,11,0,"Veterans Day");
+// http://www4.law.cornell.edu/uscode/5/6103.html
+</script>
+</head>
+
+<body onload="init();">
+
+<form name='emuform' action='[+ $EMU::EMU_URL +]' method='POST'>
+<input type='hidden' name='passed' value='select'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+[# Open PreBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PreBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;&nbsp;Email Search</font></td>
+ </tr>
+</table>
+[# Close PreBody #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+ <tr class="Menu"> 
+  <td valign="top">
+
+[# Open Menu #]   
+[- &Execute("$args->{DOCROOT}/menu.html", $args) -]
+[# Close Menu #]
+
+</td>
+[# BADCSS Check #]
+[$ if ($args->{BADCSS} eq 1) $]
+   <td valign='top' width='85%'>
+[$ else $]
+   <td class='Body'>
+[$ endif $]
+
+[# Open Body #]
+
+<table width="100%" border="0" cellspacing="0" cellpadding="10">
+<tr class="Body">
+<td colspan="5" align="center"><font class="alert">[+ &EMU::get_status() +]</font>
+<tr><td>
+	
+	<table cellspacing=0 cellpadding=0 border=0 width=85%>
+	<tr><td> <!-- gripper -->
+		<fieldset><!--  style="width:300;-->
+		<legend align="bottom"><font class="DefaultText"><b>Search criteria</b></font></legend>
+		<table cellspacing=0 cellpadding=0 border=0 width=100%>
+		<tr><td valign=top>
+
+			<table cellspacing=2 cellpadding=0 border=0>
+    		<tr><td><font class="DefaultText"><nobr>Look in:</nobr>&nbsp;</font></td><td><select class="DefaultSelect" name="srch_folder_name"><!-- <option value=''>- All local folders - -->
+    			<option value='[+ $EMU::inbox +]'>[+ $EMU::inbox +]
+    			[$ foreach $folder (@{$args->{folders}}) $]
+    			<option value='[+ $folder +]'>[+ $folder +]
+    			[$ endforeach $]
+    			</select></td></tr>
+    			<!-- <tr><td><font class="DefaultText">Message status: </font></td><td><select class="DefaultSelect" name="srch_msg_status"><option value="">- All -<option value="new">New<option value="read">Read<option value="answer">Answered</select></td></tr> -->
+    		<tr>
+    		<td>
+    			<font class="DefaultText">Date:</font>
+    		</td>
+    		<td>
+    			<nobr>
+    			<font class="DefaultText"> from </font><input class="DefaultFile" type="text" name="srch_start_date" size=10 maxlength=10 value="">&nbsp;<a href="#" onclick="popUpCalendar(this, emuform.srch_start_date, 'mm/dd/yyyy'); return false;"><img src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/" +]calendar_button.gif" align="absmiddle" border="0" alt="Open Calendar"></a> 
+    			<font class="DefaultText">to </font><input class="DefaultFile" type="text" name="srch_end_date" size=10 maxlength=10 value="">&nbsp;<a href="#" onclick="popUpCalendar(this, emuform.srch_end_date, 'mm/dd/yyyy'); return false;"><img src="[+ "$args->{IMGURL}/skins/$args->{SKIN}/" +]calendar_button.gif" align="absmiddle" border="0" alt="Open Calendar"></a>
+    			</nobr>
+    		</td></tr>
+    		</table>
+
+		</td>
+		<td width=15>&nbsp;</td>
+		<td valign=top align="right">
+
+    		<table cellspacing=2 cellpadding=0 border=0>
+    		<tr><td><font class="DefaultText">From:&nbsp;</font></td><td><input class="DefaultTextbox" type=text name="srch_criterion_from" value=""></td></tr>
+    		<tr><td><font class="DefaultText">To:&nbsp;</font></td><td><input class="DefaultTextbox" type=text name="srch_criterion_to" value=""></td></tr>
+    		<tr><td><font class="DefaultText">Subject:&nbsp;</font></td><td><input class="DefaultTextbox" type=text name="srch_criterion_subj"></td></tr>
+    		<tr><td><font class="DefaultText">Body:&nbsp;</font></td><td><input class="DefaultTextbox" type=text name="srch_criterion_body" onFocus="CheckBodyCriterion('visible')" onBlur="CheckBodyCriterion('hidden')"></td></tr>
+    		<script language="JavaScript">
+    		function CheckBodyCriterion(visibility)
+    		{
+    			if (!document.emuform.srch_criterion_body.value)
+    				document.getElementById('fullbodysearchwarn').style.visibility = visibility;
+    		}
+    		</script>
+    		<tr><td colspan=2><div id="fullbodysearchwarn" name="fullbodysearchwarn" style="visibility: hidden;"><font class="DefaultText"><font color="red"><b>Warning!</b></font> A full body search requires <b>all messages</b> to be downloaded from your mail server and may take a while to complete. Please be patient. [$ if (&EMU::get_var('allowed') > 0) $]Also, please note this may <b>break your quota</b>.[$ endif $]</font></div></td></tr>
+    		</table>
+    
+		</td></tr>
+		</table>
+    	</fieldset>
+	</td></tr>
+	<tr><td align="right">
+		&nbsp;<input type="submit" name="search.x" class="DefaultButton" value="    Start  Search    ">
+	</td></tr></table> <!-- /gripper -->
+
+</td></tr>
+</table>
+
+[# Close Body #]
+
+</td>
+</tr>
+</table>
+
+[# Open PostBody #]
+<table width="100%" border="0" cellspacing="0" cellpadding="4">
+ <tr class="PostBody">
+  <td><img src="[+ $args->{IMGURL} +]/point.gif" width="160" height="1" alt=""></td>
+  <td width="100%"><font class="PageTitle">&nbsp;</font></td>
+ </tr>
+</table>
+[# Close PostBody #]
+
+[# Open Footer #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Footer #]
+
+</form>
+</body>
+</html>

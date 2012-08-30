@@ -1,0 +1,89 @@
+<html>
+<head>
+<title>Folder Editor</title>
+<script language='Javascript'>
+
+var me, dirs;
+
+function Load() {
+   document.popup.name.value = me.name;
+}
+
+function saveChanges() {
+   me.name = document.popup.name.value;
+
+   if (document.popup.dir) {
+      if (document.popup.dir.length) {
+         me.dir  = document.popup.dir.options[document.popup.dir.selectedIndex].value;
+      } else {
+         me.dir = document.popup.dir.value;
+      }
+   }
+      
+   if (document.popup.protocol && document.popup.protocol.checked) {
+      me.protocol = document.popup.protocol.value;
+   } else {
+      me.protocol = '';
+   }
+      
+
+   window.opener.saveFolder(me);
+   window.close();
+}
+
+</script>
+</head>
+
+<script>
+   document.write("<link id='css_link' rel='stylesheet' type='text/css' href='css/skin_webmail_"+window.opener.GetSkin()+".css'>");
+</script>
+
+<body class="Popup" onload='Load()'>
+<form name='popup' onsubmit='saveChanges(); return false;'>
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+ <tr>
+  <td colspan="2"><font class="DefaultText">Please complete the field(s) below, then click "Save".<br>&nbsp;</font></td>
+</tr>
+
+<script language='Javascript'>
+   me = window.opener.getCurrent();
+   dirs = window.opener.getDirs();
+   
+   if (me.fresh && dirs.length > 0) {
+      document.write("<tr><td align='right'><input type='checkbox' name='protocol' value='local' checked></td><td><font class='DefaultText'>Local Folder</font></td>");
+   } 
+</script>
+<tr>
+ <td align="right"><font class='DefaultText'>Folder&nbsp;Name:&nbsp;</font></td>
+ <td><input type='text' name='name' class='DefaultTextbox'></td>
+</tr>
+
+<script language='Javascript'>
+   if (me.fresh && dirs.length > 0) {
+      if (dirs.length == 1) {
+         document.writeln("<input type='hidden' name='dir' value='"+dirs[0]+"'>");
+      } else {
+         document.writeln("<tr>");
+         document.writeln("<td align='right' valign='top'><font class='DefaultText'>IMAP Path</font></td>");
+         document.writeln("<td><select name='dir' class='DefaultSelect'>");
+         for (var i=0; i< dirs.length; i++) {
+            document.writeln("<option value='"+dirs[i]+"'>"+dirs[i]);
+         }
+      }
+      
+      document.writeln("</select></td></tr>");
+
+      document.writeln("<tr><td colspan=2>");
+      document.writeln("<font class='DefaultText'>&nbsp;<br>Note: To create a new IMAP dir, end your folder name with a '/'<br>&nbsp;</font>");
+      document.writeln("</td></tr>");
+   }
+</script>
+ <tr>
+  <td colspan="2">&nbsp;</td>
+ </tr><tr align="center"> 
+  <td colspan="2"><input type="button" value="Save" onclick='saveChanges()' class='DefaultButton'>&nbsp;<input type="button" value="Cancel" onClick="window.close()" class='DefaultButton'></td>
+ </tr>
+</table>
+</form>
+</body>
+</html>

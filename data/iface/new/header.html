@@ -1,0 +1,36 @@
+[-
+
+$args = shift @param;
+
+# This is a browser check to identify if the user's browser is one known to have poor CSS implementation
+if ($ENV{HTTP_USER_AGENT} =~ /^Mozilla\/4/ && $ENV{HTTP_USER_AGENT} !~ /MSIE|Opera/i) {
+   $args->{BADCSS} = 1;
+} else {
+   $args->{BADCSS} = 0;
+}
+
+   $name = $EMU::userdb{'options.real_name'};
+   if (defined $EMU::userdb{'options.email'}) {
+      $email  = $EMU::userdb{'options.email'};
+   } else {
+      $email = &EMU::get_var('user_name');
+   }
+   $now = &EMU::get_date(undef,undef,undef,1);
+
+-]
+
+<script>
+   function GetSkin() {
+      return "[+ $args->{SKIN} +]";
+   }
+</script>
+
+<div id="header"> 
+  <div id="header-inner-wrap"> 
+    <div id="emu-logo"><img src="[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/webmail_logo.gif" alt="EMUWebmail" width="297" height="49"></div>
+    <div id="welcome" class="smallText">[+ $now +]<br>
+      <div class="name">[$ if $name $]Welcome, [+ $name +][$ endif $]</div>
+      <div class="email">[+ $email +]</div>
+    </div>
+  </div>
+</div>

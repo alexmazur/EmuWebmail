@@ -1,0 +1,28 @@
+[-
+   $args = shift @param;
+   $theme = $args->{theme};
+-]
+<html>
+<head>
+<title>[+ $EMU::c{publisher_name} +] - Login</title>
+</head>
+
+<body style='background-image: url("[+ $args->{IMGURL} +]/skins/[+ $args->{SKIN} +]/page_background.gif")'>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/header.html", $args) -]
+[# Close Header #]
+
+<table width="100%" border="0" cellspacing="20" cellpadding="0">
+ <tr> 
+  <td class="Body"><font class="DefaultText"><div align="center"><a href='[+ &EMU::get_var('attachurl') +]' class="Default">Download this MSWord file</a><br></div>&nbsp;<br><br><font class="MessageText"><pre>[+ &EMU::get_var('word_body') +]</pre></font></font></td>
+</tr>
+</table>
+
+[# Open Header #]
+[- &Execute("$args->{DOCROOT}/footer.html", $args) -]
+[# Close Header #]
+
+</form>
+</body>
+</html>
