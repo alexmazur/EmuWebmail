@@ -2,7 +2,7 @@
 
 BASE_PATH=`pwd`
 
-echo "Welcome to the EMUWebmail installation script!"
+echo "Welcome to the EmuWebmail installation script!"
 echo "This script will install and configure EMUWebmail for basic usage."
 echo "It is strongly recommended that you review the default settings after"
 echo "installation. A good place to start is the 'site.emu' file in the"
@@ -12,7 +12,7 @@ echo
 echo "This script need some basic information before it can begin. For any of"
 echo "these questions, you can simply press 'enter' to accept the default value."
 echo
-echo "Where would you like EMUWebmail installed? [Default: /home/EMU]"
+echo "Where would you like EmuWebmail installed? [Default: /home/EMU]"
 echo -n "Path: "
 read INST_PATH
 if [ ! $INST_PATH ] ; then 

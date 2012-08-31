@@ -10,7 +10,7 @@ $EMU::Date = q$Date: 2006/09/19 11:59:31 $;
 $EMU::Language = "english";
 $EMU::DB_Version = "4.00";
 
-$EMU::Version = '7.1';
+$EMU::Version = '8.1';
 #use diagnostics;
 
 use subs qw(look move);
