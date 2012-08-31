@@ -36,7 +36,7 @@ if [ ! $INST_GROUP ] ; then
    echo "Using '$INST_GROUP'"
 fi
 
-# Set up emumail
+# Set up emuwebmail
 
 mkdir -p $INST_PATH
 cd $INST_PATH
