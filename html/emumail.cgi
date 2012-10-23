@@ -1,10 +1,9 @@
 #!/usr/bin/perl
-#-d:DProf
 
 package EMU;
 require 5.005;
 
-$EMU::Revision = q$Id: emumail.cgi,v 1.584 2006/09/19 11:59:31 ruslan Exp $;
+$EMU::Revision = q$Id:$;
 $EMU::Date = q$Date: 2006/09/19 11:59:31 $;
 
 $EMU::Language = "english";
