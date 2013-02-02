@@ -150,9 +150,6 @@ sub VERSION_ERROR        { -1 }  # indicates an error...
 
 use CGI::Carp qw(carpout fatalsToBrowser);
 
-# Loads the init.emu file!
-use Init;
-
 # Modules We Use
 # ==============
 use strict;
@@ -179,10 +176,13 @@ use Mail::Address;
 use Digest::MD5;
 use Net::SMTP_auth;
 
+# use ../data/lib as lib location
+use FindBin qw($Bin);
+use lib "$Bin/../data/lib";
+
 use EMU::Config;
 use EMU::POP3;
 use EMU::IMAP;
-use EMU::License;
 
 use EMU::Locks;
 my $ELocks;
@@ -202,7 +202,7 @@ sub read_ini
 
 # Load the init file, this will tell use where our page root
 # is, which we use to load the rest of the files
-$page_root = read_ini();
+$page_root = "$Bin/../data";
 push (@INC, "$page_root/lib");
 
 # now load our configurer
@@ -226,18 +226,19 @@ sub map_emu_conf
 
 # Load the language file. 
 # If we can't find it then we have to exit. VERY SERIOUS.
-if (! map_emu_conf("$page_root/lang.emu", \%msg))
+if (! map_emu_conf("$Bin/../data/lang.emu", \%msg))
 {
-	die "Content-type: text\/html\n\nFatal: Could not load $page_root/lang.emu!";
+	print "Fatal: Could not load $Bin/../data/lang.emu!";
+    die;
 }
 
 # Load the main config file. Exit it we can't find it. VERY SERIOUS.
 # MM: 11/28/98: Added concept of site config file, 
 # and then interface config files
 #   Precedence goes:  User Config File->Interface Config->Site Config
-if (! map_emu_conf("$page_root/site.emu", \%c))
+if (! map_emu_conf("$Bin/../data/site.emu", \%c))
 {
-	die "Content-type: text\/html\n\nFatal: Could not load $page_root/site.emu!";
+	die "Fatal: Could not load $Bin/../data/site.emu!";
 }
 
 require "EMU/AddressbookDefs.pl";
@@ -297,6 +298,7 @@ load:
 	# Load up some modules now
     load_module("Benchmark") if ( $c{'emu_debug'} );
     load_module( ($c{'use_fastcgi'}) ? "CGI::Fast" : "CGI" );
+    load_module("IO::Socket::SSL");
 }
 
 # init_variables(); # we never use modperl and variables are init'ed in run_emu
@@ -1990,28 +1992,12 @@ sub load_page
         $do_checksum = 1;
     }
 
-
-  VERIFY_CHECKSUM:
-    {
-        last if (!$do_checksum || $force_load);
-
-        my $checksumed = get_digest($ra_data);
-
-        debug "$file checksum is $checksumed";
-
-        if ($checksum{$file} ne $checksumed && 
-                $checksum{$file} !~ /\s*$checksumed\s*/) {
-            write_tmp('phrase', "Licensing Error: Template $emu_type/$file modified?<P> Contact sales\@emumail.com for a valid license key.");
-            return load_page('errors.html',  $bnocleanup, $force_type, 1); 
-        }
-    }
-
     # WHM (03/12/99) Added the Embedded Perl parsing. 
     # options => 512 removes HTML scan
     if ($c{"embedded_perl"})
     {
         debug "preparing to parse embperl";
-	load_module("HTML::Embperl");
+	load_module("Embperl");
 	load_module("EMU::Theme");
         # HM 06/28/00 - Lets set up some commonly used data for the interface
         my $params = {
@@ -2036,14 +2022,14 @@ sub load_page
         # JR(6/18/99): We need optDisableFormData = 256 here in order
         # to bypass the %fdat and @ffld creation, which were causing
         # the server to hang, waiting to gather CGI input.
-        HTML::Embperl::Execute({ input     => \$parsed_output,
-                                 inputfile => $file,
-                                 output    => \$parsed_output,
-                                 options   => 2|16|256|512|16384,
-                                 mtime     => -M $file,
-                                 param     => [$params],
-                                 debug     => 0,
-                                 escmode   => 0 });
+        Embperl::Execute({ input     => \$parsed_output,
+                           inputfile => $file,
+                           output    => \$parsed_output,
+                           options   => 2|16|256|512|16384,
+                           mtime     => -M $file,
+                           param     => [$params],
+                           debug     => 0,
+                           escmode   => 0 });
         debug "Done parsing embperl!";
     } 
 
@@ -17475,7 +17461,7 @@ sub export_messages {
     	print "Content-type: application/zip\n";
     	print "Content-disposition: attachment; filename=$fold.zip\n\n";
     	
-    	use Archive::Zip qw(:CONSTANTS :ERROR_CODES);
+    load_module( "Archive::Zip qw(:CONSTANTS :ERROR_CODES)" );
 	use IO::Scalar;
 	my $zipContents = '';
 	my $SH = IO::Scalar->new(\$zipContents);
@@ -17499,9 +17485,13 @@ sub export_messages {
 	       	my $body = new MIME::Body::File "$homedir/messages/$msg";
 		    
 		my $member = $zip->addString($body->as_string(), "$i.eml");
-		$member->desiredCompressionMethod(COMPRESSION_DEFLATED);
-		my $status = $zip->writeToFileHandle( $SH );
-	debug "THE STATUS IS: $status";
+		eval
+		{
+		  $member->desiredCompressionMethod('COMPRESSION_DEFLATED');
+		  my $status = $zip->writeToFileHandle( $SH );
+	      debug "THE STATUS IS: $status";
+		};
+		  
 	}
 	
 	
@@ -17516,7 +17506,7 @@ sub export_messages {
 	$cont .= "\r\n Powered by EMU Webmail - www.emumail.com";
 	
 	my $member = $zip->addString($cont, 'index.txt');
-	$member->desiredCompressionMethod(COMPRESSION_DEFLATED);
+	$member->desiredCompressionMethod('COMPRESSION_DEFLATED');
 	
 	
 	$zip->writeToFileNamed("$homedir/tmp/$fold.zip");

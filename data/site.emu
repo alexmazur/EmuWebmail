@@ -226,7 +226,7 @@ help_url=help
 	# leave debugging off when you do not absolutely need it.
 emu_debug=true
 	# Where to write debug info by default
-debug_path=/home/heath/sandbox/webmail/data
+debug_path=/Library/EmuWebmail/EmuWebmail/data
 	# set this to true if you wish the debug output to contain the
 	# webserver's hostname. Useful when running multiple servers,
 	# not useful otherwise

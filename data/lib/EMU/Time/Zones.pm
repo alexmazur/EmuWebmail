@@ -54,7 +54,7 @@ sub import
       my $class  = "EMU::Time::Zones::" . ucfirst lc;
 
       no strict 'refs';
-      if(! defined @{"$class\::VERSION"}) # Load once...
+      if(! @{"$class\::VERSION"}) # Load once...
       {
         eval "require $class";
         if($@)

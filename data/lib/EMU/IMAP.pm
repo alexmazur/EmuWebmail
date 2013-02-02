@@ -6,17 +6,19 @@ package EMU::IMAP;
 
 use IO::Select;
 
-my $err = eval { use IO::Socket::SSL };
-if ($err eq undef)
-{
-EMU::debug("IO::Socket::SSL module is not loaded. You may not use IMAPs");
-}
 
 use Unicode::IMAPUtf7;
 
 use vars qw(@ISA);
 
 @ISA = qw(IO::Socket::INET);
+
+#my $err = eval { use IO::Socket::SSL };
+#if ($err eq undef)
+#{
+#EMU::debug("IO::Socket::SSL module is not loaded. You may not use IMAPs");
+#}
+
 
 sub _port         { 993               }
 sub _sock_from    { 'IO::Socket::SSL' }
