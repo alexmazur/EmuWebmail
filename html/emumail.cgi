@@ -424,8 +424,9 @@ sub init_variables()
 	#  1 = ADVT: Can't change HTML, ads
 	#  2 = DEMO: Can change HTML w/ads
 	
-        my $private;
-	($AD_VERT,$private)      = &EMU::License::check_key();
+    my $private;
+	my ($AD_VERT,$private);
+	#      = &EMU::License::check_key();
         check_license_module($private);
 	debug "advtype: $AD_VERT";
 #        return if ($AD_VERT == -1);
@@ -981,7 +982,8 @@ sub main
         debug "requested $http_host last was $last_http_host";
 
         my $private;
-	($AD_VERT,$private) = &EMU::License::check_key();
+	    my ($AD_VERT,$private);
+	    # = &EMU::License::check_key();
         check_license_module($private);
 
         debug "version is $AD_VERT";
