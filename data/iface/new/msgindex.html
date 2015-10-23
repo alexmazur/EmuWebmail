@@ -21,10 +21,11 @@ $currenthref = "$EMU::EMU_URL?passed=go_index&folder=$EMU::folder";
 
 $theme = $args->{theme};
 $manual_filtering = $EMU::userdb{'options.manual_filtering'} && $EMU::c{'allow_manual_filtering'};
-
+$escmode = 0;
 -]
 <html>
 <head>
+<meta charset="UTF-8">
 <title>[+ $EMU::c{publisher_name} +] - [+ $EMU::folder +] [+ &EMU::folder_stats() +]</title>
 
 [$ if (!$EMU::v{'mailcheck_popup'}) $]
@@ -277,7 +278,7 @@ function enable() {
              $style = ($status eq 'icon_new.gif') ? "selected" : "";
 
              if (length($status) > 1) {
-             $status = "<img src='$args->{IMGURL}/skins/$args->{SKIN}/icons/16x16/$status'>";
+               $status = "<img aaa src=$args->{IMGURL}/skins/$args->{SKIN}/icons/16x16/$status>";
              }
            
              $status  ||= '&nbsp;';
@@ -287,16 +288,16 @@ function enable() {
              else {
                  $attachment = '&nbsp;';
              }
-             $from = $msgdata{"from$m"} || '&nbsp;';
-             $to = $msgdata{"to$m"} || '&nbsp;';
-             $hash = $msgdata{"hash$m"} || '&nbsp;';
-             $href = $msgdata{"href$m"} || '&nbsp;';
-             $subject = $msgdata{"subject$m"};
-             $date = $msgdata{"day_name$m"}. ', ' . $msgdata{"day$m"}.' '.$msgdata{"month_name$m"}.' '.$msgdata{"year$m"};
-             $date .= ' ' . $msgdata{"hour$m"} . ':' . sprintf("%02d", $msgdata{"minute$m"}) . ':' . sprintf("%02d", $msgdata{"second$m"});
-             $date .= ' ' . $msgdata{"ampm$m"} if ($msgdata{"ampm$m"});
-             $date .= ' ' . $msgdata{"gmt$m"} if ($msgdata{"gmt$m"});
-             $size = $msgdata{"size$m"} || '&nbsp;';
+                 $from = $msgdata{"from$m"} || '&nbsp;';
+                 $to = $msgdata{"to$m"} || '&nbsp;';
+                 $hash = $msgdata{"hash$m"} || '&nbsp;';
+                 $href = $msgdata{"href$m"} || '&nbsp;';
+                 $subject = $msgdata{"subject$m"};
+                 $date = $msgdata{"day_name$m"}. ', ' . $msgdata{"day$m"}.' '.$msgdata{"month_name$m"}.' '.$msgdata{"year$m"};
+                 $date .= ' ' . $msgdata{"hour$m"} . ':' . sprintf("%02d", $msgdata{"minute$m"}) . ':' . sprintf("%02d", $msgdata{"second$m"});
+                 $date .= ' ' . $msgdata{"ampm$m"} if ($msgdata{"ampm$m"});
+                 $date .= ' ' . $msgdata{"gmt$m"} if ($msgdata{"gmt$m"});
+                 $size = $msgdata{"size$m"} || '&nbsp;';
             -]
 
               <tr onMouseOver="this.bgColor='#D6EEF2';" onMouseOut="this.bgColor='#FFFFFF';" style="cursor:hand; cursor:pointer"> 

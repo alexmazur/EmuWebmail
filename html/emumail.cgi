@@ -21487,8 +21487,17 @@ sub get_msg_array
 	    $h{"from"} = $folderdb{"$msg:from"};
 	    $h{"to"} = $folderdb{"$msg:to"};
 	    $h{"date"} = $folderdb{"$msg:date"};
+	    #Fix me AM 22/10/15
+	    use Encode qw(decode);
+	    
+	    
 	    $h{"subj"} = $folderdb{"$msg:subj"};
-
+	    
+	    debug "SUbj was: ".$h{"subj"};
+	    
+        $h{"subj"} = decode("MIME-Header", $h{"subj"},Encode::FB_CROAK);
+        debug "SUbj becomes: ".$h{"subj"};
+        
 	    if (!$folderdb{"$msg:size"})
 	    {
 			$folderdb{"$msg:size"} = -s "$homedir/messages/$msg";
@@ -22669,7 +22678,8 @@ sub get_imap_delimiter
    if ($protocol =~ /imap/i && ref $pop ne 'EMU::IMAP') {
       debug "logging in.";
       my $user = $userdb{"folder:$inbox:username"};
-      my $p = decode($userdb{"folder:$inbox:password"});
+      my $p = decode2($userdb{"folder:$inbox:password"});
+      
       my $host = $userdb{"folder:$inbox:hostname"};
       &do_imap_login($user,$p,$host,$inbox,1);
    }
