@@ -427,7 +427,7 @@ sub init_variables()
     my $private;
 	my ($AD_VERT,$private);
 	#      = &EMU::License::check_key();
-        check_license_module($private);
+    #check_license_module($private);
 	debug "advtype: $AD_VERT";
 #        return if ($AD_VERT == -1);
 
@@ -984,7 +984,7 @@ sub main
         my $private;
 	    my ($AD_VERT,$private);
 	    # = &EMU::License::check_key();
-        check_license_module($private);
+        #check_license_module($private);
 
         debug "version is $AD_VERT";
         if ($AD_VERT == -1) {
@@ -23165,27 +23165,6 @@ sub wildrm
    debug "dir: $dir ; regexp: $regexp ; negate? $negate ; removing: @files"; 
    unlink @files;
 }
-
-
-sub check_license_module {
-    my ($private) = @_;
-
-    my $md5 = new Digest::MD5;
-    my $key_string = $EMU::Version . $$;
-    $md5->add($key_string);
-    $key_string = $md5->hexdigest();
-
-    if ($key_string ne $private) {
-        # tampering!!
-        debug "Someone tampered with EMU::License.pm !!";
-        $status = "License Error! Your EMU::License.pm module has been tampered with!";
-        write_tmp("title", $status);
-        write_tmp("phrase", $status);
-
-        $AD_VERT = -1;
-    }
-}
-
 
 sub text_wrap {
     my ($prefix, @lines) = @_;
