@@ -10,11 +10,8 @@ $EMU::Language = "english";
 $EMU::DB_Version = "4.00";
 
 $EMU::Version = '8.1';
-#use diagnostics;
-
 use subs qw(look move);
 
-# Hmm, well..now we want it unbuffered, at least for now.
 $| = 1;
 
 use subs qw(debug error);
